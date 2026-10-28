@@ -1,0 +1,2410 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html>
+<!-- PRB000047095 -->
+<div class="capaBlock" style="visibility:hidden">
+	<div class="sk-fading-circle">
+	  <div class="sk-circle1 sk-circle"></div>
+	  <div class="sk-circle2 sk-circle"></div>
+	  <div class="sk-circle3 sk-circle"></div>
+	  <div class="sk-circle4 sk-circle"></div>
+	  <div class="sk-circle5 sk-circle"></div>
+	  <div class="sk-circle6 sk-circle"></div>
+	  <div class="sk-circle7 sk-circle"></div>
+	  <div class="sk-circle8 sk-circle"></div>
+	  <div class="sk-circle9 sk-circle"></div>
+	  <div class="sk-circle10 sk-circle"></div>
+	  <div class="sk-circle11 sk-circle"></div>
+	  <div class="sk-circle12 sk-circle"></div>
+	</div>		
+</div>	
+<head>    
+
+
+<title>Movimientos de cuentas</title>
+
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+
+
+<style>
+
+.capaBlock {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10050;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    filter: alpha(opacity=50);
+    opacity: .5;
+    display: block;
+}
+
+.sk-fading-circle {
+  margin: 400px auto;
+  width: 40px;
+  height: 40px;
+  position: relative;
+}
+
+.sk-fading-circle .sk-circle {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.sk-fading-circle .sk-circle:before {
+  content: '';
+  display: block;
+  margin: 0 auto;
+  width: 15%;
+  height: 15%;
+  background-color: #FFF;
+  border-radius: 100%;
+  -webkit-animation: sk-circleFadeDelay 1.2s infinite ease-in-out both;
+          animation: sk-circleFadeDelay 1.2s infinite ease-in-out both;
+}
+.sk-fading-circle .sk-circle2 {
+  -webkit-transform: rotate(30deg);
+      -ms-transform: rotate(30deg);
+          transform: rotate(30deg);
+}
+.sk-fading-circle .sk-circle3 {
+  -webkit-transform: rotate(60deg);
+      -ms-transform: rotate(60deg);
+          transform: rotate(60deg);
+}
+.sk-fading-circle .sk-circle4 {
+  -webkit-transform: rotate(90deg);
+      -ms-transform: rotate(90deg);
+          transform: rotate(90deg);
+}
+.sk-fading-circle .sk-circle5 {
+  -webkit-transform: rotate(120deg);
+      -ms-transform: rotate(120deg);
+          transform: rotate(120deg);
+}
+.sk-fading-circle .sk-circle6 {
+  -webkit-transform: rotate(150deg);
+      -ms-transform: rotate(150deg);
+          transform: rotate(150deg);
+}
+.sk-fading-circle .sk-circle7 {
+  -webkit-transform: rotate(180deg);
+      -ms-transform: rotate(180deg);
+          transform: rotate(180deg);
+}
+.sk-fading-circle .sk-circle8 {
+  -webkit-transform: rotate(210deg);
+      -ms-transform: rotate(210deg);
+          transform: rotate(210deg);
+}
+.sk-fading-circle .sk-circle9 {
+  -webkit-transform: rotate(240deg);
+      -ms-transform: rotate(240deg);
+          transform: rotate(240deg);
+}
+.sk-fading-circle .sk-circle10 {
+  -webkit-transform: rotate(270deg);
+      -ms-transform: rotate(270deg);
+          transform: rotate(270deg);
+}
+.sk-fading-circle .sk-circle11 {
+  -webkit-transform: rotate(300deg);
+      -ms-transform: rotate(300deg);
+          transform: rotate(300deg); 
+}
+.sk-fading-circle .sk-circle12 {
+  -webkit-transform: rotate(330deg);
+      -ms-transform: rotate(330deg);
+          transform: rotate(330deg); 
+}
+.sk-fading-circle .sk-circle2:before {
+  -webkit-animation-delay: -1.1s;
+          animation-delay: -1.1s; 
+}
+.sk-fading-circle .sk-circle3:before {
+  -webkit-animation-delay: -1s;
+          animation-delay: -1s; 
+}
+.sk-fading-circle .sk-circle4:before {
+  -webkit-animation-delay: -0.9s;
+          animation-delay: -0.9s; 
+}
+.sk-fading-circle .sk-circle5:before {
+  -webkit-animation-delay: -0.8s;
+          animation-delay: -0.8s; 
+}
+.sk-fading-circle .sk-circle6:before {
+  -webkit-animation-delay: -0.7s;
+          animation-delay: -0.7s; 
+}
+.sk-fading-circle .sk-circle7:before {
+  -webkit-animation-delay: -0.6s;
+          animation-delay: -0.6s; 
+}
+.sk-fading-circle .sk-circle8:before {
+  -webkit-animation-delay: -0.5s;
+          animation-delay: -0.5s; 
+}
+.sk-fading-circle .sk-circle9:before {
+  -webkit-animation-delay: -0.4s;
+          animation-delay: -0.4s;
+}
+.sk-fading-circle .sk-circle10:before {
+  -webkit-animation-delay: -0.3s;
+          animation-delay: -0.3s;
+}
+.sk-fading-circle .sk-circle11:before {
+  -webkit-animation-delay: -0.2s;
+          animation-delay: -0.2s;
+}
+.sk-fading-circle .sk-circle12:before {
+  -webkit-animation-delay: -0.1s;
+          animation-delay: -0.1s;
+}
+
+@-webkit-keyframes sk-circleFadeDelay {
+  0%, 39%, 100% { opacity: 0; }
+  40% { opacity: 1; }
+}
+
+@keyframes sk-circleFadeDelay {
+  0%, 39%, 100% { opacity: 0; }
+  40% { opacity: 1; } 
+}
+
+</style>
+
+<script type="text/javascript">
+	window.CONFIG_PANTALLA = {
+		esLH: '${empty param.esLH ? "N" : param.esLH}'
+	};
+</script>
+
+<script language="JavaScript" src="/js/inicialPagina.js"></script>
+<script>
+
+
+
+
+	
+		
+			
+			
+				inicioPaginaHead("controlCache","origenInternac='S';","","");
+			
+		
+	
+	
+
+
+
+
+
+var tituloFMT = 'Movimientos de cuentas';
+var subtituloFMT = '';
+var textoinicioFMT = 'Para consultar datos distintos de los que se muestran, seleccione en los campos superiores y pulse "Iniciar búsqueda"';
+
+function activateBlockOperationsDiv() { 	
+	$jq(".capaBlock").css("visibility","visible");
+}
+
+function removeBlockOperationsDiv() { 	
+	$jq(".capaBlock").css("visibility","hidden");
+}
+
+var horaFecha ="";
+var formatoHora ="HH:mm";
+var formatoHoraExtendida ="HH:mm:ss";
+var formatoFecha="dd/MM/yyyy";
+var formatoFechaExtendida="dd/MM/yyyy HH:mm:ss";
+var formatoFechaCorta="MM/yyyy";
+var separadorMiles = '.';
+var separadorDecimales = ',';
+var path_imagen_idioma='';
+var ayuda_alt = 'Pulse para ver la ayuda';	
+var demo_alt = 'Pulse para ver la demo';
+
+
+var fechaglobal = horaFecha;
+
+var fechaGlobResgTF = '';
+if(fechaGlobResgTF != null && fechaGlobResgTF != '')
+	horaFecha = 'Fecha: ' + fechaGlobResgTF;
+
+
+
+
+inicioPaginaCuerpo("","","","","","",horaFecha);
+
+var nombreP = 'fo_ce_conmov';
+
+
+
+		pintarSubtitulo(tituloFMT,subtituloFMT,textoinicioFMT);
+	
+
+
+
+
+
+
+
+
+</script>
+
+
+
+
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+    <META http-equiv="Expires" content="Tue, 20 Aug 1996 14:25:27 GMT">
+    <META http-equiv="Cache-Control" content="no-cache">
+    <meta http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+    <meta name=ProgId content=Excel.Sheet>
+</head>
+<body>
+
+ <table border="1">
+  <tr>
+      <th>Fecha operación</th>
+      <th>FECHA VALOR</th>
+      <th>Tipo de operación</th>
+      <th>Concepto</th>
+      <th colspan="2">Cargo/Abono<br>Importe</th>
+      <th>Saldo</th>
+   </tr>   
+  
+  	<tr>
+	 <td align="center">29/10/2025</td>
+	 <td colspan="5">Saldo Inicio</td>
+	 <td>38,20</td>
+   </tr>
+  
+   <tr>
+    <td align="center">29/10/2025&nbsp;</td>
+    <td align="center">31/10/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES EMERGING MRK IND S EUR</td>
+	<td>C</td>
+	<td>-1,00</td>
+	<td>37,20</td>
+   </tr>
+  
+   <tr>
+    <td align="center">30/10/2025&nbsp;</td>
+    <td align="center">31/10/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>VANGUARD GLOB SMALL CAP EU INV</td>
+	<td>C</td>
+	<td>-3,73</td>
+	<td>33,47</td>
+   </tr>
+  
+   <tr>
+    <td align="center">30/10/2025&nbsp;</td>
+    <td align="center">30/10/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+180,00</td>
+	<td>213,47</td>
+   </tr>
+  
+   <tr>
+    <td align="center">31/10/2025&nbsp;</td>
+    <td align="center">03/11/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>INDEX MSCI EM IE AC EUR @ 0.11</td>
+	<td>C</td>
+	<td>-24,99</td>
+	<td>188,48</td>
+   </tr>
+  
+   <tr>
+    <td align="center">31/10/2025&nbsp;</td>
+    <td align="center">04/11/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES DEVELOPED WRD IN S EUR</td>
+	<td>C</td>
+	<td>-1,00</td>
+	<td>187,48</td>
+   </tr>
+  
+   <tr>
+    <td align="center">03/11/2025&nbsp;</td>
+    <td align="center">05/11/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 1</td>
+	<td>C</td>
+	<td>-9,35</td>
+	<td>178,13</td>
+   </tr>
+  
+   <tr>
+    <td align="center">03/11/2025&nbsp;</td>
+    <td align="center">03/11/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+9,52</td>
+	<td>187,65</td>
+   </tr>
+  
+   <tr>
+    <td align="center">03/11/2025&nbsp;</td>
+    <td align="center">05/11/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES US INDEX FUND IE S EUR</td>
+	<td>C</td>
+	<td>-1,00</td>
+	<td>186,65</td>
+   </tr>
+  
+   <tr>
+    <td align="center">04/11/2025&nbsp;</td>
+    <td align="center">06/11/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 1</td>
+	<td>C</td>
+	<td>-9,09</td>
+	<td>177,56</td>
+   </tr>
+  
+   <tr>
+    <td align="center">05/11/2025&nbsp;</td>
+    <td align="center">03/11/2025&nbsp;</td>
+	<td>APORTACION PLANES</td>
+	<td>MYINVESTOR INDEXADO GLOBAL PP</td>
+	<td>C</td>
+	<td>-150,00</td>
+	<td>27,56</td>
+   </tr>
+  
+   <tr>
+    <td align="center">05/11/2025&nbsp;</td>
+    <td align="center">05/11/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+10,00</td>
+	<td>37,56</td>
+   </tr>
+  
+   <tr>
+    <td align="center">05/11/2025&nbsp;</td>
+    <td align="center">07/11/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 1</td>
+	<td>C</td>
+	<td>-8,88</td>
+	<td>28,68</td>
+   </tr>
+  
+   <tr>
+    <td align="center">05/11/2025&nbsp;</td>
+    <td align="center">05/11/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+6,00</td>
+	<td>34,68</td>
+   </tr>
+  
+   <tr>
+    <td align="center">06/11/2025&nbsp;</td>
+    <td align="center">10/11/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES EMERGING MRK IND S EUR</td>
+	<td>C</td>
+	<td>-1,00</td>
+	<td>33,68</td>
+   </tr>
+  
+   <tr>
+    <td align="center">07/11/2025&nbsp;</td>
+    <td align="center">07/11/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+100,00</td>
+	<td>133,68</td>
+   </tr>
+  
+   <tr>
+    <td align="center">07/11/2025&nbsp;</td>
+    <td align="center">06/11/2025&nbsp;</td>
+	<td>LIQUIDAC. INTERESES</td>
+	<td>PERIODO 06/10/2025 06/11/2025</td>
+	<td>A</td>
+	<td>+0,03</td>
+	<td>133,71</td>
+   </tr>
+  
+   <tr>
+    <td align="center">07/11/2025&nbsp;</td>
+    <td align="center">10/11/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>VANGUARD GLOB SMALL CAP EU INV</td>
+	<td>C</td>
+	<td>-3,68</td>
+	<td>130,03</td>
+   </tr>
+  
+   <tr>
+    <td align="center">07/11/2025&nbsp;</td>
+    <td align="center">11/11/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 4</td>
+	<td>C</td>
+	<td>-35,37</td>
+	<td>94,66</td>
+   </tr>
+  
+   <tr>
+    <td align="center">07/11/2025&nbsp;</td>
+    <td align="center">10/11/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>INDEX MSCI EM IE AC EUR @ 0.11</td>
+	<td>C</td>
+	<td>-24,99</td>
+	<td>69,67</td>
+   </tr>
+  
+   <tr>
+    <td align="center">08/11/2025&nbsp;</td>
+    <td align="center">08/11/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+150,00</td>
+	<td>219,67</td>
+   </tr>
+  
+   <tr>
+    <td align="center">10/11/2025&nbsp;</td>
+    <td align="center">12/11/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 1</td>
+	<td>C</td>
+	<td>-9,19</td>
+	<td>210,48</td>
+   </tr>
+  
+   <tr>
+    <td align="center">10/11/2025&nbsp;</td>
+    <td align="center">10/11/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+50,00</td>
+	<td>260,48</td>
+   </tr>
+  
+   <tr>
+    <td align="center">10/11/2025&nbsp;</td>
+    <td align="center">12/11/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 2</td>
+	<td>C</td>
+	<td>-18,19</td>
+	<td>242,29</td>
+   </tr>
+  
+   <tr>
+    <td align="center">11/11/2025&nbsp;</td>
+    <td align="center">13/11/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 1</td>
+	<td>C</td>
+	<td>-8,98</td>
+	<td>233,31</td>
+   </tr>
+  
+   <tr>
+    <td align="center">11/11/2025&nbsp;</td>
+    <td align="center">10/11/2025&nbsp;</td>
+	<td>APORTACION PLANES</td>
+	<td>MYINVESTOR INDEXADO GLOBAL PP</td>
+	<td>C</td>
+	<td>-150,00</td>
+	<td>83,31</td>
+   </tr>
+  
+   <tr>
+    <td align="center">13/11/2025&nbsp;</td>
+    <td align="center">17/11/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 1</td>
+	<td>C</td>
+	<td>-8,87</td>
+	<td>74,44</td>
+   </tr>
+  
+   <tr>
+    <td align="center">14/11/2025&nbsp;</td>
+    <td align="center">17/11/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>VANGUARD GLOB SMALL CAP EU INV</td>
+	<td>C</td>
+	<td>-3,68</td>
+	<td>70,76</td>
+   </tr>
+  
+   <tr>
+    <td align="center">14/11/2025&nbsp;</td>
+    <td align="center">17/11/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>INDEX MSCI EM IE AC EUR @ 0.11</td>
+	<td>C</td>
+	<td>-24,99</td>
+	<td>45,77</td>
+   </tr>
+  
+   <tr>
+    <td align="center">14/11/2025&nbsp;</td>
+    <td align="center">18/11/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 2</td>
+	<td>C</td>
+	<td>-16,74</td>
+	<td>29,03</td>
+   </tr>
+  
+   <tr>
+    <td align="center">14/11/2025&nbsp;</td>
+    <td align="center">18/11/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES DEVELOPED WRD IN S EUR</td>
+	<td>C</td>
+	<td>-5,00</td>
+	<td>24,03</td>
+   </tr>
+  
+   <tr>
+    <td align="center">15/11/2025&nbsp;</td>
+    <td align="center">15/11/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+176,00</td>
+	<td>200,03</td>
+   </tr>
+  
+   <tr>
+    <td align="center">17/11/2025&nbsp;</td>
+    <td align="center">19/11/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 2</td>
+	<td>C</td>
+	<td>-16,49</td>
+	<td>183,54</td>
+   </tr>
+  
+   <tr>
+    <td align="center">18/11/2025&nbsp;</td>
+    <td align="center">20/11/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 3</td>
+	<td>C</td>
+	<td>-23,64</td>
+	<td>159,90</td>
+   </tr>
+  
+   <tr>
+    <td align="center">18/11/2025&nbsp;</td>
+    <td align="center">18/11/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+50,00</td>
+	<td>209,90</td>
+   </tr>
+  
+   <tr>
+    <td align="center">18/11/2025&nbsp;</td>
+    <td align="center">17/11/2025&nbsp;</td>
+	<td>APORTACION PLANES</td>
+	<td>MYINVESTOR INDEXADO GLOBAL PP</td>
+	<td>C</td>
+	<td>-150,00</td>
+	<td>59,90</td>
+   </tr>
+  
+   <tr>
+    <td align="center">18/11/2025&nbsp;</td>
+    <td align="center">18/11/2025&nbsp;</td>
+	<td>TRANSFERENCIA SEPA</td>
+	<td>Avaro GarcA Fuentes</td>
+	<td>A</td>
+	<td>+20,00</td>
+	<td>79,90</td>
+   </tr>
+  
+   <tr>
+    <td align="center">19/11/2025&nbsp;</td>
+    <td align="center">21/11/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 3</td>
+	<td>C</td>
+	<td>-23,69</td>
+	<td>56,21</td>
+   </tr>
+  
+   <tr>
+    <td align="center">21/11/2025&nbsp;</td>
+    <td align="center">24/11/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>VANGUARD GLOB SMALL CAP EU INV</td>
+	<td>C</td>
+	<td>-3,59</td>
+	<td>52,62</td>
+   </tr>
+  
+   <tr>
+    <td align="center">21/11/2025&nbsp;</td>
+    <td align="center">24/11/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>INDEX MSCI EM IE AC EUR @ 0.11</td>
+	<td>C</td>
+	<td>-24,99</td>
+	<td>27,63</td>
+   </tr>
+  
+   <tr>
+    <td align="center">21/11/2025&nbsp;</td>
+    <td align="center">25/11/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 1</td>
+	<td>C</td>
+	<td>-7,12</td>
+	<td>20,51</td>
+   </tr>
+  
+   <tr>
+    <td align="center">21/11/2025&nbsp;</td>
+    <td align="center">21/11/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+50,00</td>
+	<td>70,51</td>
+   </tr>
+  
+   <tr>
+    <td align="center">21/11/2025&nbsp;</td>
+    <td align="center">25/11/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 3</td>
+	<td>C</td>
+	<td>-21,19</td>
+	<td>49,32</td>
+   </tr>
+  
+   <tr>
+    <td align="center">21/11/2025&nbsp;</td>
+    <td align="center">21/11/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+200,00</td>
+	<td>249,32</td>
+   </tr>
+  
+   <tr>
+    <td align="center">21/11/2025&nbsp;</td>
+    <td align="center">21/11/2025&nbsp;</td>
+	<td>TRANSFERENCIA SEPA</td>
+	<td>Avaro GarcA Fuentes</td>
+	<td>A</td>
+	<td>+40,00</td>
+	<td>289,32</td>
+   </tr>
+  
+   <tr>
+    <td align="center">24/11/2025&nbsp;</td>
+    <td align="center">26/11/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 2</td>
+	<td>C</td>
+	<td>-14,91</td>
+	<td>274,41</td>
+   </tr>
+  
+   <tr>
+    <td align="center">25/11/2025&nbsp;</td>
+    <td align="center">27/11/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 2</td>
+	<td>C</td>
+	<td>-15,21</td>
+	<td>259,20</td>
+   </tr>
+  
+   <tr>
+    <td align="center">25/11/2025&nbsp;</td>
+    <td align="center">27/11/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES EMERGING MRK IND S EUR</td>
+	<td>C</td>
+	<td>-4,00</td>
+	<td>255,20</td>
+   </tr>
+  
+   <tr>
+    <td align="center">25/11/2025&nbsp;</td>
+    <td align="center">28/11/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES DEVELOPED WRD IN S EUR</td>
+	<td>C</td>
+	<td>-9,00</td>
+	<td>246,20</td>
+   </tr>
+  
+   <tr>
+    <td align="center">25/11/2025&nbsp;</td>
+    <td align="center">25/11/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+300,00</td>
+	<td>546,20</td>
+   </tr>
+  
+   <tr>
+    <td align="center">25/11/2025&nbsp;</td>
+    <td align="center">24/11/2025&nbsp;</td>
+	<td>APORTACION PLANES</td>
+	<td>MYINVESTOR INDEXADO GLOBAL PP</td>
+	<td>C</td>
+	<td>-40,00</td>
+	<td>506,20</td>
+   </tr>
+  
+   <tr>
+    <td align="center">25/11/2025&nbsp;</td>
+    <td align="center">24/11/2025&nbsp;</td>
+	<td>APORTACION PLANES</td>
+	<td>MYINVESTOR INDEXADO GLOBAL PP</td>
+	<td>C</td>
+	<td>-150,00</td>
+	<td>356,20</td>
+   </tr>
+  
+   <tr>
+    <td align="center">26/11/2025&nbsp;</td>
+    <td align="center">28/11/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 2</td>
+	<td>C</td>
+	<td>-15,06</td>
+	<td>341,14</td>
+   </tr>
+  
+   <tr>
+    <td align="center">27/11/2025&nbsp;</td>
+    <td align="center">26/11/2025&nbsp;</td>
+	<td>APORTACION PLANES</td>
+	<td>MYINVESTOR INDEXADO GLOBAL PP</td>
+	<td>C</td>
+	<td>-50,00</td>
+	<td>291,14</td>
+   </tr>
+  
+   <tr>
+    <td align="center">27/11/2025&nbsp;</td>
+    <td align="center">26/11/2025&nbsp;</td>
+	<td>APORTACION PLANES</td>
+	<td>MYINVESTOR INDEXADO GLOBAL PP</td>
+	<td>C</td>
+	<td>-50,00</td>
+	<td>241,14</td>
+   </tr>
+  
+   <tr>
+    <td align="center">28/11/2025&nbsp;</td>
+    <td align="center">01/12/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>INDEX MSCI EM IE AC EUR @ 0.11</td>
+	<td>C</td>
+	<td>-24,99</td>
+	<td>216,15</td>
+   </tr>
+  
+   <tr>
+    <td align="center">30/11/2025&nbsp;</td>
+    <td align="center">30/11/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+78,00</td>
+	<td>294,15</td>
+   </tr>
+  
+   <tr>
+    <td align="center">01/12/2025&nbsp;</td>
+    <td align="center">02/12/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>VANGUARD GLOB SMALL CAP EU INV</td>
+	<td>C</td>
+	<td>-3,80</td>
+	<td>290,35</td>
+   </tr>
+  
+   <tr>
+    <td align="center">02/12/2025&nbsp;</td>
+    <td align="center">02/12/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+50,00</td>
+	<td>340,35</td>
+   </tr>
+  
+   <tr>
+    <td align="center">02/12/2025&nbsp;</td>
+    <td align="center">04/12/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 2</td>
+	<td>C</td>
+	<td>-15,03</td>
+	<td>325,32</td>
+   </tr>
+  
+   <tr>
+    <td align="center">02/12/2025&nbsp;</td>
+    <td align="center">01/12/2025&nbsp;</td>
+	<td>APORTACION PLANES</td>
+	<td>MYINVESTOR INDEXADO GLOBAL PP</td>
+	<td>C</td>
+	<td>-200,00</td>
+	<td>125,32</td>
+   </tr>
+  
+   <tr>
+    <td align="center">04/12/2025&nbsp;</td>
+    <td align="center">08/12/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES DEVELOPED WRD IN S EUR</td>
+	<td>C</td>
+	<td>-15,00</td>
+	<td>110,32</td>
+   </tr>
+  
+   <tr>
+    <td align="center">05/12/2025&nbsp;</td>
+    <td align="center">08/12/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>VANGUARD GLOB SMALL CAP EU INV</td>
+	<td>C</td>
+	<td>-3,79</td>
+	<td>106,53</td>
+   </tr>
+  
+   <tr>
+    <td align="center">05/12/2025&nbsp;</td>
+    <td align="center">08/12/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>INDEX MSCI EM IE AC EUR @ 0.12</td>
+	<td>C</td>
+	<td>-24,99</td>
+	<td>81,54</td>
+   </tr>
+  
+   <tr>
+    <td align="center">07/12/2025&nbsp;</td>
+    <td align="center">06/12/2025&nbsp;</td>
+	<td>LIQUIDAC. INTERESES</td>
+	<td>PERIODO 06/11/2025 06/12/2025</td>
+	<td>A</td>
+	<td>+0,09</td>
+	<td>81,63</td>
+   </tr>
+  
+   <tr>
+    <td align="center">08/12/2025&nbsp;</td>
+    <td align="center">08/12/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+200,00</td>
+	<td>281,63</td>
+   </tr>
+  
+   <tr>
+    <td align="center">08/12/2025&nbsp;</td>
+    <td align="center">08/12/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+100,00</td>
+	<td>381,63</td>
+   </tr>
+  
+   <tr>
+    <td align="center">08/12/2025&nbsp;</td>
+    <td align="center">10/12/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES EMERGING MRK IND S EUR</td>
+	<td>C</td>
+	<td>-10,00</td>
+	<td>371,63</td>
+   </tr>
+  
+   <tr>
+    <td align="center">09/12/2025&nbsp;</td>
+    <td align="center">10/12/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>VANGUARD GLOB SMALL CAP EU INV</td>
+	<td>C</td>
+	<td>-19,00</td>
+	<td>352,63</td>
+   </tr>
+  
+   <tr>
+    <td align="center">09/12/2025&nbsp;</td>
+    <td align="center">11/12/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 2</td>
+	<td>C</td>
+	<td>-15,49</td>
+	<td>337,14</td>
+   </tr>
+  
+   <tr>
+    <td align="center">10/12/2025&nbsp;</td>
+    <td align="center">12/12/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES DEVELOPED WRD IN S EUR</td>
+	<td>C</td>
+	<td>-50,00</td>
+	<td>287,14</td>
+   </tr>
+  
+   <tr>
+    <td align="center">11/12/2025&nbsp;</td>
+    <td align="center">15/12/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 3</td>
+	<td>C</td>
+	<td>-23,16</td>
+	<td>263,98</td>
+   </tr>
+  
+   <tr>
+    <td align="center">11/12/2025&nbsp;</td>
+    <td align="center">09/12/2025&nbsp;</td>
+	<td>APORTACION PLANES</td>
+	<td>MYINVESTOR INDEXADO GLOBAL PP</td>
+	<td>C</td>
+	<td>-200,00</td>
+	<td>63,98</td>
+   </tr>
+  
+   <tr>
+    <td align="center">11/12/2025&nbsp;</td>
+    <td align="center">15/12/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES DEVELOPED WRD IN S EUR</td>
+	<td>C</td>
+	<td>-15,00</td>
+	<td>48,98</td>
+   </tr>
+  
+   <tr>
+    <td align="center">12/12/2025&nbsp;</td>
+    <td align="center">15/12/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>VANGUARD GLOB SMALL CAP EU INV</td>
+	<td>C</td>
+	<td>-3,83</td>
+	<td>45,15</td>
+   </tr>
+  
+   <tr>
+    <td align="center">12/12/2025&nbsp;</td>
+    <td align="center">15/12/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>INDEX MSCI EM IE AC EUR @ 0.12</td>
+	<td>C</td>
+	<td>-24,99</td>
+	<td>20,16</td>
+   </tr>
+  
+   <tr>
+    <td align="center">12/12/2025&nbsp;</td>
+    <td align="center">16/12/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 2</td>
+	<td>C</td>
+	<td>-15,74</td>
+	<td>4,42</td>
+   </tr>
+  
+   <tr>
+    <td align="center">15/12/2025&nbsp;</td>
+    <td align="center">15/12/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+300,00</td>
+	<td>304,42</td>
+   </tr>
+  
+   <tr>
+    <td align="center">15/12/2025&nbsp;</td>
+    <td align="center">17/12/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 2</td>
+	<td>C</td>
+	<td>-14,78</td>
+	<td>289,64</td>
+   </tr>
+  
+   <tr>
+    <td align="center">17/12/2025&nbsp;</td>
+    <td align="center">15/12/2025&nbsp;</td>
+	<td>APORTACION PLANES</td>
+	<td>MYINVESTOR INDEXADO GLOBAL PP</td>
+	<td>C</td>
+	<td>-200,00</td>
+	<td>89,64</td>
+   </tr>
+  
+   <tr>
+    <td align="center">18/12/2025&nbsp;</td>
+    <td align="center">22/12/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES DEVELOPED WRD IN S EUR</td>
+	<td>C</td>
+	<td>-15,00</td>
+	<td>74,64</td>
+   </tr>
+  
+   <tr>
+    <td align="center">19/12/2025&nbsp;</td>
+    <td align="center">22/12/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>VANGUARD GLOB SMALL CAP EU INV</td>
+	<td>C</td>
+	<td>-3,78</td>
+	<td>70,86</td>
+   </tr>
+  
+   <tr>
+    <td align="center">19/12/2025&nbsp;</td>
+    <td align="center">22/12/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>INDEX MSCI EM IE AC EUR @ 0.12</td>
+	<td>C</td>
+	<td>-24,99</td>
+	<td>45,87</td>
+   </tr>
+  
+   <tr>
+    <td align="center">19/12/2025&nbsp;</td>
+    <td align="center">23/12/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES EMERGING MRK IND S EUR</td>
+	<td>C</td>
+	<td>-10,71</td>
+	<td>35,16</td>
+   </tr>
+  
+   <tr>
+    <td align="center">22/12/2025&nbsp;</td>
+    <td align="center">23/12/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>VANGUARD GLOB SMALL CAP EU INV</td>
+	<td>C</td>
+	<td>-22,89</td>
+	<td>12,27</td>
+   </tr>
+  
+   <tr>
+    <td align="center">22/12/2025&nbsp;</td>
+    <td align="center">22/12/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+100,00</td>
+	<td>112,27</td>
+   </tr>
+  
+   <tr>
+    <td align="center">22/12/2025&nbsp;</td>
+    <td align="center">24/12/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 4</td>
+	<td>C</td>
+	<td>-30,71</td>
+	<td>81,56</td>
+   </tr>
+  
+   <tr>
+    <td align="center">23/12/2025&nbsp;</td>
+    <td align="center">29/12/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 3</td>
+	<td>C</td>
+	<td>-22,13</td>
+	<td>59,43</td>
+   </tr>
+  
+   <tr>
+    <td align="center">24/12/2025&nbsp;</td>
+    <td align="center">24/12/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+150,00</td>
+	<td>209,43</td>
+   </tr>
+  
+   <tr>
+    <td align="center">31/12/2025&nbsp;</td>
+    <td align="center">02/01/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>VANGUARD GLOB SMALL CAP EU INV</td>
+	<td>C</td>
+	<td>-22,87</td>
+	<td>186,56</td>
+   </tr>
+  
+   <tr>
+    <td align="center">31/12/2025&nbsp;</td>
+    <td align="center">02/01/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>INDEX MSCI EM IE AC EUR @ 0.11</td>
+	<td>C</td>
+	<td>-24,99</td>
+	<td>161,57</td>
+   </tr>
+  
+   <tr>
+    <td align="center">31/12/2025&nbsp;</td>
+    <td align="center">31/12/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+200,00</td>
+	<td>361,57</td>
+   </tr>
+  
+   <tr>
+    <td align="center">06/01/2026&nbsp;</td>
+    <td align="center">07/01/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>VANGUARD GLOB SMALL CAP EU INV</td>
+	<td>C</td>
+	<td>-7,77</td>
+	<td>353,80</td>
+   </tr>
+  
+   <tr>
+    <td align="center">06/01/2026&nbsp;</td>
+    <td align="center">08/01/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES EMERGING MRK IND S EUR</td>
+	<td>C</td>
+	<td>-25,00</td>
+	<td>328,80</td>
+   </tr>
+  
+   <tr>
+    <td align="center">06/01/2026&nbsp;</td>
+    <td align="center">08/01/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES DEVELOPED WRD IN S EUR</td>
+	<td>C</td>
+	<td>-105,00</td>
+	<td>223,80</td>
+   </tr>
+  
+   <tr>
+    <td align="center">07/01/2026&nbsp;</td>
+    <td align="center">06/01/2026&nbsp;</td>
+	<td>LIQUIDAC. INTERESES</td>
+	<td>PERIODO 06/12/2025 06/01/2026</td>
+	<td>A</td>
+	<td>+0,11</td>
+	<td>223,91</td>
+   </tr>
+  
+   <tr>
+    <td align="center">08/01/2026&nbsp;</td>
+    <td align="center">12/01/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES DEVELOPED WRD IN S EUR</td>
+	<td>C</td>
+	<td>-115,00</td>
+	<td>108,91</td>
+   </tr>
+  
+   <tr>
+    <td align="center">11/01/2026&nbsp;</td>
+    <td align="center">11/01/2026&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+200,00</td>
+	<td>308,91</td>
+   </tr>
+  
+   <tr>
+    <td align="center">12/01/2026&nbsp;</td>
+    <td align="center">14/01/2026&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 2</td>
+	<td>C</td>
+	<td>-15,52</td>
+	<td>293,39</td>
+   </tr>
+  
+   <tr>
+    <td align="center">13/01/2026&nbsp;</td>
+    <td align="center">14/01/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>VANGUARD GLOB SMALL CAP EU INV</td>
+	<td>C</td>
+	<td>-7,98</td>
+	<td>285,41</td>
+   </tr>
+  
+   <tr>
+    <td align="center">13/01/2026&nbsp;</td>
+    <td align="center">15/01/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES EMERGING MRK IND S EUR</td>
+	<td>C</td>
+	<td>-25,00</td>
+	<td>260,41</td>
+   </tr>
+  
+   <tr>
+    <td align="center">14/01/2026&nbsp;</td>
+    <td align="center">05/01/2026&nbsp;</td>
+	<td>APORTACION PLANES</td>
+	<td>MYINVESTOR INDEXADO GLOBAL PP</td>
+	<td>C</td>
+	<td>-30,00</td>
+	<td>230,41</td>
+   </tr>
+  
+   <tr>
+    <td align="center">15/01/2026&nbsp;</td>
+    <td align="center">20/01/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES DEVELOPED WRD IN S EUR</td>
+	<td>C</td>
+	<td>-115,00</td>
+	<td>115,41</td>
+   </tr>
+  
+   <tr>
+    <td align="center">19/01/2026&nbsp;</td>
+    <td align="center">19/01/2026&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+121,64</td>
+	<td>237,05</td>
+   </tr>
+  
+   <tr>
+    <td align="center">19/01/2026&nbsp;</td>
+    <td align="center">12/01/2026&nbsp;</td>
+	<td>APORTACION PLANES</td>
+	<td>MYINVESTOR INDEXADO GLOBAL PP</td>
+	<td>C</td>
+	<td>-30,00</td>
+	<td>207,05</td>
+   </tr>
+  
+   <tr>
+    <td align="center">19/01/2026&nbsp;</td>
+    <td align="center">19/01/2026&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+20,14</td>
+	<td>227,19</td>
+   </tr>
+  
+   <tr>
+    <td align="center">20/01/2026&nbsp;</td>
+    <td align="center">22/01/2026&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 2</td>
+	<td>C</td>
+	<td>-15,54</td>
+	<td>211,65</td>
+   </tr>
+  
+   <tr>
+    <td align="center">20/01/2026&nbsp;</td>
+    <td align="center">20/01/2026&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+35,00</td>
+	<td>246,65</td>
+   </tr>
+  
+   <tr>
+    <td align="center">20/01/2026&nbsp;</td>
+    <td align="center">22/01/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES EMERGING MRK IND S EUR</td>
+	<td>C</td>
+	<td>-25,00</td>
+	<td>221,65</td>
+   </tr>
+  
+   <tr>
+    <td align="center">21/01/2026&nbsp;</td>
+    <td align="center">22/01/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>VANGUARD GLOB SMALL CAP EU INV</td>
+	<td>C</td>
+	<td>-7,98</td>
+	<td>213,67</td>
+   </tr>
+  
+   <tr>
+    <td align="center">21/01/2026&nbsp;</td>
+    <td align="center">21/01/2026&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+30,00</td>
+	<td>243,67</td>
+   </tr>
+  
+   <tr>
+    <td align="center">21/01/2026&nbsp;</td>
+    <td align="center">23/01/2026&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 3</td>
+	<td>C</td>
+	<td>-22,88</td>
+	<td>220,79</td>
+   </tr>
+  
+   <tr>
+    <td align="center">21/01/2026&nbsp;</td>
+    <td align="center">19/01/2026&nbsp;</td>
+	<td>APORTACION PLANES</td>
+	<td>MYINVESTOR INDEXADO GLOBAL PP</td>
+	<td>C</td>
+	<td>-30,00</td>
+	<td>190,79</td>
+   </tr>
+  
+   <tr>
+    <td align="center">22/01/2026&nbsp;</td>
+    <td align="center">26/01/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES DEVELOPED WRD IN S EUR</td>
+	<td>C</td>
+	<td>-115,00</td>
+	<td>75,79</td>
+   </tr>
+  
+   <tr>
+    <td align="center">22/01/2026&nbsp;</td>
+    <td align="center">22/01/2026&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+115,00</td>
+	<td>190,79</td>
+   </tr>
+  
+   <tr>
+    <td align="center">22/01/2026&nbsp;</td>
+    <td align="center">22/01/2026&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+20,00</td>
+	<td>210,79</td>
+   </tr>
+  
+   <tr>
+    <td align="center">26/01/2026&nbsp;</td>
+    <td align="center">28/01/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES US INDEX FUND IE S EUR</td>
+	<td>C</td>
+	<td>-5,00</td>
+	<td>205,79</td>
+   </tr>
+  
+   <tr>
+    <td align="center">26/01/2026&nbsp;</td>
+    <td align="center">23/01/2026&nbsp;</td>
+	<td>APORTACION PLANES</td>
+	<td>MYINVESTOR INDEXADO GLOBAL PP</td>
+	<td>C</td>
+	<td>-30,00</td>
+	<td>175,79</td>
+   </tr>
+  
+   <tr>
+    <td align="center">26/01/2026&nbsp;</td>
+    <td align="center">26/01/2026&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+100,00</td>
+	<td>275,79</td>
+   </tr>
+  
+   <tr>
+    <td align="center">26/01/2026&nbsp;</td>
+    <td align="center">28/01/2026&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 10</td>
+	<td>C</td>
+	<td>-74,54</td>
+	<td>201,25</td>
+   </tr>
+  
+   <tr>
+    <td align="center">27/01/2026&nbsp;</td>
+    <td align="center">28/01/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>VANGUARD GLOB SMALL CAP EU INV</td>
+	<td>C</td>
+	<td>-8,01</td>
+	<td>193,24</td>
+   </tr>
+  
+   <tr>
+    <td align="center">27/01/2026&nbsp;</td>
+    <td align="center">29/01/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES EMERGING MRK IND S EUR</td>
+	<td>C</td>
+	<td>-25,00</td>
+	<td>168,24</td>
+   </tr>
+  
+   <tr>
+    <td align="center">27/01/2026&nbsp;</td>
+    <td align="center">29/01/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES EMERGING MRK IND S EUR</td>
+	<td>C</td>
+	<td>-25,00</td>
+	<td>143,24</td>
+   </tr>
+  
+   <tr>
+    <td align="center">27/01/2026&nbsp;</td>
+    <td align="center">29/01/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES DEVELOPED WRD IN S EUR</td>
+	<td>C</td>
+	<td>-115,00</td>
+	<td>28,24</td>
+   </tr>
+  
+   <tr>
+    <td align="center">29/01/2026&nbsp;</td>
+    <td align="center">29/01/2026&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+700,00</td>
+	<td>728,24</td>
+   </tr>
+  
+   <tr>
+    <td align="center">29/01/2026&nbsp;</td>
+    <td align="center">29/01/2026&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+16,76</td>
+	<td>745,00</td>
+   </tr>
+  
+   <tr>
+    <td align="center">02/02/2026&nbsp;</td>
+    <td align="center">02/02/2026&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+77,50</td>
+	<td>822,50</td>
+   </tr>
+  
+   <tr>
+    <td align="center">02/02/2026&nbsp;</td>
+    <td align="center">02/02/2026&nbsp;</td>
+	<td>TRANSF INMEDIATA EMITIDA</td>
+	<td>Transferencia desde MyInvestor</td>
+	<td>C</td>
+	<td>-77,50</td>
+	<td>745,00</td>
+   </tr>
+  
+   <tr>
+    <td align="center">04/02/2026&nbsp;</td>
+    <td align="center">05/02/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>VANGUARD GLOB SMALL CAP EUR IN</td>
+	<td>C</td>
+	<td>-36,17</td>
+	<td>708,83</td>
+   </tr>
+  
+   <tr>
+    <td align="center">04/02/2026&nbsp;</td>
+    <td align="center">06/02/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES EMERGING MRK IND S EUR</td>
+	<td>C</td>
+	<td>-120,00</td>
+	<td>588,83</td>
+   </tr>
+  
+   <tr>
+    <td align="center">04/02/2026&nbsp;</td>
+    <td align="center">02/02/2026&nbsp;</td>
+	<td>APORTACION PLANES</td>
+	<td>MYINVESTOR INDEXADO GLOBAL PP</td>
+	<td>C</td>
+	<td>-125,00</td>
+	<td>463,83</td>
+   </tr>
+  
+   <tr>
+    <td align="center">04/02/2026&nbsp;</td>
+    <td align="center">06/02/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES DEVELOPED WRD IN S EUR</td>
+	<td>C</td>
+	<td>-460,00</td>
+	<td>3,83</td>
+   </tr>
+  
+   <tr>
+    <td align="center">07/02/2026&nbsp;</td>
+    <td align="center">06/02/2026&nbsp;</td>
+	<td>LIQUIDAC. INTERESES</td>
+	<td>PERIODO 06/01/2026 06/02/2026</td>
+	<td>A</td>
+	<td>+0,19</td>
+	<td>4,02</td>
+   </tr>
+  
+   <tr>
+    <td align="center">09/02/2026&nbsp;</td>
+    <td align="center">09/02/2026&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+174,00</td>
+	<td>178,02</td>
+   </tr>
+  
+   <tr>
+    <td align="center">09/02/2026&nbsp;</td>
+    <td align="center">09/02/2026&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+80,00</td>
+	<td>258,02</td>
+   </tr>
+  
+   <tr>
+    <td align="center">09/02/2026&nbsp;</td>
+    <td align="center">09/02/2026&nbsp;</td>
+	<td>TRANSF INMEDIATA EMITIDA</td>
+	<td>Transferencia desde MyInvestor</td>
+	<td>C</td>
+	<td>-258,00</td>
+	<td>0,02</td>
+   </tr>
+  
+   <tr>
+    <td align="center">26/02/2026&nbsp;</td>
+    <td align="center">26/02/2026&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+749,98</td>
+	<td>750,00</td>
+   </tr>
+  
+   <tr>
+    <td align="center">03/03/2026&nbsp;</td>
+    <td align="center">02/03/2026&nbsp;</td>
+	<td>APORTACION PLANES</td>
+	<td>MYINVESTOR INDEXADO GLOBAL PP</td>
+	<td>C</td>
+	<td>-125,00</td>
+	<td>625,00</td>
+   </tr>
+  
+   <tr>
+    <td align="center">04/03/2026&nbsp;</td>
+    <td align="center">05/03/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>VANGUARD GLOB SMALL CAP EUR IN</td>
+	<td>C</td>
+	<td>-36,97</td>
+	<td>588,03</td>
+   </tr>
+  
+   <tr>
+    <td align="center">04/03/2026&nbsp;</td>
+    <td align="center">06/03/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES EMERGING MARKETS INDEX</td>
+	<td>C</td>
+	<td>-140,00</td>
+	<td>448,03</td>
+   </tr>
+  
+   <tr>
+    <td align="center">04/03/2026&nbsp;</td>
+    <td align="center">06/03/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES DEVELOPED WORLD INDEX</td>
+	<td>C</td>
+	<td>-440,00</td>
+	<td>8,03</td>
+   </tr>
+  
+   <tr>
+    <td align="center">04/03/2026&nbsp;</td>
+    <td align="center">04/03/2026&nbsp;</td>
+	<td>TRANSF INMEDIATA EMITIDA</td>
+	<td>Transferencia desde MyInvestor</td>
+	<td>C</td>
+	<td>-8,03</td>
+	<td>0,00</td>
+   </tr>
+  
+   <tr>
+    <td align="center">06/03/2026&nbsp;</td>
+    <td align="center">06/03/2026&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+25,00</td>
+	<td>25,00</td>
+   </tr>
+  
+   <tr>
+    <td align="center">07/03/2026&nbsp;</td>
+    <td align="center">06/03/2026&nbsp;</td>
+	<td>LIQUIDAC. INTERESES</td>
+	<td>PERIODO 06/02/2026 06/03/2026</td>
+	<td>A</td>
+	<td>+0,09</td>
+	<td>25,09</td>
+   </tr>
+  
+   <tr>
+    <td align="center">11/03/2026&nbsp;</td>
+    <td align="center">13/03/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES EMERGING MARKETS INDEX</td>
+	<td>C</td>
+	<td>-25,00</td>
+	<td>0,09</td>
+   </tr>
+  
+   <tr>
+    <td align="center">16/03/2026&nbsp;</td>
+    <td align="center">16/03/2026&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+125,00</td>
+	<td>125,09</td>
+   </tr>
+  
+   <tr>
+    <td align="center">16/03/2026&nbsp;</td>
+    <td align="center">16/03/2026&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+115,00</td>
+	<td>240,09</td>
+   </tr>
+  
+   <tr>
+    <td align="center">19/03/2026&nbsp;</td>
+    <td align="center">19/03/2026&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+250,00</td>
+	<td>490,09</td>
+   </tr>
+  
+   <tr>
+    <td align="center">19/03/2026&nbsp;</td>
+    <td align="center">19/03/2026&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+100,00</td>
+	<td>590,09</td>
+   </tr>
+  
+   <tr>
+    <td align="center">19/03/2026&nbsp;</td>
+    <td align="center">23/03/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES DEVELOPED WORLD INDEX</td>
+	<td>C</td>
+	<td>-125,00</td>
+	<td>465,09</td>
+   </tr>
+  
+   <tr>
+    <td align="center">19/03/2026&nbsp;</td>
+    <td align="center">23/03/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES DEVELOPED WORLD INDEX</td>
+	<td>C</td>
+	<td>-115,00</td>
+	<td>350,09</td>
+   </tr>
+  
+   <tr>
+    <td align="center">22/03/2026&nbsp;</td>
+    <td align="center">22/03/2026&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+100,00</td>
+	<td>450,09</td>
+   </tr>
+  
+   <tr>
+    <td align="center">22/03/2026&nbsp;</td>
+    <td align="center">22/03/2026&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+260,00</td>
+	<td>710,09</td>
+   </tr>
+  
+   <tr>
+    <td align="center">24/03/2026&nbsp;</td>
+    <td align="center">24/03/2026&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+20,00</td>
+	<td>730,09</td>
+   </tr>
+  
+   <tr>
+    <td align="center">24/03/2026&nbsp;</td>
+    <td align="center">26/03/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES EMERGING MARKETS INDEX</td>
+	<td>C</td>
+	<td>-100,00</td>
+	<td>630,09</td>
+   </tr>
+  
+   <tr>
+    <td align="center">24/03/2026&nbsp;</td>
+    <td align="center">26/03/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES DEVELOPED WORLD INDEX</td>
+	<td>C</td>
+	<td>-250,09</td>
+	<td>380,00</td>
+   </tr>
+  
+   <tr>
+    <td align="center">24/03/2026&nbsp;</td>
+    <td align="center">24/03/2026&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+200,00</td>
+	<td>580,00</td>
+   </tr>
+  
+   <tr>
+    <td align="center">25/03/2026&nbsp;</td>
+    <td align="center">26/03/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>VANGUARD GLOB SMALL CAP EUR IN</td>
+	<td>C</td>
+	<td>-97,47</td>
+	<td>482,53</td>
+   </tr>
+  
+   <tr>
+    <td align="center">25/03/2026&nbsp;</td>
+    <td align="center">23/03/2026&nbsp;</td>
+	<td>APORTACION PLANES</td>
+	<td>MYINVESTOR INDEXADO GLOBAL PP</td>
+	<td>C</td>
+	<td>-260,00</td>
+	<td>222,53</td>
+   </tr>
+  
+   <tr>
+    <td align="center">26/03/2026&nbsp;</td>
+    <td align="center">30/03/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES US INDEX FUND IE S EUR</td>
+	<td>C</td>
+	<td>-20,00</td>
+	<td>202,53</td>
+   </tr>
+  
+   <tr>
+    <td align="center">27/03/2026&nbsp;</td>
+    <td align="center">31/03/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES EMERGING MARKETS INDEX</td>
+	<td>C</td>
+	<td>-100,00</td>
+	<td>102,53</td>
+   </tr>
+  
+   <tr>
+    <td align="center">27/03/2026&nbsp;</td>
+    <td align="center">31/03/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES DEVELOPED WORLD INDEX</td>
+	<td>C</td>
+	<td>-100,00</td>
+	<td>2,53</td>
+   </tr>
+  
+   <tr>
+    <td align="center">27/03/2026&nbsp;</td>
+    <td align="center">27/03/2026&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+400,00</td>
+	<td>402,53</td>
+   </tr>
+  
+   <tr>
+    <td align="center">31/03/2026&nbsp;</td>
+    <td align="center">01/04/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>VANGUARD GLOB SMALL CAP EUR IN</td>
+	<td>C</td>
+	<td>-7,69</td>
+	<td>394,84</td>
+   </tr>
+  
+   <tr>
+    <td align="center">31/03/2026&nbsp;</td>
+    <td align="center">30/03/2026&nbsp;</td>
+	<td>APORTACION PLANES</td>
+	<td>MYINVESTOR INDEXADO GLOBAL PP</td>
+	<td>C</td>
+	<td>-30,00</td>
+	<td>364,84</td>
+   </tr>
+  
+   <tr>
+    <td align="center">01/04/2026&nbsp;</td>
+    <td align="center">07/04/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES US INDEX FUND IE S EUR</td>
+	<td>C</td>
+	<td>-30,00</td>
+	<td>334,84</td>
+   </tr>
+  
+   <tr>
+    <td align="center">01/04/2026&nbsp;</td>
+    <td align="center">07/04/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES DEVELOPED WORLD INDEX</td>
+	<td>C</td>
+	<td>-152,53</td>
+	<td>182,31</td>
+   </tr>
+  
+   <tr>
+    <td align="center">01/04/2026&nbsp;</td>
+    <td align="center">07/04/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES EMERGING MARKETS INDEX</td>
+	<td>C</td>
+	<td>-50,00</td>
+	<td>132,31</td>
+   </tr>
+  
+   <tr>
+    <td align="center">01/04/2026&nbsp;</td>
+    <td align="center">01/04/2026&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+250,00</td>
+	<td>382,31</td>
+   </tr>
+  
+   <tr>
+    <td align="center">02/04/2026&nbsp;</td>
+    <td align="center">02/04/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>GROUPAMA TRESORERIE I ACC EUR</td>
+	<td>C</td>
+	<td>-97,04</td>
+	<td>285,27</td>
+   </tr>
+  
+   <tr>
+    <td align="center">02/04/2026&nbsp;</td>
+    <td align="center">01/04/2026&nbsp;</td>
+	<td>APORTACION PLANES</td>
+	<td>MYINVESTOR INDEXADO GLOBAL PP</td>
+	<td>C</td>
+	<td>-40,00</td>
+	<td>245,27</td>
+   </tr>
+  
+   <tr>
+    <td align="center">07/04/2026&nbsp;</td>
+    <td align="center">06/04/2026&nbsp;</td>
+	<td>LIQUIDAC. INTERESES</td>
+	<td>PERIODO 06/03/2026 06/04/2026</td>
+	<td>A</td>
+	<td>+0,18</td>
+	<td>245,45</td>
+   </tr>
+  
+   <tr>
+    <td align="center">07/04/2026&nbsp;</td>
+    <td align="center">07/04/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>AXA TRESOR COURT TERME C ACC E</td>
+	<td>C</td>
+	<td>-99,83</td>
+	<td>145,62</td>
+   </tr>
+  
+   <tr>
+    <td align="center">07/04/2026&nbsp;</td>
+    <td align="center">07/04/2026&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+300,00</td>
+	<td>445,62</td>
+   </tr>
+  
+   <tr>
+    <td align="center">08/04/2026&nbsp;</td>
+    <td align="center">10/04/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES EMERGING MARKETS INDEX</td>
+	<td>C</td>
+	<td>-42,31</td>
+	<td>403,31</td>
+   </tr>
+  
+   <tr>
+    <td align="center">08/04/2026&nbsp;</td>
+    <td align="center">10/04/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES DEVELOPED WORLD INDEX</td>
+	<td>C</td>
+	<td>-92,31</td>
+	<td>311,00</td>
+   </tr>
+  
+   <tr>
+    <td align="center">09/04/2026&nbsp;</td>
+    <td align="center">08/04/2026&nbsp;</td>
+	<td>APORTACION PLANES</td>
+	<td>MYINVESTOR INDEXADO GLOBAL PP</td>
+	<td>C</td>
+	<td>-100,00</td>
+	<td>211,00</td>
+   </tr>
+  
+   <tr>
+    <td align="center">10/04/2026&nbsp;</td>
+    <td align="center">10/04/2026&nbsp;</td>
+	<td>TRANSF INMEDIATA EMITIDA</td>
+	<td>Transferencia desde MyInvestor</td>
+	<td>C</td>
+	<td>-6,00</td>
+	<td>205,00</td>
+   </tr>
+  
+   <tr>
+    <td align="center">10/04/2026&nbsp;</td>
+    <td align="center">13/04/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>VANGUARD GLOB SMALL CAP EUR IN</td>
+	<td>C</td>
+	<td>-28,56</td>
+	<td>176,44</td>
+   </tr>
+  
+   <tr>
+    <td align="center">10/04/2026&nbsp;</td>
+    <td align="center">14/04/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES DEVELOPED WORLD INDEX</td>
+	<td>C</td>
+	<td>-111,00</td>
+	<td>65,44</td>
+   </tr>
+  
+   <tr>
+    <td align="center">10/04/2026&nbsp;</td>
+    <td align="center">14/04/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES EMERGING MARKETS INDEX</td>
+	<td>C</td>
+	<td>-60,00</td>
+	<td>5,44</td>
+   </tr>
+  
+   <tr>
+    <td align="center">13/04/2026&nbsp;</td>
+    <td align="center">13/04/2026&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+125,00</td>
+	<td>130,44</td>
+   </tr>
+  
+   <tr>
+    <td align="center">15/04/2026&nbsp;</td>
+    <td align="center">16/04/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>VANGUARD GLOB SMALL CAP EUR IN</td>
+	<td>C</td>
+	<td>-8,22</td>
+	<td>122,22</td>
+   </tr>
+  
+   <tr>
+    <td align="center">16/04/2026&nbsp;</td>
+    <td align="center">20/04/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES DEVELOPED WORLD INDEX</td>
+	<td>C</td>
+	<td>-100,00</td>
+	<td>22,22</td>
+   </tr>
+  
+   <tr>
+    <td align="center">16/04/2026&nbsp;</td>
+    <td align="center">20/04/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES EMERGING MARKETS INDEX</td>
+	<td>C</td>
+	<td>-20,00</td>
+	<td>2,22</td>
+   </tr>
+  
+   <tr>
+    <td align="center">16/04/2026&nbsp;</td>
+    <td align="center">16/04/2026&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+113,00</td>
+	<td>115,22</td>
+   </tr>
+  
+   <tr>
+    <td align="center">17/04/2026&nbsp;</td>
+    <td align="center">17/04/2026&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+1,00</td>
+	<td>116,22</td>
+   </tr>
+  
+   <tr>
+    <td align="center">21/04/2026&nbsp;</td>
+    <td align="center">22/04/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>VANGUARD GLOB SMALL CAP EUR IN</td>
+	<td>C</td>
+	<td>-4,20</td>
+	<td>112,02</td>
+   </tr>
+  
+   <tr>
+    <td align="center">21/04/2026&nbsp;</td>
+    <td align="center">23/04/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES EMERGING MARKETS INDEX</td>
+	<td>C</td>
+	<td>-20,00</td>
+	<td>92,02</td>
+   </tr>
+  
+   <tr>
+    <td align="center">21/04/2026&nbsp;</td>
+    <td align="center">23/04/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES DEVELOPED WORLD INDEX</td>
+	<td>C</td>
+	<td>-90,00</td>
+	<td>2,02</td>
+   </tr>
+  
+   <tr>
+    <td align="center">22/04/2026&nbsp;</td>
+    <td align="center">22/04/2026&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td>null</td>
+	<td>A</td>
+	<td>+180,00</td>
+	<td>182,02</td>
+   </tr>
+  
+   <tr>
+    <td align="center">27/04/2026&nbsp;</td>
+    <td align="center">28/04/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>VANGUARD GLOB SMALL CAP EUR IN</td>
+	<td>C</td>
+	<td>-16,69</td>
+	<td>165,33</td>
+   </tr>
+  
+   <tr>
+    <td align="center">27/04/2026&nbsp;</td>
+    <td align="center">29/04/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES DEVELOPED WORLD INDEX</td>
+	<td>C</td>
+	<td>-112,02</td>
+	<td>53,31</td>
+   </tr>
+  
+   <tr>
+    <td align="center">27/04/2026&nbsp;</td>
+    <td align="center">29/04/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES EMERGING MARKETS INDEX</td>
+	<td>C</td>
+	<td>-50,00</td>
+	<td>3,31</td>
+   </tr>
+  
+   <tr>
+    <td align="center">30/04/2026&nbsp;</td>
+    <td align="center">30/04/2026&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td>null</td>
+	<td>A</td>
+	<td>+716,69</td>
+	<td>720,00</td>
+   </tr>
+  
+   <tr>
+    <td align="center">06/05/2026&nbsp;</td>
+    <td align="center">07/05/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>VANGUARD GLOB SMALL CAP EUR IN</td>
+	<td>C</td>
+	<td>-38,16</td>
+	<td>681,84</td>
+   </tr>
+  
+   <tr>
+    <td align="center">06/05/2026&nbsp;</td>
+    <td align="center">06/05/2026&nbsp;</td>
+	<td>ABONO PROMOCION</td>
+	<td>Promocion black25</td>
+	<td>A</td>
+	<td>+0,50</td>
+	<td>682,34</td>
+   </tr>
+  
+   <tr>
+    <td align="center">06/05/2026&nbsp;</td>
+    <td align="center">06/05/2026&nbsp;</td>
+	<td>CARGO RETENCION A CUENTA</td>
+	<td>Promocion black25</td>
+	<td>C</td>
+	<td>-0,10</td>
+	<td>682,24</td>
+   </tr>
+  
+   <tr>
+    <td align="center">07/05/2026&nbsp;</td>
+    <td align="center">06/05/2026&nbsp;</td>
+	<td>LIQUIDAC. INTERESES</td>
+	<td>PERIODO 06/04/2026 06/05/2026</td>
+	<td>A</td>
+	<td>+0,16</td>
+	<td>682,40</td>
+   </tr>
+  
+   <tr>
+    <td align="center">07/05/2026&nbsp;</td>
+    <td align="center">11/05/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES DEVELOPED WORLD INDEX</td>
+	<td>C</td>
+	<td>-440,00</td>
+	<td>242,40</td>
+   </tr>
+  
+   <tr>
+    <td align="center">07/05/2026&nbsp;</td>
+    <td align="center">11/05/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES EMERGING MARKETS INDEX</td>
+	<td>C</td>
+	<td>-140,00</td>
+	<td>102,40</td>
+   </tr>
+  
+   <tr>
+    <td align="center">07/05/2026&nbsp;</td>
+    <td align="center">04/05/2026&nbsp;</td>
+	<td>APORTACION PLANES</td>
+	<td>MYINVESTOR INDEXADO GLOBAL PP</td>
+	<td>C</td>
+	<td>-100,00</td>
+	<td>2,40</td>
+   </tr>
+  
+   <tr>
+    <td align="center">29/05/2026&nbsp;</td>
+    <td align="center">29/05/2026&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+100,00</td>
+	<td>102,40</td>
+   </tr>
+  
+   <tr>
+    <td align="center">29/05/2026&nbsp;</td>
+    <td align="center">29/05/2026&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+4,65</td>
+	<td>107,05</td>
+   </tr>
+  
+   <tr>
+    <td align="center">29/05/2026&nbsp;</td>
+    <td align="center">29/05/2026&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+0,37</td>
+	<td>107,42</td>
+   </tr>
+  
+   <tr>
+    <td align="center">01/06/2026&nbsp;</td>
+    <td align="center">01/06/2026&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+3,27</td>
+	<td>110,69</td>
+   </tr>
+  
+   <tr>
+    <td align="center">01/06/2026&nbsp;</td>
+    <td align="center">01/06/2026&nbsp;</td>
+	<td>REEMBOLSO IIC</td>
+	<td>GROUPAMA TRESORERIE I ACC EUR</td>
+	<td>A</td>
+	<td>+75,21</td>
+	<td>185,90</td>
+   </tr>
+  
+   <tr>
+    <td align="center">03/06/2026&nbsp;</td>
+    <td align="center">01/06/2026&nbsp;</td>
+	<td>APORTACION PLANES</td>
+	<td>MYINVESTOR INDEXADO GLOBAL PP</td>
+	<td>C</td>
+	<td>-100,00</td>
+	<td>85,90</td>
+   </tr>
+  
+   <tr>
+    <td align="center">04/06/2026&nbsp;</td>
+    <td align="center">05/06/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>VANGUARD GLOB SMALL CAP EUR IN</td>
+	<td>C</td>
+	<td>-13,11</td>
+	<td>72,79</td>
+   </tr>
+  
+   <tr>
+    <td align="center">04/06/2026&nbsp;</td>
+    <td align="center">08/06/2026&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES DEVELOPED WORLD INDEX</td>
+	<td>C</td>
+	<td>-51,54</td>
+	<td>21,25</td>
+   </tr>
+  
+  <tr>
+   <td align="center">29/10/2026</td>
+   <td colspan="5">Saldo Final</td>
+   <td>21,25</td>
+  </tr>
+  
+  </table>   
+  
+  
+ </body>
+</html>

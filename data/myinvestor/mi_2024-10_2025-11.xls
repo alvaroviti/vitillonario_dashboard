@@ -1,0 +1,2410 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html>
+<!-- PRB000047095 -->
+<div class="capaBlock" style="visibility:hidden">
+	<div class="sk-fading-circle">
+	  <div class="sk-circle1 sk-circle"></div>
+	  <div class="sk-circle2 sk-circle"></div>
+	  <div class="sk-circle3 sk-circle"></div>
+	  <div class="sk-circle4 sk-circle"></div>
+	  <div class="sk-circle5 sk-circle"></div>
+	  <div class="sk-circle6 sk-circle"></div>
+	  <div class="sk-circle7 sk-circle"></div>
+	  <div class="sk-circle8 sk-circle"></div>
+	  <div class="sk-circle9 sk-circle"></div>
+	  <div class="sk-circle10 sk-circle"></div>
+	  <div class="sk-circle11 sk-circle"></div>
+	  <div class="sk-circle12 sk-circle"></div>
+	</div>		
+</div>	
+<head>    
+
+
+<title>Movimientos de cuentas</title>
+
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+
+
+<style>
+
+.capaBlock {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10050;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    filter: alpha(opacity=50);
+    opacity: .5;
+    display: block;
+}
+
+.sk-fading-circle {
+  margin: 400px auto;
+  width: 40px;
+  height: 40px;
+  position: relative;
+}
+
+.sk-fading-circle .sk-circle {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.sk-fading-circle .sk-circle:before {
+  content: '';
+  display: block;
+  margin: 0 auto;
+  width: 15%;
+  height: 15%;
+  background-color: #FFF;
+  border-radius: 100%;
+  -webkit-animation: sk-circleFadeDelay 1.2s infinite ease-in-out both;
+          animation: sk-circleFadeDelay 1.2s infinite ease-in-out both;
+}
+.sk-fading-circle .sk-circle2 {
+  -webkit-transform: rotate(30deg);
+      -ms-transform: rotate(30deg);
+          transform: rotate(30deg);
+}
+.sk-fading-circle .sk-circle3 {
+  -webkit-transform: rotate(60deg);
+      -ms-transform: rotate(60deg);
+          transform: rotate(60deg);
+}
+.sk-fading-circle .sk-circle4 {
+  -webkit-transform: rotate(90deg);
+      -ms-transform: rotate(90deg);
+          transform: rotate(90deg);
+}
+.sk-fading-circle .sk-circle5 {
+  -webkit-transform: rotate(120deg);
+      -ms-transform: rotate(120deg);
+          transform: rotate(120deg);
+}
+.sk-fading-circle .sk-circle6 {
+  -webkit-transform: rotate(150deg);
+      -ms-transform: rotate(150deg);
+          transform: rotate(150deg);
+}
+.sk-fading-circle .sk-circle7 {
+  -webkit-transform: rotate(180deg);
+      -ms-transform: rotate(180deg);
+          transform: rotate(180deg);
+}
+.sk-fading-circle .sk-circle8 {
+  -webkit-transform: rotate(210deg);
+      -ms-transform: rotate(210deg);
+          transform: rotate(210deg);
+}
+.sk-fading-circle .sk-circle9 {
+  -webkit-transform: rotate(240deg);
+      -ms-transform: rotate(240deg);
+          transform: rotate(240deg);
+}
+.sk-fading-circle .sk-circle10 {
+  -webkit-transform: rotate(270deg);
+      -ms-transform: rotate(270deg);
+          transform: rotate(270deg);
+}
+.sk-fading-circle .sk-circle11 {
+  -webkit-transform: rotate(300deg);
+      -ms-transform: rotate(300deg);
+          transform: rotate(300deg); 
+}
+.sk-fading-circle .sk-circle12 {
+  -webkit-transform: rotate(330deg);
+      -ms-transform: rotate(330deg);
+          transform: rotate(330deg); 
+}
+.sk-fading-circle .sk-circle2:before {
+  -webkit-animation-delay: -1.1s;
+          animation-delay: -1.1s; 
+}
+.sk-fading-circle .sk-circle3:before {
+  -webkit-animation-delay: -1s;
+          animation-delay: -1s; 
+}
+.sk-fading-circle .sk-circle4:before {
+  -webkit-animation-delay: -0.9s;
+          animation-delay: -0.9s; 
+}
+.sk-fading-circle .sk-circle5:before {
+  -webkit-animation-delay: -0.8s;
+          animation-delay: -0.8s; 
+}
+.sk-fading-circle .sk-circle6:before {
+  -webkit-animation-delay: -0.7s;
+          animation-delay: -0.7s; 
+}
+.sk-fading-circle .sk-circle7:before {
+  -webkit-animation-delay: -0.6s;
+          animation-delay: -0.6s; 
+}
+.sk-fading-circle .sk-circle8:before {
+  -webkit-animation-delay: -0.5s;
+          animation-delay: -0.5s; 
+}
+.sk-fading-circle .sk-circle9:before {
+  -webkit-animation-delay: -0.4s;
+          animation-delay: -0.4s;
+}
+.sk-fading-circle .sk-circle10:before {
+  -webkit-animation-delay: -0.3s;
+          animation-delay: -0.3s;
+}
+.sk-fading-circle .sk-circle11:before {
+  -webkit-animation-delay: -0.2s;
+          animation-delay: -0.2s;
+}
+.sk-fading-circle .sk-circle12:before {
+  -webkit-animation-delay: -0.1s;
+          animation-delay: -0.1s;
+}
+
+@-webkit-keyframes sk-circleFadeDelay {
+  0%, 39%, 100% { opacity: 0; }
+  40% { opacity: 1; }
+}
+
+@keyframes sk-circleFadeDelay {
+  0%, 39%, 100% { opacity: 0; }
+  40% { opacity: 1; } 
+}
+
+</style>
+
+<script type="text/javascript">
+	window.CONFIG_PANTALLA = {
+		esLH: '${empty param.esLH ? "N" : param.esLH}'
+	};
+</script>
+
+<script language="JavaScript" src="/js/inicialPagina.js"></script>
+<script>
+
+
+
+
+	
+		
+			
+			
+				inicioPaginaHead("controlCache","origenInternac='S';","","");
+			
+		
+	
+	
+
+
+
+
+
+var tituloFMT = 'Movimientos de cuentas';
+var subtituloFMT = '';
+var textoinicioFMT = 'Para consultar datos distintos de los que se muestran, seleccione en los campos superiores y pulse "Iniciar búsqueda"';
+
+function activateBlockOperationsDiv() { 	
+	$jq(".capaBlock").css("visibility","visible");
+}
+
+function removeBlockOperationsDiv() { 	
+	$jq(".capaBlock").css("visibility","hidden");
+}
+
+var horaFecha ="";
+var formatoHora ="HH:mm";
+var formatoHoraExtendida ="HH:mm:ss";
+var formatoFecha="dd/MM/yyyy";
+var formatoFechaExtendida="dd/MM/yyyy HH:mm:ss";
+var formatoFechaCorta="MM/yyyy";
+var separadorMiles = '.';
+var separadorDecimales = ',';
+var path_imagen_idioma='';
+var ayuda_alt = 'Pulse para ver la ayuda';	
+var demo_alt = 'Pulse para ver la demo';
+
+
+var fechaglobal = horaFecha;
+
+var fechaGlobResgTF = '';
+if(fechaGlobResgTF != null && fechaGlobResgTF != '')
+	horaFecha = 'Fecha: ' + fechaGlobResgTF;
+
+
+
+
+inicioPaginaCuerpo("","","","","","",horaFecha);
+
+var nombreP = 'fo_ce_conmov';
+
+
+
+		pintarSubtitulo(tituloFMT,subtituloFMT,textoinicioFMT);
+	
+
+
+
+
+
+
+
+
+</script>
+
+
+
+
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+    <META http-equiv="Expires" content="Tue, 20 Aug 1996 14:25:27 GMT">
+    <META http-equiv="Cache-Control" content="no-cache">
+    <meta http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+    <meta name=ProgId content=Excel.Sheet>
+</head>
+<body>
+
+ <table border="1">
+  <tr>
+      <th>Fecha operación</th>
+      <th>FECHA VALOR</th>
+      <th>Tipo de operación</th>
+      <th>Concepto</th>
+      <th colspan="2">Cargo/Abono<br>Importe</th>
+      <th>Saldo</th>
+   </tr>   
+  
+  	<tr>
+	 <td align="center">29/09/2024</td>
+	 <td colspan="5">Saldo Inicio</td>
+	 <td>0,00</td>
+   </tr>
+  
+   <tr>
+    <td align="center">30/10/2024&nbsp;</td>
+    <td align="center">30/10/2024&nbsp;</td>
+	<td>ABONO PROMOCION</td>
+	<td>PROMOCION 20 ACTIVACION</td>
+	<td>A</td>
+	<td>+20,00</td>
+	<td>20,00</td>
+   </tr>
+  
+   <tr>
+    <td align="center">30/10/2024&nbsp;</td>
+    <td align="center">30/10/2024&nbsp;</td>
+	<td>CARGO RETENCION A CUENTA</td>
+	<td>RET. PROMOCION 20 ACTIVACION</td>
+	<td>C</td>
+	<td>-3,80</td>
+	<td>16,20</td>
+   </tr>
+  
+   <tr>
+    <td align="center">07/11/2024&nbsp;</td>
+    <td align="center">06/11/2024&nbsp;</td>
+	<td>LIQUIDAC. INTERESES</td>
+	<td>PERIODO 06/10/2024 06/11/2024</td>
+	<td>A</td>
+	<td>+0,01</td>
+	<td>16,21</td>
+   </tr>
+  
+   <tr>
+    <td align="center">07/12/2024&nbsp;</td>
+    <td align="center">06/12/2024&nbsp;</td>
+	<td>LIQUIDAC. INTERESES</td>
+	<td>PERIODO 06/11/2024 06/12/2024</td>
+	<td>A</td>
+	<td>+0,02</td>
+	<td>16,23</td>
+   </tr>
+  
+   <tr>
+    <td align="center">19/12/2024&nbsp;</td>
+    <td align="center">20/12/2024&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>MSCI WORLD INDEX P ACC USD @ 1</td>
+	<td>C</td>
+	<td>-13,37</td>
+	<td>2,86</td>
+   </tr>
+  
+   <tr>
+    <td align="center">07/01/2025&nbsp;</td>
+    <td align="center">06/01/2025&nbsp;</td>
+	<td>LIQUIDAC. INTERESES</td>
+	<td>PERIODO 06/12/2024 06/01/2025</td>
+	<td>A</td>
+	<td>+0,02</td>
+	<td>2,88</td>
+   </tr>
+  
+   <tr>
+    <td align="center">02/02/2025&nbsp;</td>
+    <td align="center">02/02/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+5,00</td>
+	<td>7,88</td>
+   </tr>
+  
+   <tr>
+    <td align="center">05/02/2025&nbsp;</td>
+    <td align="center">06/02/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>MSCI WORLD INDEX P ACC USD @ 0</td>
+	<td>C</td>
+	<td>-6,76</td>
+	<td>1,12</td>
+   </tr>
+  
+   <tr>
+    <td align="center">15/02/2025&nbsp;</td>
+    <td align="center">15/02/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+20,00</td>
+	<td>21,12</td>
+   </tr>
+  
+   <tr>
+    <td align="center">19/02/2025&nbsp;</td>
+    <td align="center">20/02/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>MSCI WORLD INDEX P ACC USD @ 1</td>
+	<td>C</td>
+	<td>-18,16</td>
+	<td>2,96</td>
+   </tr>
+  
+   <tr>
+    <td align="center">26/02/2025&nbsp;</td>
+    <td align="center">27/02/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>INDEX S&P 500 ESG AE ACC EUR @</td>
+	<td>C</td>
+	<td>-1,99</td>
+	<td>0,97</td>
+   </tr>
+  
+   <tr>
+    <td align="center">27/02/2025&nbsp;</td>
+    <td align="center">27/02/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+100,00</td>
+	<td>100,97</td>
+   </tr>
+  
+   <tr>
+    <td align="center">03/03/2025&nbsp;</td>
+    <td align="center">04/03/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>INDEX S&P 500 ESG AE ACC EUR @</td>
+	<td>C</td>
+	<td>-19,99</td>
+	<td>80,98</td>
+   </tr>
+  
+   <tr>
+    <td align="center">04/03/2025&nbsp;</td>
+    <td align="center">05/03/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>MSCI WORLD INDEX P ACC EUR @ 6</td>
+	<td>C</td>
+	<td>-80,00</td>
+	<td>0,98</td>
+   </tr>
+  
+   <tr>
+    <td align="center">07/03/2025&nbsp;</td>
+    <td align="center">06/03/2025&nbsp;</td>
+	<td>LIQUIDAC. INTERESES</td>
+	<td>PERIODO 06/02/2025 06/03/2025</td>
+	<td>A</td>
+	<td>+0,02</td>
+	<td>1,00</td>
+   </tr>
+  
+   <tr>
+    <td align="center">12/03/2025&nbsp;</td>
+    <td align="center">12/03/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+100,00</td>
+	<td>101,00</td>
+   </tr>
+  
+   <tr>
+    <td align="center">13/03/2025&nbsp;</td>
+    <td align="center">14/03/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>INDEX S&P 500 ESG AE ACC EUR @</td>
+	<td>C</td>
+	<td>-29,99</td>
+	<td>71,01</td>
+   </tr>
+  
+   <tr>
+    <td align="center">14/03/2025&nbsp;</td>
+    <td align="center">17/03/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>MSCI WORLD INDEX P ACC EUR @ 6</td>
+	<td>C</td>
+	<td>-69,99</td>
+	<td>1,02</td>
+   </tr>
+  
+   <tr>
+    <td align="center">25/03/2025&nbsp;</td>
+    <td align="center">25/03/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+40,00</td>
+	<td>41,02</td>
+   </tr>
+  
+   <tr>
+    <td align="center">25/03/2025&nbsp;</td>
+    <td align="center">25/03/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+30,00</td>
+	<td>71,02</td>
+   </tr>
+  
+   <tr>
+    <td align="center">27/03/2025&nbsp;</td>
+    <td align="center">28/03/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>VANGUARD GLOB STOCK EUR @ 0.2</td>
+	<td>C</td>
+	<td>-9,99</td>
+	<td>61,03</td>
+   </tr>
+  
+   <tr>
+    <td align="center">28/03/2025&nbsp;</td>
+    <td align="center">31/03/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>MSCI WORLD INDEX P ACC EUR @ 1</td>
+	<td>C</td>
+	<td>-20,00</td>
+	<td>41,03</td>
+   </tr>
+  
+   <tr>
+    <td align="center">28/03/2025&nbsp;</td>
+    <td align="center">31/03/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>INDEX MSCI EM IE AC EUR @ 0.10</td>
+	<td>C</td>
+	<td>-19,99</td>
+	<td>21,04</td>
+   </tr>
+  
+   <tr>
+    <td align="center">04/04/2025&nbsp;</td>
+    <td align="center">07/04/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>MSCI WORLD INDEX P ACC EUR @ 1</td>
+	<td>C</td>
+	<td>-20,00</td>
+	<td>1,04</td>
+   </tr>
+  
+   <tr>
+    <td align="center">04/04/2025&nbsp;</td>
+    <td align="center">04/04/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+40,00</td>
+	<td>41,04</td>
+   </tr>
+  
+   <tr>
+    <td align="center">07/04/2025&nbsp;</td>
+    <td align="center">06/04/2025&nbsp;</td>
+	<td>LIQUIDAC. INTERESES</td>
+	<td>PERIODO 06/03/2025 06/04/2025</td>
+	<td>A</td>
+	<td>+0,03</td>
+	<td>41,07</td>
+   </tr>
+  
+   <tr>
+    <td align="center">11/04/2025&nbsp;</td>
+    <td align="center">14/04/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>MSCI WORLD INDEX P ACC EUR @ 2</td>
+	<td>C</td>
+	<td>-20,00</td>
+	<td>21,07</td>
+   </tr>
+  
+   <tr>
+    <td align="center">18/04/2025&nbsp;</td>
+    <td align="center">22/04/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>MSCI WORLD INDEX P ACC EUR @ 2</td>
+	<td>C</td>
+	<td>-20,00</td>
+	<td>1,07</td>
+   </tr>
+  
+   <tr>
+    <td align="center">21/04/2025&nbsp;</td>
+    <td align="center">21/04/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+40,00</td>
+	<td>41,07</td>
+   </tr>
+  
+   <tr>
+    <td align="center">25/04/2025&nbsp;</td>
+    <td align="center">28/04/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>MSCI WORLD INDEX P ACC EUR @ 1</td>
+	<td>C</td>
+	<td>-20,00</td>
+	<td>21,07</td>
+   </tr>
+  
+   <tr>
+    <td align="center">02/05/2025&nbsp;</td>
+    <td align="center">05/05/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>MSCI WORLD INDEX P ACC EUR @ 1</td>
+	<td>C</td>
+	<td>-20,00</td>
+	<td>1,07</td>
+   </tr>
+  
+   <tr>
+    <td align="center">02/05/2025&nbsp;</td>
+    <td align="center">02/05/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+40,00</td>
+	<td>41,07</td>
+   </tr>
+  
+   <tr>
+    <td align="center">07/05/2025&nbsp;</td>
+    <td align="center">06/05/2025&nbsp;</td>
+	<td>LIQUIDAC. INTERESES</td>
+	<td>PERIODO 06/04/2025 06/05/2025</td>
+	<td>A</td>
+	<td>+0,03</td>
+	<td>41,10</td>
+   </tr>
+  
+   <tr>
+    <td align="center">09/05/2025&nbsp;</td>
+    <td align="center">12/05/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>MSCI WORLD INDEX P ACC EUR @ 1</td>
+	<td>C</td>
+	<td>-20,00</td>
+	<td>21,10</td>
+   </tr>
+  
+   <tr>
+    <td align="center">09/05/2025&nbsp;</td>
+    <td align="center">09/05/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+18,90</td>
+	<td>40,00</td>
+   </tr>
+  
+   <tr>
+    <td align="center">13/05/2025&nbsp;</td>
+    <td align="center">14/05/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>VANGUARD US 500 STOCK EUR @ 0.</td>
+	<td>C</td>
+	<td>-19,70</td>
+	<td>20,30</td>
+   </tr>
+  
+   <tr>
+    <td align="center">15/05/2025&nbsp;</td>
+    <td align="center">15/05/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+60,00</td>
+	<td>80,30</td>
+   </tr>
+  
+   <tr>
+    <td align="center">16/05/2025&nbsp;</td>
+    <td align="center">19/05/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>MSCI WORLD INDEX P ACC EUR @ 1</td>
+	<td>C</td>
+	<td>-20,00</td>
+	<td>60,30</td>
+   </tr>
+  
+   <tr>
+    <td align="center">23/05/2025&nbsp;</td>
+    <td align="center">27/05/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>MSCI WORLD INDEX P ACC EUR @ 1</td>
+	<td>C</td>
+	<td>-20,00</td>
+	<td>40,30</td>
+   </tr>
+  
+   <tr>
+    <td align="center">23/05/2025&nbsp;</td>
+    <td align="center">28/05/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>EURO STOXX50 A ACC EUR @ 0.2</td>
+	<td>C</td>
+	<td>-5,00</td>
+	<td>35,30</td>
+   </tr>
+  
+   <tr>
+    <td align="center">29/05/2025&nbsp;</td>
+    <td align="center">29/05/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+400,00</td>
+	<td>435,30</td>
+   </tr>
+  
+   <tr>
+    <td align="center">29/05/2025&nbsp;</td>
+    <td align="center">29/05/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+80,00</td>
+	<td>515,30</td>
+   </tr>
+  
+   <tr>
+    <td align="center">29/05/2025&nbsp;</td>
+    <td align="center">02/06/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES MSCI ACWI @ 1</td>
+	<td>C</td>
+	<td>-83,26</td>
+	<td>432,04</td>
+   </tr>
+  
+   <tr>
+    <td align="center">30/05/2025&nbsp;</td>
+    <td align="center">02/06/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>MSCI WORLD INDEX P ACC EUR @ 1</td>
+	<td>C</td>
+	<td>-20,00</td>
+	<td>412,04</td>
+   </tr>
+  
+   <tr>
+    <td align="center">30/05/2025&nbsp;</td>
+    <td align="center">04/06/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>EURO STOXX50 A ACC EUR @ 0.2</td>
+	<td>C</td>
+	<td>-5,00</td>
+	<td>407,04</td>
+   </tr>
+  
+   <tr>
+    <td align="center">03/06/2025&nbsp;</td>
+    <td align="center">03/06/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+95,00</td>
+	<td>502,04</td>
+   </tr>
+  
+   <tr>
+    <td align="center">06/06/2025&nbsp;</td>
+    <td align="center">09/06/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>INDEX MSCI EM IE AC EUR @ 0.13</td>
+	<td>C</td>
+	<td>-24,99</td>
+	<td>477,05</td>
+   </tr>
+  
+   <tr>
+    <td align="center">06/06/2025&nbsp;</td>
+    <td align="center">11/06/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>EURO STOXX50 A ACC EUR @ 1.01</td>
+	<td>C</td>
+	<td>-25,00</td>
+	<td>452,05</td>
+   </tr>
+  
+   <tr>
+    <td align="center">07/06/2025&nbsp;</td>
+    <td align="center">06/06/2025&nbsp;</td>
+	<td>LIQUIDAC. INTERESES</td>
+	<td>PERIODO 06/05/2025 06/06/2025</td>
+	<td>A</td>
+	<td>+0,11</td>
+	<td>452,16</td>
+   </tr>
+  
+   <tr>
+    <td align="center">09/06/2025&nbsp;</td>
+    <td align="center">10/06/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>MSCI WORLD INDEX P ACC EUR @ 6</td>
+	<td>C</td>
+	<td>-75,00</td>
+	<td>377,16</td>
+   </tr>
+  
+   <tr>
+    <td align="center">13/06/2025&nbsp;</td>
+    <td align="center">16/06/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>INDEX MSCI EM IE AC EUR @ 0.13</td>
+	<td>C</td>
+	<td>-24,99</td>
+	<td>352,17</td>
+   </tr>
+  
+   <tr>
+    <td align="center">13/06/2025&nbsp;</td>
+    <td align="center">18/06/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>EURO STOXX50 A ACC EUR @ 1.04</td>
+	<td>C</td>
+	<td>-25,00</td>
+	<td>327,17</td>
+   </tr>
+  
+   <tr>
+    <td align="center">17/06/2025&nbsp;</td>
+    <td align="center">18/06/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>MSCI WORLD INDEX P ACC EUR @ 6</td>
+	<td>C</td>
+	<td>-75,00</td>
+	<td>252,17</td>
+   </tr>
+  
+   <tr>
+    <td align="center">19/06/2025&nbsp;</td>
+    <td align="center">24/06/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>EURO STOXX50 A ACC EUR @ 1.05</td>
+	<td>C</td>
+	<td>-25,00</td>
+	<td>227,17</td>
+   </tr>
+  
+   <tr>
+    <td align="center">20/06/2025&nbsp;</td>
+    <td align="center">23/06/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>INDEX MSCI EM IE AC EUR @ 0.13</td>
+	<td>C</td>
+	<td>-24,99</td>
+	<td>202,18</td>
+   </tr>
+  
+   <tr>
+    <td align="center">24/06/2025&nbsp;</td>
+    <td align="center">25/06/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>MSCI WORLD INDEX P ACC EUR @ 6</td>
+	<td>C</td>
+	<td>-75,00</td>
+	<td>127,18</td>
+   </tr>
+  
+   <tr>
+    <td align="center">26/06/2025&nbsp;</td>
+    <td align="center">26/06/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+100,00</td>
+	<td>227,18</td>
+   </tr>
+  
+   <tr>
+    <td align="center">26/06/2025&nbsp;</td>
+    <td align="center">01/07/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>EURO STOXX50 A ACC EUR @ 1.05</td>
+	<td>C</td>
+	<td>-25,00</td>
+	<td>202,18</td>
+   </tr>
+  
+   <tr>
+    <td align="center">27/06/2025&nbsp;</td>
+    <td align="center">30/06/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>INDEX MSCI EM IE AC EUR @ 0.13</td>
+	<td>C</td>
+	<td>-24,99</td>
+	<td>177,19</td>
+   </tr>
+  
+   <tr>
+    <td align="center">30/06/2025&nbsp;</td>
+    <td align="center">01/07/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>MSCI WORLD INDEX P ACC EUR @ 6</td>
+	<td>C</td>
+	<td>-75,00</td>
+	<td>102,19</td>
+   </tr>
+  
+   <tr>
+    <td align="center">30/06/2025&nbsp;</td>
+    <td align="center">30/06/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+500,00</td>
+	<td>602,19</td>
+   </tr>
+  
+   <tr>
+    <td align="center">01/07/2025&nbsp;</td>
+    <td align="center">03/07/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES DEVL WRLD INDX D EUR @</td>
+	<td>C</td>
+	<td>-99,85</td>
+	<td>502,34</td>
+   </tr>
+  
+   <tr>
+    <td align="center">03/07/2025&nbsp;</td>
+    <td align="center">08/07/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>EURO STOXX50 A ACC EUR @ 1.02</td>
+	<td>C</td>
+	<td>-25,00</td>
+	<td>477,34</td>
+   </tr>
+  
+   <tr>
+    <td align="center">04/07/2025&nbsp;</td>
+    <td align="center">07/07/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>INDEX MSCI EM IE AC EUR @ 0.13</td>
+	<td>C</td>
+	<td>-24,99</td>
+	<td>452,35</td>
+   </tr>
+  
+   <tr>
+    <td align="center">07/07/2025&nbsp;</td>
+    <td align="center">06/07/2025&nbsp;</td>
+	<td>LIQUIDAC. INTERESES</td>
+	<td>PERIODO 06/06/2025 06/07/2025</td>
+	<td>A</td>
+	<td>+0,24</td>
+	<td>452,59</td>
+   </tr>
+  
+   <tr>
+    <td align="center">07/07/2025&nbsp;</td>
+    <td align="center">09/07/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>X GALAXY PHY BITCOIN ETC @ 1</td>
+	<td>C</td>
+	<td>-16,16</td>
+	<td>436,43</td>
+   </tr>
+  
+   <tr>
+    <td align="center">07/07/2025&nbsp;</td>
+    <td align="center">09/07/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES PHYSICAL GOLD ETC @ 1</td>
+	<td>C</td>
+	<td>-54,74</td>
+	<td>381,69</td>
+   </tr>
+  
+   <tr>
+    <td align="center">09/07/2025&nbsp;</td>
+    <td align="center">11/07/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES DEVL WRLD INDX D EUR @</td>
+	<td>C</td>
+	<td>-99,85</td>
+	<td>281,84</td>
+   </tr>
+  
+   <tr>
+    <td align="center">10/07/2025&nbsp;</td>
+    <td align="center">11/07/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>MSCI WORLD INDEX P ACC EUR @ 8</td>
+	<td>C</td>
+	<td>-100,00</td>
+	<td>181,84</td>
+   </tr>
+  
+   <tr>
+    <td align="center">10/07/2025&nbsp;</td>
+    <td align="center">15/07/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>EURO STOXX50 A ACC EUR @ 1.01</td>
+	<td>C</td>
+	<td>-25,00</td>
+	<td>156,84</td>
+   </tr>
+  
+   <tr>
+    <td align="center">11/07/2025&nbsp;</td>
+    <td align="center">14/07/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>INDEX MSCI EM IE AC EUR @ 0.13</td>
+	<td>C</td>
+	<td>-24,99</td>
+	<td>131,85</td>
+   </tr>
+  
+   <tr>
+    <td align="center">11/07/2025&nbsp;</td>
+    <td align="center">11/07/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td>Enviada desde N26</td>
+	<td>A</td>
+	<td>+1,00</td>
+	<td>132,85</td>
+   </tr>
+  
+   <tr>
+    <td align="center">11/07/2025&nbsp;</td>
+    <td align="center">11/07/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td>Enviada desde N26</td>
+	<td>A</td>
+	<td>+149,00</td>
+	<td>281,85</td>
+   </tr>
+  
+   <tr>
+    <td align="center">11/07/2025&nbsp;</td>
+    <td align="center">11/07/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td>Enviada desde N26</td>
+	<td>A</td>
+	<td>+1.837,14</td>
+	<td>2.118,99</td>
+   </tr>
+  
+   <tr>
+    <td align="center">15/07/2025&nbsp;</td>
+    <td align="center">15/07/2025&nbsp;</td>
+	<td>TRANSFERENCIA SEPA</td>
+	<td>Transferencia desde MyInvestor</td>
+	<td>C</td>
+	<td>-20,00</td>
+	<td>2.098,99</td>
+   </tr>
+  
+   <tr>
+    <td align="center">16/07/2025&nbsp;</td>
+    <td align="center">16/07/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+20,00</td>
+	<td>2.118,99</td>
+   </tr>
+  
+   <tr>
+    <td align="center">17/07/2025&nbsp;</td>
+    <td align="center">18/07/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>MSCI WORLD INDEX P ACC EUR @ 8</td>
+	<td>C</td>
+	<td>-100,00</td>
+	<td>2.018,99</td>
+   </tr>
+  
+   <tr>
+    <td align="center">17/07/2025&nbsp;</td>
+    <td align="center">22/07/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>EURO STOXX50 A ACC EUR @ 1.02</td>
+	<td>C</td>
+	<td>-25,00</td>
+	<td>1.993,99</td>
+   </tr>
+  
+   <tr>
+    <td align="center">18/07/2025&nbsp;</td>
+    <td align="center">21/07/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>INDEX MSCI EM IE AC EUR @ 0.13</td>
+	<td>C</td>
+	<td>-24,99</td>
+	<td>1.969,00</td>
+   </tr>
+  
+   <tr>
+    <td align="center">24/07/2025&nbsp;</td>
+    <td align="center">25/07/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>MSCI WORLD INDEX P ACC EUR @ 8</td>
+	<td>C</td>
+	<td>-100,00</td>
+	<td>1.869,00</td>
+   </tr>
+  
+   <tr>
+    <td align="center">24/07/2025&nbsp;</td>
+    <td align="center">29/07/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>EURO STOXX50 A ACC EUR @ 1.02</td>
+	<td>C</td>
+	<td>-25,00</td>
+	<td>1.844,00</td>
+   </tr>
+  
+   <tr>
+    <td align="center">25/07/2025&nbsp;</td>
+    <td align="center">28/07/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>INDEX MSCI EM IE AC EUR @ 0.13</td>
+	<td>C</td>
+	<td>-24,99</td>
+	<td>1.819,01</td>
+   </tr>
+  
+   <tr>
+    <td align="center">31/07/2025&nbsp;</td>
+    <td align="center">01/08/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>MSCI WORLD INDEX P ACC EUR @ 8</td>
+	<td>C</td>
+	<td>-100,00</td>
+	<td>1.719,01</td>
+   </tr>
+  
+   <tr>
+    <td align="center">31/07/2025&nbsp;</td>
+    <td align="center">05/08/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>EURO STOXX50 A ACC EUR @ 1.03</td>
+	<td>C</td>
+	<td>-25,00</td>
+	<td>1.694,01</td>
+   </tr>
+  
+   <tr>
+    <td align="center">01/08/2025&nbsp;</td>
+    <td align="center">04/08/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>INDEX MSCI EM IE AC EUR @ 0.13</td>
+	<td>C</td>
+	<td>-24,99</td>
+	<td>1.669,02</td>
+   </tr>
+  
+   <tr>
+    <td align="center">05/08/2025&nbsp;</td>
+    <td align="center">08/08/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>EURO STOXX50 A ACC EUR @ 0.83</td>
+	<td>C</td>
+	<td>-20,00</td>
+	<td>1.649,02</td>
+   </tr>
+  
+   <tr>
+    <td align="center">06/08/2025&nbsp;</td>
+    <td align="center">06/08/2025&nbsp;</td>
+	<td>TRANSFERENCIA SEPA</td>
+	<td>Transferencia desde MyInvestor</td>
+	<td>C</td>
+	<td>-1,00</td>
+	<td>1.648,02</td>
+   </tr>
+  
+   <tr>
+    <td align="center">06/08/2025&nbsp;</td>
+    <td align="center">07/08/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>VANGUARD US 500 STOCK EUR @ 1</td>
+	<td>C</td>
+	<td>-65,96</td>
+	<td>1.582,06</td>
+   </tr>
+  
+   <tr>
+    <td align="center">07/08/2025&nbsp;</td>
+    <td align="center">06/08/2025&nbsp;</td>
+	<td>LIQUIDAC. INTERESES</td>
+	<td>PERIODO 06/07/2025 06/08/2025</td>
+	<td>A</td>
+	<td>+0,88</td>
+	<td>1.582,94</td>
+   </tr>
+  
+   <tr>
+    <td align="center">07/08/2025&nbsp;</td>
+    <td align="center">08/08/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>MSCI WORLD INDEX P ACC EUR @ 8</td>
+	<td>C</td>
+	<td>-100,00</td>
+	<td>1.482,94</td>
+   </tr>
+  
+   <tr>
+    <td align="center">07/08/2025&nbsp;</td>
+    <td align="center">08/08/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>INDEX MSCI EM IE AC EUR @ 0.10</td>
+	<td>C</td>
+	<td>-19,99</td>
+	<td>1.462,95</td>
+   </tr>
+  
+   <tr>
+    <td align="center">07/08/2025&nbsp;</td>
+    <td align="center">07/08/2025&nbsp;</td>
+	<td>TRANSFERENCIA SEPA</td>
+	<td>Transferencia desde MyInvestor</td>
+	<td>C</td>
+	<td>-150,00</td>
+	<td>1.312,95</td>
+   </tr>
+  
+   <tr>
+    <td align="center">08/08/2025&nbsp;</td>
+    <td align="center">08/08/2025&nbsp;</td>
+	<td>TRANSFERENCIA SEPA</td>
+	<td>Transferencia desde MyInvestor</td>
+	<td>C</td>
+	<td>-500,00</td>
+	<td>812,95</td>
+   </tr>
+  
+   <tr>
+    <td align="center">11/08/2025&nbsp;</td>
+    <td align="center">14/08/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>EURO STOXX50 A ACC EUR @ 0.41</td>
+	<td>C</td>
+	<td>-10,00</td>
+	<td>802,95</td>
+   </tr>
+  
+   <tr>
+    <td align="center">12/08/2025&nbsp;</td>
+    <td align="center">15/08/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>EURO STOXX50 A ACC EUR @ 0.82</td>
+	<td>C</td>
+	<td>-20,00</td>
+	<td>782,95</td>
+   </tr>
+  
+   <tr>
+    <td align="center">13/08/2025&nbsp;</td>
+    <td align="center">14/08/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>INDEX MSCI EM IE AC EUR @ 0.10</td>
+	<td>C</td>
+	<td>-19,99</td>
+	<td>762,96</td>
+   </tr>
+  
+   <tr>
+    <td align="center">14/08/2025&nbsp;</td>
+    <td align="center">15/08/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>MSCI WORLD INDEX P ACC EUR @ 8</td>
+	<td>C</td>
+	<td>-100,00</td>
+	<td>662,96</td>
+   </tr>
+  
+   <tr>
+    <td align="center">14/08/2025&nbsp;</td>
+    <td align="center">18/08/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES DEVL WRLD INDX D EUR @</td>
+	<td>C</td>
+	<td>-62,95</td>
+	<td>600,01</td>
+   </tr>
+  
+   <tr>
+    <td align="center">18/08/2025&nbsp;</td>
+    <td align="center">21/08/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>EURO STOXX50 A ACC EUR @ 0.8</td>
+	<td>C</td>
+	<td>-20,00</td>
+	<td>580,01</td>
+   </tr>
+  
+   <tr>
+    <td align="center">20/08/2025&nbsp;</td>
+    <td align="center">21/08/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>INDEX MSCI EM IE AC EUR @ 0.10</td>
+	<td>C</td>
+	<td>-19,99</td>
+	<td>560,02</td>
+   </tr>
+  
+   <tr>
+    <td align="center">21/08/2025&nbsp;</td>
+    <td align="center">22/08/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>MSCI WORLD INDEX P ACC EUR @ 8</td>
+	<td>C</td>
+	<td>-100,00</td>
+	<td>460,02</td>
+   </tr>
+  
+   <tr>
+    <td align="center">25/08/2025&nbsp;</td>
+    <td align="center">28/08/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>EURO STOXX50 A ACC EUR @ 0.4</td>
+	<td>C</td>
+	<td>-10,00</td>
+	<td>450,02</td>
+   </tr>
+  
+   <tr>
+    <td align="center">27/08/2025&nbsp;</td>
+    <td align="center">28/08/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>INDEX MSCI EM IE AC EUR @ 0.10</td>
+	<td>C</td>
+	<td>-19,99</td>
+	<td>430,03</td>
+   </tr>
+  
+   <tr>
+    <td align="center">28/08/2025&nbsp;</td>
+    <td align="center">29/08/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>MSCI WORLD INDEX P ACC EUR @ 8</td>
+	<td>C</td>
+	<td>-100,00</td>
+	<td>330,03</td>
+   </tr>
+  
+   <tr>
+    <td align="center">01/09/2025&nbsp;</td>
+    <td align="center">04/09/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>EURO STOXX50 A ACC EUR @ 0.41</td>
+	<td>C</td>
+	<td>-10,00</td>
+	<td>320,03</td>
+   </tr>
+  
+   <tr>
+    <td align="center">04/09/2025&nbsp;</td>
+    <td align="center">05/09/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>INDEX MSCI EM IE AC EUR @ 0.10</td>
+	<td>C</td>
+	<td>-19,99</td>
+	<td>300,04</td>
+   </tr>
+  
+   <tr>
+    <td align="center">04/09/2025&nbsp;</td>
+    <td align="center">05/09/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>MSCI WORLD INDEX P ACC EUR @ 9</td>
+	<td>C</td>
+	<td>-110,00</td>
+	<td>190,04</td>
+   </tr>
+  
+   <tr>
+    <td align="center">05/09/2025&nbsp;</td>
+    <td align="center">09/09/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES DEVL WRLD INDX D EUR @</td>
+	<td>C</td>
+	<td>-47,54</td>
+	<td>142,50</td>
+   </tr>
+  
+   <tr>
+    <td align="center">07/09/2025&nbsp;</td>
+    <td align="center">06/09/2025&nbsp;</td>
+	<td>LIQUIDAC. INTERESES</td>
+	<td>PERIODO 06/08/2025 06/09/2025</td>
+	<td>A</td>
+	<td>+0,32</td>
+	<td>142,82</td>
+   </tr>
+  
+   <tr>
+    <td align="center">08/09/2025&nbsp;</td>
+    <td align="center">11/09/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>EURO STOXX50 A ACC EUR @ 0.41</td>
+	<td>C</td>
+	<td>-10,00</td>
+	<td>132,82</td>
+   </tr>
+  
+   <tr>
+    <td align="center">09/09/2025&nbsp;</td>
+    <td align="center">09/09/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+300,00</td>
+	<td>432,82</td>
+   </tr>
+  
+   <tr>
+    <td align="center">10/09/2025&nbsp;</td>
+    <td align="center">11/09/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>MSCI WORLD INDEX P ACC EUR @ 9</td>
+	<td>C</td>
+	<td>-110,00</td>
+	<td>322,82</td>
+   </tr>
+  
+   <tr>
+    <td align="center">10/09/2025&nbsp;</td>
+    <td align="center">11/09/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>INDEX MSCI EM IE AC EUR @ 0.10</td>
+	<td>C</td>
+	<td>-19,99</td>
+	<td>302,83</td>
+   </tr>
+  
+   <tr>
+    <td align="center">12/09/2025&nbsp;</td>
+    <td align="center">15/09/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>VANGUARD GLOB SMALL CAP EU INV</td>
+	<td>C</td>
+	<td>-3,69</td>
+	<td>299,14</td>
+   </tr>
+  
+   <tr>
+    <td align="center">15/09/2025&nbsp;</td>
+    <td align="center">11/09/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>MYINVESTOR NASDAQ 100 FI @ 7.3</td>
+	<td>C</td>
+	<td>-10,00</td>
+	<td>289,14</td>
+   </tr>
+  
+   <tr>
+    <td align="center">17/09/2025&nbsp;</td>
+    <td align="center">18/09/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>MSCI WORLD INDEX P ACC EUR @ 1</td>
+	<td>C</td>
+	<td>-120,00</td>
+	<td>169,14</td>
+   </tr>
+  
+   <tr>
+    <td align="center">17/09/2025&nbsp;</td>
+    <td align="center">18/09/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>INDEX MSCI EM IE AC EUR @ 0.10</td>
+	<td>C</td>
+	<td>-19,99</td>
+	<td>149,15</td>
+   </tr>
+  
+   <tr>
+    <td align="center">19/09/2025&nbsp;</td>
+    <td align="center">22/09/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>VANGUARD GLOB SMALL CAP EU INV</td>
+	<td>C</td>
+	<td>-3,69</td>
+	<td>145,46</td>
+   </tr>
+  
+   <tr>
+    <td align="center">24/09/2025&nbsp;</td>
+    <td align="center">25/09/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>MSCI WORLD INDEX P ACC EUR @ 1</td>
+	<td>C</td>
+	<td>-120,00</td>
+	<td>25,46</td>
+   </tr>
+  
+   <tr>
+    <td align="center">24/09/2025&nbsp;</td>
+    <td align="center">25/09/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>INDEX MSCI EM IE AC EUR @ 0.09</td>
+	<td>C</td>
+	<td>-19,99</td>
+	<td>5,47</td>
+   </tr>
+  
+   <tr>
+    <td align="center">24/09/2025&nbsp;</td>
+    <td align="center">24/09/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+200,00</td>
+	<td>205,47</td>
+   </tr>
+  
+   <tr>
+    <td align="center">26/09/2025&nbsp;</td>
+    <td align="center">29/09/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>VANGUARD GLOB SMALL CAP EU INV</td>
+	<td>C</td>
+	<td>-3,65</td>
+	<td>201,82</td>
+   </tr>
+  
+   <tr>
+    <td align="center">26/09/2025&nbsp;</td>
+    <td align="center">30/09/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES DEVL WRLD INDX D EUR @</td>
+	<td>C</td>
+	<td>-48,05</td>
+	<td>153,77</td>
+   </tr>
+  
+   <tr>
+    <td align="center">01/10/2025&nbsp;</td>
+    <td align="center">02/10/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>MSCI WORLD INDEX P ACC EUR @ 9</td>
+	<td>C</td>
+	<td>-120,00</td>
+	<td>33,77</td>
+   </tr>
+  
+   <tr>
+    <td align="center">01/10/2025&nbsp;</td>
+    <td align="center">02/10/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>INDEX MSCI EM IE AC EUR @ 0.09</td>
+	<td>C</td>
+	<td>-19,99</td>
+	<td>13,78</td>
+   </tr>
+  
+   <tr>
+    <td align="center">01/10/2025&nbsp;</td>
+    <td align="center">01/10/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+180,00</td>
+	<td>193,78</td>
+   </tr>
+  
+   <tr>
+    <td align="center">06/10/2025&nbsp;</td>
+    <td align="center">07/10/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>VANGUARD GLOB SMALL CAP EU INV</td>
+	<td>C</td>
+	<td>-3,72</td>
+	<td>190,06</td>
+   </tr>
+  
+   <tr>
+    <td align="center">06/10/2025&nbsp;</td>
+    <td align="center">08/10/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES EMERGING MRK IND S EUR</td>
+	<td>C</td>
+	<td>-1,00</td>
+	<td>189,06</td>
+   </tr>
+  
+   <tr>
+    <td align="center">06/10/2025&nbsp;</td>
+    <td align="center">08/10/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES US INDEX FUND IE S EUR</td>
+	<td>C</td>
+	<td>-1,00</td>
+	<td>188,06</td>
+   </tr>
+  
+   <tr>
+    <td align="center">06/10/2025&nbsp;</td>
+    <td align="center">08/10/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES DEVELOPED WRD IN S EUR</td>
+	<td>C</td>
+	<td>-1,00</td>
+	<td>187,06</td>
+   </tr>
+  
+   <tr>
+    <td align="center">06/10/2025&nbsp;</td>
+    <td align="center">09/10/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>EURO STOXX50 A ACC EUR @ 0.54</td>
+	<td>C</td>
+	<td>-14,00</td>
+	<td>173,06</td>
+   </tr>
+  
+   <tr>
+    <td align="center">07/10/2025&nbsp;</td>
+    <td align="center">06/10/2025&nbsp;</td>
+	<td>LIQUIDAC. INTERESES</td>
+	<td>PERIODO 06/09/2025 06/10/2025</td>
+	<td>A</td>
+	<td>+0,05</td>
+	<td>173,11</td>
+   </tr>
+  
+   <tr>
+    <td align="center">08/10/2025&nbsp;</td>
+    <td align="center">09/10/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>MSCI WORLD INDEX P ACC EUR @ 9</td>
+	<td>C</td>
+	<td>-120,00</td>
+	<td>53,11</td>
+   </tr>
+  
+   <tr>
+    <td align="center">09/10/2025&nbsp;</td>
+    <td align="center">10/10/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>INDEX MSCI EM IE AC EUR @ 0.09</td>
+	<td>C</td>
+	<td>-19,99</td>
+	<td>33,12</td>
+   </tr>
+  
+   <tr>
+    <td align="center">10/10/2025&nbsp;</td>
+    <td align="center">14/10/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>VANGUARD GLOB SMALL CAP EU INV</td>
+	<td>C</td>
+	<td>-3,75</td>
+	<td>29,37</td>
+   </tr>
+  
+   <tr>
+    <td align="center">10/10/2025&nbsp;</td>
+    <td align="center">06/10/2025&nbsp;</td>
+	<td>APORTACION PLANES</td>
+	<td>MYINVESTOR INDEXADO GLOBAL PP</td>
+	<td>C</td>
+	<td>-10,00</td>
+	<td>19,37</td>
+   </tr>
+  
+   <tr>
+    <td align="center">10/10/2025&nbsp;</td>
+    <td align="center">10/10/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+0,95</td>
+	<td>20,32</td>
+   </tr>
+  
+   <tr>
+    <td align="center">13/10/2025&nbsp;</td>
+    <td align="center">13/10/2025&nbsp;</td>
+	<td>TRANSFERENCIA SEPA</td>
+	<td>Avaro GarcA Fuentes</td>
+	<td>A</td>
+	<td>+40,00</td>
+	<td>60,32</td>
+   </tr>
+  
+   <tr>
+    <td align="center">13/10/2025&nbsp;</td>
+    <td align="center">13/10/2025&nbsp;</td>
+	<td>TRANSFERENCIA SEPA</td>
+	<td>Avaro GarcA Fuentes</td>
+	<td>A</td>
+	<td>+140,00</td>
+	<td>200,32</td>
+   </tr>
+  
+   <tr>
+    <td align="center">14/10/2025&nbsp;</td>
+    <td align="center">15/10/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES US INDEX FUND IE S EUR</td>
+	<td>C</td>
+	<td>-1,00</td>
+	<td>199,32</td>
+   </tr>
+  
+   <tr>
+    <td align="center">15/10/2025&nbsp;</td>
+    <td align="center">16/10/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>VANGUARD GLOB SMALL CAP EU @ 0</td>
+	<td>C</td>
+	<td>-3,59</td>
+	<td>195,73</td>
+   </tr>
+  
+   <tr>
+    <td align="center">15/10/2025&nbsp;</td>
+    <td align="center">15/10/2025&nbsp;</td>
+	<td>TRANSFERENCIA SEPA</td>
+	<td>Avaro GarcA Fuentes</td>
+	<td>A</td>
+	<td>+152,77</td>
+	<td>348,50</td>
+   </tr>
+  
+   <tr>
+    <td align="center">16/10/2025&nbsp;</td>
+    <td align="center">17/10/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES DEVELOPED WRD IN S EUR</td>
+	<td>C</td>
+	<td>-1,00</td>
+	<td>347,50</td>
+   </tr>
+  
+   <tr>
+    <td align="center">16/10/2025&nbsp;</td>
+    <td align="center">17/10/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>MSCI WORLD INDEX P ACC EUR @ 9</td>
+	<td>C</td>
+	<td>-120,00</td>
+	<td>227,50</td>
+   </tr>
+  
+   <tr>
+    <td align="center">16/10/2025&nbsp;</td>
+    <td align="center">17/10/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>INDEX MSCI EM IE AC EUR @ 0.12</td>
+	<td>C</td>
+	<td>-24,99</td>
+	<td>202,51</td>
+   </tr>
+  
+   <tr>
+    <td align="center">16/10/2025&nbsp;</td>
+    <td align="center">14/10/2025&nbsp;</td>
+	<td>APORTACION PLANES</td>
+	<td>MYINVESTOR INDEXADO GLOBAL PP</td>
+	<td>C</td>
+	<td>-10,00</td>
+	<td>192,51</td>
+   </tr>
+  
+   <tr>
+    <td align="center">17/10/2025&nbsp;</td>
+    <td align="center">20/10/2025&nbsp;</td>
+	<td>REEMBOLSO IIC</td>
+	<td>VANGUARD GLOB SMALL CAP EU @ 0</td>
+	<td>A</td>
+	<td>+3,56</td>
+	<td>196,07</td>
+   </tr>
+  
+   <tr>
+    <td align="center">20/10/2025&nbsp;</td>
+    <td align="center">22/10/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>X GALAXY PHY BITCOIN ETC @ 1</td>
+	<td>C</td>
+	<td>-16,63</td>
+	<td>179,44</td>
+   </tr>
+  
+   <tr>
+    <td align="center">20/10/2025&nbsp;</td>
+    <td align="center">22/10/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 2</td>
+	<td>C</td>
+	<td>-19,09</td>
+	<td>160,35</td>
+   </tr>
+  
+   <tr>
+    <td align="center">20/10/2025&nbsp;</td>
+    <td align="center">20/10/2025&nbsp;</td>
+	<td>TRANSFERENCIA SEPA</td>
+	<td>Avaro GarcA Fuentes</td>
+	<td>A</td>
+	<td>+100,00</td>
+	<td>260,35</td>
+   </tr>
+  
+   <tr>
+    <td align="center">21/10/2025&nbsp;</td>
+    <td align="center">21/10/2025&nbsp;</td>
+	<td>TRANSFERENCIA SEPA</td>
+	<td>Avaro GarcA Fuentes</td>
+	<td>A</td>
+	<td>+80,00</td>
+	<td>340,35</td>
+   </tr>
+  
+   <tr>
+    <td align="center">22/10/2025&nbsp;</td>
+    <td align="center">23/10/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>MSCI WORLD INDEX P ACC EUR @ 9</td>
+	<td>C</td>
+	<td>-120,00</td>
+	<td>220,35</td>
+   </tr>
+  
+   <tr>
+    <td align="center">22/10/2025&nbsp;</td>
+    <td align="center">24/10/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES US INDEX FUND IE S EUR</td>
+	<td>C</td>
+	<td>-2,00</td>
+	<td>218,35</td>
+   </tr>
+  
+   <tr>
+    <td align="center">22/10/2025&nbsp;</td>
+    <td align="center">21/10/2025&nbsp;</td>
+	<td>APORTACION PLANES</td>
+	<td>MYINVESTOR INDEXADO GLOBAL PP</td>
+	<td>C</td>
+	<td>-10,00</td>
+	<td>208,35</td>
+   </tr>
+  
+   <tr>
+    <td align="center">23/10/2025&nbsp;</td>
+    <td align="center">24/10/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>VANGUARD GLOB SMALL CAP EU INV</td>
+	<td>C</td>
+	<td>-3,72</td>
+	<td>204,63</td>
+   </tr>
+  
+   <tr>
+    <td align="center">23/10/2025&nbsp;</td>
+    <td align="center">27/10/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 1</td>
+	<td>C</td>
+	<td>-9,44</td>
+	<td>195,19</td>
+   </tr>
+  
+   <tr>
+    <td align="center">23/10/2025&nbsp;</td>
+    <td align="center">27/10/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES DEVELOPED WRD IN S EUR</td>
+	<td>C</td>
+	<td>-1,00</td>
+	<td>194,19</td>
+   </tr>
+  
+   <tr>
+    <td align="center">24/10/2025&nbsp;</td>
+    <td align="center">27/10/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>INDEX MSCI EM IE AC EUR @ 0.11</td>
+	<td>C</td>
+	<td>-24,99</td>
+	<td>169,20</td>
+   </tr>
+  
+   <tr>
+    <td align="center">24/10/2025&nbsp;</td>
+    <td align="center">28/10/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES EMERGING MRK IND S EUR</td>
+	<td>C</td>
+	<td>-1,00</td>
+	<td>168,20</td>
+   </tr>
+  
+   <tr>
+    <td align="center">28/10/2025&nbsp;</td>
+    <td align="center">27/10/2025&nbsp;</td>
+	<td>APORTACION PLANES</td>
+	<td>MYINVESTOR INDEXADO GLOBAL PP</td>
+	<td>C</td>
+	<td>-130,00</td>
+	<td>38,20</td>
+   </tr>
+  
+   <tr>
+    <td align="center">29/10/2025&nbsp;</td>
+    <td align="center">31/10/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES EMERGING MRK IND S EUR</td>
+	<td>C</td>
+	<td>-1,00</td>
+	<td>37,20</td>
+   </tr>
+  
+   <tr>
+    <td align="center">30/10/2025&nbsp;</td>
+    <td align="center">31/10/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>VANGUARD GLOB SMALL CAP EU INV</td>
+	<td>C</td>
+	<td>-3,73</td>
+	<td>33,47</td>
+   </tr>
+  
+   <tr>
+    <td align="center">30/10/2025&nbsp;</td>
+    <td align="center">30/10/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+180,00</td>
+	<td>213,47</td>
+   </tr>
+  
+   <tr>
+    <td align="center">31/10/2025&nbsp;</td>
+    <td align="center">03/11/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>INDEX MSCI EM IE AC EUR @ 0.11</td>
+	<td>C</td>
+	<td>-24,99</td>
+	<td>188,48</td>
+   </tr>
+  
+   <tr>
+    <td align="center">31/10/2025&nbsp;</td>
+    <td align="center">04/11/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES DEVELOPED WRD IN S EUR</td>
+	<td>C</td>
+	<td>-1,00</td>
+	<td>187,48</td>
+   </tr>
+  
+   <tr>
+    <td align="center">03/11/2025&nbsp;</td>
+    <td align="center">05/11/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 1</td>
+	<td>C</td>
+	<td>-9,35</td>
+	<td>178,13</td>
+   </tr>
+  
+   <tr>
+    <td align="center">03/11/2025&nbsp;</td>
+    <td align="center">03/11/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+9,52</td>
+	<td>187,65</td>
+   </tr>
+  
+   <tr>
+    <td align="center">03/11/2025&nbsp;</td>
+    <td align="center">05/11/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES US INDEX FUND IE S EUR</td>
+	<td>C</td>
+	<td>-1,00</td>
+	<td>186,65</td>
+   </tr>
+  
+   <tr>
+    <td align="center">04/11/2025&nbsp;</td>
+    <td align="center">06/11/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 1</td>
+	<td>C</td>
+	<td>-9,09</td>
+	<td>177,56</td>
+   </tr>
+  
+   <tr>
+    <td align="center">05/11/2025&nbsp;</td>
+    <td align="center">03/11/2025&nbsp;</td>
+	<td>APORTACION PLANES</td>
+	<td>MYINVESTOR INDEXADO GLOBAL PP</td>
+	<td>C</td>
+	<td>-150,00</td>
+	<td>27,56</td>
+   </tr>
+  
+   <tr>
+    <td align="center">05/11/2025&nbsp;</td>
+    <td align="center">05/11/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+10,00</td>
+	<td>37,56</td>
+   </tr>
+  
+   <tr>
+    <td align="center">05/11/2025&nbsp;</td>
+    <td align="center">07/11/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 1</td>
+	<td>C</td>
+	<td>-8,88</td>
+	<td>28,68</td>
+   </tr>
+  
+   <tr>
+    <td align="center">05/11/2025&nbsp;</td>
+    <td align="center">05/11/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+6,00</td>
+	<td>34,68</td>
+   </tr>
+  
+   <tr>
+    <td align="center">06/11/2025&nbsp;</td>
+    <td align="center">10/11/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES EMERGING MRK IND S EUR</td>
+	<td>C</td>
+	<td>-1,00</td>
+	<td>33,68</td>
+   </tr>
+  
+   <tr>
+    <td align="center">07/11/2025&nbsp;</td>
+    <td align="center">07/11/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+100,00</td>
+	<td>133,68</td>
+   </tr>
+  
+   <tr>
+    <td align="center">07/11/2025&nbsp;</td>
+    <td align="center">06/11/2025&nbsp;</td>
+	<td>LIQUIDAC. INTERESES</td>
+	<td>PERIODO 06/10/2025 06/11/2025</td>
+	<td>A</td>
+	<td>+0,03</td>
+	<td>133,71</td>
+   </tr>
+  
+   <tr>
+    <td align="center">07/11/2025&nbsp;</td>
+    <td align="center">10/11/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>VANGUARD GLOB SMALL CAP EU INV</td>
+	<td>C</td>
+	<td>-3,68</td>
+	<td>130,03</td>
+   </tr>
+  
+   <tr>
+    <td align="center">07/11/2025&nbsp;</td>
+    <td align="center">11/11/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 4</td>
+	<td>C</td>
+	<td>-35,37</td>
+	<td>94,66</td>
+   </tr>
+  
+   <tr>
+    <td align="center">07/11/2025&nbsp;</td>
+    <td align="center">10/11/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>INDEX MSCI EM IE AC EUR @ 0.11</td>
+	<td>C</td>
+	<td>-24,99</td>
+	<td>69,67</td>
+   </tr>
+  
+   <tr>
+    <td align="center">08/11/2025&nbsp;</td>
+    <td align="center">08/11/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+150,00</td>
+	<td>219,67</td>
+   </tr>
+  
+   <tr>
+    <td align="center">10/11/2025&nbsp;</td>
+    <td align="center">12/11/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 1</td>
+	<td>C</td>
+	<td>-9,19</td>
+	<td>210,48</td>
+   </tr>
+  
+   <tr>
+    <td align="center">10/11/2025&nbsp;</td>
+    <td align="center">10/11/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+50,00</td>
+	<td>260,48</td>
+   </tr>
+  
+   <tr>
+    <td align="center">10/11/2025&nbsp;</td>
+    <td align="center">12/11/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 2</td>
+	<td>C</td>
+	<td>-18,19</td>
+	<td>242,29</td>
+   </tr>
+  
+   <tr>
+    <td align="center">11/11/2025&nbsp;</td>
+    <td align="center">13/11/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 1</td>
+	<td>C</td>
+	<td>-8,98</td>
+	<td>233,31</td>
+   </tr>
+  
+   <tr>
+    <td align="center">11/11/2025&nbsp;</td>
+    <td align="center">10/11/2025&nbsp;</td>
+	<td>APORTACION PLANES</td>
+	<td>MYINVESTOR INDEXADO GLOBAL PP</td>
+	<td>C</td>
+	<td>-150,00</td>
+	<td>83,31</td>
+   </tr>
+  
+   <tr>
+    <td align="center">13/11/2025&nbsp;</td>
+    <td align="center">17/11/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 1</td>
+	<td>C</td>
+	<td>-8,87</td>
+	<td>74,44</td>
+   </tr>
+  
+   <tr>
+    <td align="center">14/11/2025&nbsp;</td>
+    <td align="center">17/11/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>VANGUARD GLOB SMALL CAP EU INV</td>
+	<td>C</td>
+	<td>-3,68</td>
+	<td>70,76</td>
+   </tr>
+  
+   <tr>
+    <td align="center">14/11/2025&nbsp;</td>
+    <td align="center">17/11/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>INDEX MSCI EM IE AC EUR @ 0.11</td>
+	<td>C</td>
+	<td>-24,99</td>
+	<td>45,77</td>
+   </tr>
+  
+   <tr>
+    <td align="center">14/11/2025&nbsp;</td>
+    <td align="center">18/11/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 2</td>
+	<td>C</td>
+	<td>-16,74</td>
+	<td>29,03</td>
+   </tr>
+  
+   <tr>
+    <td align="center">14/11/2025&nbsp;</td>
+    <td align="center">18/11/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES DEVELOPED WRD IN S EUR</td>
+	<td>C</td>
+	<td>-5,00</td>
+	<td>24,03</td>
+   </tr>
+  
+   <tr>
+    <td align="center">15/11/2025&nbsp;</td>
+    <td align="center">15/11/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+176,00</td>
+	<td>200,03</td>
+   </tr>
+  
+   <tr>
+    <td align="center">17/11/2025&nbsp;</td>
+    <td align="center">19/11/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 2</td>
+	<td>C</td>
+	<td>-16,49</td>
+	<td>183,54</td>
+   </tr>
+  
+   <tr>
+    <td align="center">18/11/2025&nbsp;</td>
+    <td align="center">20/11/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 3</td>
+	<td>C</td>
+	<td>-23,64</td>
+	<td>159,90</td>
+   </tr>
+  
+   <tr>
+    <td align="center">18/11/2025&nbsp;</td>
+    <td align="center">18/11/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+50,00</td>
+	<td>209,90</td>
+   </tr>
+  
+   <tr>
+    <td align="center">18/11/2025&nbsp;</td>
+    <td align="center">17/11/2025&nbsp;</td>
+	<td>APORTACION PLANES</td>
+	<td>MYINVESTOR INDEXADO GLOBAL PP</td>
+	<td>C</td>
+	<td>-150,00</td>
+	<td>59,90</td>
+   </tr>
+  
+   <tr>
+    <td align="center">18/11/2025&nbsp;</td>
+    <td align="center">18/11/2025&nbsp;</td>
+	<td>TRANSFERENCIA SEPA</td>
+	<td>Avaro GarcA Fuentes</td>
+	<td>A</td>
+	<td>+20,00</td>
+	<td>79,90</td>
+   </tr>
+  
+   <tr>
+    <td align="center">19/11/2025&nbsp;</td>
+    <td align="center">21/11/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 3</td>
+	<td>C</td>
+	<td>-23,69</td>
+	<td>56,21</td>
+   </tr>
+  
+   <tr>
+    <td align="center">21/11/2025&nbsp;</td>
+    <td align="center">24/11/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>VANGUARD GLOB SMALL CAP EU INV</td>
+	<td>C</td>
+	<td>-3,59</td>
+	<td>52,62</td>
+   </tr>
+  
+   <tr>
+    <td align="center">21/11/2025&nbsp;</td>
+    <td align="center">24/11/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>INDEX MSCI EM IE AC EUR @ 0.11</td>
+	<td>C</td>
+	<td>-24,99</td>
+	<td>27,63</td>
+   </tr>
+  
+   <tr>
+    <td align="center">21/11/2025&nbsp;</td>
+    <td align="center">25/11/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 1</td>
+	<td>C</td>
+	<td>-7,12</td>
+	<td>20,51</td>
+   </tr>
+  
+   <tr>
+    <td align="center">21/11/2025&nbsp;</td>
+    <td align="center">21/11/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+50,00</td>
+	<td>70,51</td>
+   </tr>
+  
+   <tr>
+    <td align="center">21/11/2025&nbsp;</td>
+    <td align="center">25/11/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 3</td>
+	<td>C</td>
+	<td>-21,19</td>
+	<td>49,32</td>
+   </tr>
+  
+   <tr>
+    <td align="center">21/11/2025&nbsp;</td>
+    <td align="center">21/11/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+200,00</td>
+	<td>249,32</td>
+   </tr>
+  
+   <tr>
+    <td align="center">21/11/2025&nbsp;</td>
+    <td align="center">21/11/2025&nbsp;</td>
+	<td>TRANSFERENCIA SEPA</td>
+	<td>Avaro GarcA Fuentes</td>
+	<td>A</td>
+	<td>+40,00</td>
+	<td>289,32</td>
+   </tr>
+  
+   <tr>
+    <td align="center">24/11/2025&nbsp;</td>
+    <td align="center">26/11/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 2</td>
+	<td>C</td>
+	<td>-14,91</td>
+	<td>274,41</td>
+   </tr>
+  
+   <tr>
+    <td align="center">25/11/2025&nbsp;</td>
+    <td align="center">27/11/2025&nbsp;</td>
+	<td>COMPRA RV CONTADO</td>
+	<td>ISHARES BITCOIN ETP @ 2</td>
+	<td>C</td>
+	<td>-15,21</td>
+	<td>259,20</td>
+   </tr>
+  
+   <tr>
+    <td align="center">25/11/2025&nbsp;</td>
+    <td align="center">27/11/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES EMERGING MRK IND S EUR</td>
+	<td>C</td>
+	<td>-4,00</td>
+	<td>255,20</td>
+   </tr>
+  
+   <tr>
+    <td align="center">25/11/2025&nbsp;</td>
+    <td align="center">28/11/2025&nbsp;</td>
+	<td>SUSCRIPCION IIC</td>
+	<td>ISHARES DEVELOPED WRD IN S EUR</td>
+	<td>C</td>
+	<td>-9,00</td>
+	<td>246,20</td>
+   </tr>
+  
+   <tr>
+    <td align="center">25/11/2025&nbsp;</td>
+    <td align="center">25/11/2025&nbsp;</td>
+	<td>TRANSFERENCIA INMEDIATA</td>
+	<td></td>
+	<td>A</td>
+	<td>+300,00</td>
+	<td>546,20</td>
+   </tr>
+  
+  <tr>
+   <td align="center">29/10/2026</td>
+   <td colspan="5">Saldo Final</td>
+   <td>546,20</td>
+  </tr>
+  
+  </table>   
+  
+  
+ </body>
+</html>
