@@ -1,41 +1,41 @@
-clave,nombre,tipo,ticker,moneda_ticker,proxy,verificado,notas
-BTC,Bitcoin,cripto,BTC-EUR,EUR,,si,
-SOL,Solana,cripto,SOL-EUR,EUR,,si,
-US8740541094,Take-Two Interactive,accion,TTWO,USD,,si,
-US0378331005,Apple,accion,AAPL,USD,,si,
-US2546871060,Walt Disney,accion,DIS,USD,,si,
-US67066G1040,NVIDIA,accion,NVDA,USD,,si,
-JP3756600007,Nintendo,accion,7974.T,JPY,,si,
-IE00B4ND3602,iShares Physical Gold ETC,etc,PPFB.DE,EUR,,si,Mismo ISIN en TR y MyInvestor
-IE00B6R52259,iShares MSCI ACWI,etf,IUSQ.DE,EUR,,si,Mismo ISIN en TR y MyInvestor
-IE00B5BMR087,iShares Core S&P 500,etf,SXR8.DE,EUR,,si,
-IE00BF4RFH31,iShares MSCI World Small Cap,etf,IUSN.DE,EUR,,si,
-IE00B3WJKG14,iShares S&P 500 Information Tech,etf,QDVE.DE,EUR,,si,
-IE00BKM4GZ66,iShares Core MSCI EM IMI,etf,IS3N.DE,EUR,,si,
-IE00B8GKDB10,Vanguard FTSE All-World High Dividend,etf,VGWD.DE,EUR,,si,
-IE00BYVQ9F29,iShares Nasdaq 100 EUR Hedged,etf,NQSE.DE,EUR,,revisar,
-IE00B3YLTY66,SPDR MSCI ACWI IMI,etf,SPYI.DE,EUR,,revisar,Split feb-2026
-IE00BYYHSQ67,iShares MSCI World Quality Dividend,etf,WQDV.DE,EUR,,revisar,
-IE000BI8OT95,Amundi Core MSCI World,etf,,EUR,EUNL.DE,revisar,Sin ticker confirmado: se estima con proxy
-IE00B4K48X80,iShares Core MSCI Europe,etf,,EUR,EXSA.DE,revisar,Sin ticker confirmado: se estima con proxy
-IE000VAHT5T0,FTSE Global All-Cap,etf,,EUR,IUSQ.DE,revisar,Sin ticker confirmado: se estima con proxy
-IE00BSKRJZ44,iShares USD Treasury Bond 20+y,etf,IDTL.L,USD,,revisar,
-XS2800678224,Bono ago-2029,bono,,EUR,,manual,Precio manual (% nominal x nominal)
-LU3170240538,Private Equity (TR),privado,,EUR,,manual,Sin cotización pública
-MI_IB1T,iShares Bitcoin ETP,etn,IB1T.DE,EUR,,revisar,
-MI_GALAXY_BTC,X Galaxy Physical Bitcoin ETC,etc,,EUR,BTC-EUR,revisar,Se estima con BTC-EUR
-MI_AXA_TRESOR,AXA Trésor Court Terme C,monetario,,EUR,,manual,Monetario: valor del último extracto
-MI_CRED_ULTRA,Cred Ultra Short Plus R C,monetario,,EUR,,manual,
-MI_DWS_FRN,Deutsche Floating Rate Notes LC,renta_fija,,EUR,,manual,
-MI_STORM_BOND,Storm Bond Fund RC,renta_fija,,EUR,,manual,
-MI_DIP_VALUE,DIP Value Catalyst Equity A,fondo,,EUR,EUNL.DE,revisar,Proxy MSCI World
-MI_ROBECO_GPE,Robeco BP Global Premium Equities D,fondo,,EUR,EUNL.DE,revisar,Proxy MSCI World
-MI_POLAR_TECH,Polar Capital Global Technology R,fondo,,EUR,QDVE.DE,revisar,Proxy S&P 500 IT
-MI_AMUNDI_EM,Amundi Index MSCI EM,fondo,,EUR,IS3N.DE,si,Proxy EM IMI
-MI_ISH_DEV_WORLD,iShares Developed World Index S,fondo,,EUR,EUNL.DE,si,Proxy MSCI World
-MI_ISH_EM,iShares Emerging Markets Index S,fondo,,EUR,IS3N.DE,si,Proxy EM IMI
-MI_ISH_US,iShares US Index Fund S,fondo,,EUR,SXR8.DE,si,Proxy S&P 500
-MI_FID_WORLD,Fidelity MSCI World Index P,fondo,,EUR,EUNL.DE,si,Proxy MSCI World
-MI_VAN_SMALL,Vanguard Global Small-Cap Index Inv,fondo,,EUR,IUSN.DE,si,Proxy World Small Cap
-MI_NASDAQ_FI,MyInvestor Nasdaq 100 FI,fondo,,EUR,SXRV.DE,revisar,Proxy Nasdaq 100
-MI_PP_GLOBAL,MyInvestor Indexado Global PP,plan_pensiones,,EUR,IUSQ.DE,revisar,Proxy MSCI ACWI
+clave,nombre,tipo,ticker,moneda_ticker,proxy,verificado,notas,perfil
+BTC,Bitcoin,cripto,BTC-EUR,EUR,,si,,CRIPTO
+SOL,Solana,cripto,SOL-EUR,EUR,,si,,CRIPTO
+US8740541094,Take-Two Interactive,accion,TTWO,USD,,si,,ACCION_EEUU
+US0378331005,Apple,accion,AAPL,USD,,si,,ACCION_EEUU
+US2546871060,Walt Disney,accion,DIS,USD,,si,,ACCION_EEUU
+US67066G1040,NVIDIA,accion,NVDA,USD,,si,,ACCION_EEUU
+JP3756600007,Nintendo,accion,7974.T,JPY,,si,,ACCION_JAPON
+IE00B4ND3602,iShares Physical Gold ETC,etc,PPFB.DE,EUR,,si,Mismo ISIN en TR y MyInvestor,ORO
+IE00B6R52259,iShares MSCI ACWI,etf,IUSQ.DE,EUR,,si,Mismo ISIN en TR y MyInvestor,MSCI_ACWI
+IE00B5BMR087,iShares Core S&P 500,etf,SXR8.DE,EUR,,si,,EEUU_RV
+IE00BF4RFH31,iShares MSCI World Small Cap,etf,IUSN.DE,EUR,,si,,WORLD_SMALL
+IE00B3WJKG14,iShares S&P 500 Information Tech,etf,QDVE.DE,EUR,,si,,EEUU_RV
+IE00BKM4GZ66,iShares Core MSCI EM IMI,etf,IS3N.DE,EUR,,si,,EMERGENTES_RV
+IE00B8GKDB10,Vanguard FTSE All-World High Dividend,etf,VGWD.DE,EUR,,si,,GLOBAL_DIVIDENDO
+IE00BYVQ9F29,iShares Nasdaq 100 EUR Hedged,etf,NQSE.DE,EUR,,revisar,,EEUU_RV
+IE00B3YLTY66,SPDR MSCI ACWI IMI,etf,SPYI.DE,EUR,,revisar,Split feb-2026,MSCI_ACWI
+IE00BYYHSQ67,iShares MSCI World Quality Dividend,etf,WQDV.DE,EUR,,revisar,,WORLD_DIVIDENDO
+IE000BI8OT95,Amundi Core MSCI World,etf,,EUR,EUNL.DE,revisar,Sin ticker confirmado: se estima con proxy,MSCI_WORLD
+IE00B4K48X80,iShares Core MSCI Europe,etf,,EUR,EXSA.DE,revisar,Sin ticker confirmado: se estima con proxy,EUROPA_RV
+IE000VAHT5T0,FTSE Global All-Cap,etf,,EUR,IUSQ.DE,revisar,Sin ticker confirmado: se estima con proxy,MSCI_ACWI
+IE00BSKRJZ44,iShares USD Treasury Bond 20+y,etf,IDTL.L,USD,,revisar,,EEUU_RF
+XS2800678224,Bono ago-2029,bono,,EUR,,manual,Precio manual (% nominal x nominal),BONO_SIN_DATOS
+LU3170240538,Private Equity (TR),privado,,EUR,,manual,Sin cotización pública,PRIVATE_EQUITY
+MI_IB1T,iShares Bitcoin ETP,etn,IB1T.DE,EUR,,revisar,,CRIPTO
+MI_GALAXY_BTC,X Galaxy Physical Bitcoin ETC,etc,,EUR,BTC-EUR,revisar,Se estima con BTC-EUR,CRIPTO
+MI_AXA_TRESOR,AXA Trésor Court Terme C,monetario,,EUR,,manual,Monetario: valor del último extracto,MONETARIO_EUR
+MI_CRED_ULTRA,Cred Ultra Short Plus R C,monetario,,EUR,,manual,,MONETARIO_EUR
+MI_DWS_FRN,Deutsche Floating Rate Notes LC,renta_fija,,EUR,,manual,,EUROPA_RF
+MI_STORM_BOND,Storm Bond Fund RC,renta_fija,,EUR,,manual,,EUROPA_RF
+MI_DIP_VALUE,DIP Value Catalyst Equity A,fondo,,EUR,EUNL.DE,revisar,Proxy MSCI World,SIN_DATOS_RV
+MI_ROBECO_GPE,Robeco BP Global Premium Equities D,fondo,,EUR,EUNL.DE,revisar,Proxy MSCI World,GLOBAL_VALUE
+MI_POLAR_TECH,Polar Capital Global Technology R,fondo,,EUR,QDVE.DE,revisar,Proxy S&P 500 IT,GLOBAL_TECH
+MI_AMUNDI_EM,Amundi Index MSCI EM,fondo,,EUR,IS3N.DE,si,Proxy EM IMI,EMERGENTES_RV
+MI_ISH_DEV_WORLD,iShares Developed World Index S,fondo,,EUR,EUNL.DE,si,Proxy MSCI World,MSCI_WORLD
+MI_ISH_EM,iShares Emerging Markets Index S,fondo,,EUR,IS3N.DE,si,Proxy EM IMI,EMERGENTES_RV
+MI_ISH_US,iShares US Index Fund S,fondo,,EUR,SXR8.DE,si,Proxy S&P 500,EEUU_RV
+MI_FID_WORLD,Fidelity MSCI World Index P,fondo,,EUR,EUNL.DE,si,Proxy MSCI World,MSCI_WORLD
+MI_VAN_SMALL,Vanguard Global Small-Cap Index Inv,fondo,,EUR,IUSN.DE,si,Proxy World Small Cap,WORLD_SMALL
+MI_NASDAQ_FI,MyInvestor Nasdaq 100 FI,fondo,,EUR,SXRV.DE,revisar,Proxy Nasdaq 100,EEUU_RV
+MI_PP_GLOBAL,MyInvestor Indexado Global PP,plan_pensiones,,EUR,IUSQ.DE,revisar,Proxy MSCI ACWI,MSCI_ACWI

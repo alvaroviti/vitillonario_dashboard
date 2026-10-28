@@ -64,7 +64,8 @@ def cargar(_marca: float):
     instrumentos = pd.read_csv(RAIZ / "config" / "instrumentos.csv")
     f_manual = RAIZ / "config" / "fiscal_manual.csv"
     fiscal_manual = pd.read_csv(f_manual) if f_manual.exists() else pd.DataFrame(columns=["año", "casilla", "concepto", "importe"])
-    return tr, mi, avisos_mi, pos_mi, instrumentos, fiscal_manual
+    perfiles, avisos_perfiles = cartera.leer_perfiles(RAIZ / "config" / "perfiles.csv")
+    return tr, mi, avisos_mi + avisos_perfiles, pos_mi, instrumentos, fiscal_manual, perfiles
 
 
 @st.cache_data(ttl=3600, show_spinner="Descargando históricos de 5 años…")
@@ -78,7 +79,7 @@ def ultimos(tickers: tuple[str, ...]):
 
 
 def marca_datos() -> float:
-    ficheros = list((RAIZ / "data").rglob("*")) + [RAIZ / "config" / "instrumentos.csv"]
+    ficheros = list((RAIZ / "data").rglob("*")) + list((RAIZ / "config").glob("*.csv"))
     return max((f.stat().st_mtime for f in ficheros if f.is_file()), default=0)
 
 
@@ -124,7 +125,7 @@ with st.sidebar:
                        ". Sin GitHub configurado, se perderán si la app se reinicia."))
         cargar.clear()
 
-tr, mi, avisos_mi, pos_mi, instrumentos, fiscal_manual = cargar(marca_datos())
+tr, mi, avisos_mi, pos_mi, instrumentos, fiscal_manual, perfiles = cargar(marca_datos())
 ventas_tr, abiertas_tr, avisos_fifo = cartera.fifo_tr(tr) if not tr.empty else (pd.DataFrame(), pd.DataFrame(), [])
 pos = cartera.posiciones(abiertas_tr, pos_mi, mi, instrumentos)
 
@@ -242,16 +243,60 @@ def pestaña_mercado(val: pd.DataFrame, ult: pd.Series):
 def pestaña_cartera(val: pd.DataFrame, efectivo_tr: float, efectivo_mi: float):
     por_plat = val.groupby("plataforma")[["coste", "valor", "resultado"]].sum()
     por_plat.loc["Efectivo"] = [efectivo_tr + efectivo_mi, efectivo_tr + efectivo_mi, 0]
-    c1, c2 = st.columns([3, 2])
+    st.subheader("Por plataforma")
+    st.dataframe(por_plat.style.format(lambda x: eur(x)), width="stretch")
+
+    st.subheader("Diversificación")
+    base = val if incluir_plan else val[val.plataforma != "MyInvestor (plan)"]
+    filas, sin_perfil = cartera.desglose(base, instrumentos, perfiles,
+                                         (efectivo_tr + efectivo_mi) if incluir_efectivo else 0.0)
+    clases = filas[filas.dimension == "clase"].groupby("categoria", as_index=False)["valor"].sum()
+    clases = clases[clases.valor > 0.5].sort_values("valor", ascending=False)
+    clases["peso"] = clases.valor / clases.valor.sum()
+
+    c1, c2 = st.columns(2)
     with c1:
-        st.subheader("Por plataforma")
-        st.dataframe(por_plat.style.format(lambda x: eur(x)), width="stretch")
-    with c2:
-        tipos = val.groupby("tipo")["valor"].sum().reset_index()
-        fig = px.pie(tipos, names="tipo", values="valor", hole=0.55,
-                     color_discrete_sequence=[VERDE, TINTA, "#C9A227", ROJO, GRIS, "#5B8C85", "#3F5866", "#D7B45A"])
-        fig.update_layout(height=300, margin=dict(l=0, r=0, t=10, b=0), showlegend=True)
+        st.markdown("**Tipo de activo**")
+        colores = {"Renta variable": VERDE, "Renta fija": TINTA, "Monetario y efectivo": GRIS,
+                   "Oro": "#C9A227", "Cripto": ROJO, "Alternativos": "#5B8C85", "Sin clasificar": "#BFC7CC"}
+        fig = px.pie(clases, names="categoria", values="valor", hole=0.55, color="categoria",
+                     color_discrete_map=colores)
+        fig.update_traces(textinfo="percent", sort=False)
+        fig.update_layout(height=320, margin=dict(l=0, r=0, t=10, b=0), legend=dict(orientation="h"))
         st.plotly_chart(fig, width="stretch")
+    with c2:
+        st.markdown("**Región**")
+        solo_rv = st.toggle("Solo renta variable", value=True,
+                            help="El oro, la cripto y el efectivo no tienen país: con esto ves solo dónde están las empresas.")
+        reg = filas[filas.dimension == "region"]
+        if solo_rv:
+            claves_rv = filas[(filas.dimension == "clase") & (filas.categoria == "Renta variable")].clave
+            reg = reg[reg.clave.isin(claves_rv)]
+        reg = reg.groupby("categoria", as_index=False)["valor"].sum()
+        reg = reg[reg.valor > 0.5].sort_values("valor")
+        reg["peso"] = reg.valor / reg.valor.sum()
+        fig = px.bar(reg, x="peso", y="categoria", orientation="h", text=reg.peso.map(lambda x: f"{x:.0%}"),
+                     color_discrete_sequence=[VERDE])
+        fig.update_layout(height=300, margin=dict(l=0, r=10, t=10, b=0), xaxis=dict(tickformat=".0%", title=None),
+                          yaxis=dict(title=None), plot_bgcolor="rgba(0,0,0,0)")
+        st.plotly_chart(fig, width="stretch")
+
+    rv = clases.set_index("categoria")["peso"]
+    defensivo = rv.get("Renta fija", 0) + rv.get("Monetario y efectivo", 0)
+    st.caption(f"Renta variable {rv.get('Renta variable', 0):.0%}, renta fija y liquidez {defensivo:.0%}, "
+               f"oro {rv.get('Oro', 0):.0%} y cripto {rv.get('Cripto', 0):.0%}. "
+               "Los fondos indexados se reparten por país con los pesos aproximados de su índice "
+               "(config/perfiles.csv).")
+    if sin_perfil:
+        st.caption("Sin clasificar todavía: " + ", ".join(sin_perfil))
+
+    with st.expander("Qué activos forman cada parte"):
+        dim = st.radio("Ver por", ["Tipo de activo", "Región"], horizontal=True)
+        det = filas[filas.dimension == ("clase" if dim == "Tipo de activo" else "region")]
+        det = det[det.valor > 0.5].groupby(["categoria", "nombre"], as_index=False)["valor"].sum()
+        det = det.sort_values(["categoria", "valor"], ascending=[True, False])
+        st.dataframe(det, hide_index=True, width="stretch",
+                     column_config={"valor": st.column_config.NumberColumn(format="%.2f €")})
 
     st.subheader("Posiciones")
     consolidar = st.toggle("Agrupar el mismo activo en ambas plataformas", value=True)

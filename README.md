@@ -41,6 +41,10 @@ La foto de posiciones es necesaria porque el extracto de MyInvestor no trae part
 
 Las filas con `verificado = revisar` tienen un ticker o equivalente que conviene comprobar. La pestaña *Datos* muestra de dónde sale el precio de cada posición.
 
+## Diversificación
+
+La pestaña *Cartera* reparte el patrimonio por tipo de activo (renta variable, renta fija, monetario y efectivo, oro, cripto) y por región. Cada activo de `config/instrumentos.csv` tiene un `perfil`, y `config/perfiles.csv` dice cómo se reparte ese perfil: por ejemplo, un fondo MSCI World cuenta un 72 % en EE. UU., un 15 % en Europa, etc. Son pesos aproximados del índice: revísalos una vez al año con la ficha del fondo. Un activo nuevo sin perfil aparece como «Sin clasificar».
+
 ## Fiscalidad
 
 - Ganancias de Trade Republic por FIFO. Las pérdidas con recompra en ±2 meses se marcan.

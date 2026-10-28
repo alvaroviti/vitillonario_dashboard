@@ -270,3 +270,42 @@ def resumen_fiscal(tr: pd.DataFrame, mi: pd.DataFrame, ventas_tr: pd.DataFrame,
         d["plan_margen"] = max(0.0, LIMITE_PLAN_PENSIONES - pp)
         res[a] = d
     return res
+
+
+# --------------------------------------------------------------------------- #
+# Desglose por tipo de activo y región
+# --------------------------------------------------------------------------- #
+def leer_perfiles(ruta) -> tuple[pd.DataFrame, list[str]]:
+    perfiles = pd.read_csv(ruta, comment="#")
+    avisos = []
+    sumas = perfiles.groupby(["perfil", "dimension"])["peso"].sum()
+    for (perfil, dim), s in sumas.items():
+        if abs(s - 1) > 0.005:
+            avisos.append(f"El perfil {perfil} suma {s:.3f} en «{dim}» en vez de 1.")
+    return perfiles, avisos
+
+
+def desglose(val: pd.DataFrame, instrumentos: pd.DataFrame, perfiles: pd.DataFrame,
+             efectivo: float = 0.0) -> tuple[pd.DataFrame, list[str]]:
+    """Reparte el valor de cada posición según su perfil. Devuelve filas
+    (clave, nombre, dimension, categoria, valor) y la lista de activos sin perfil."""
+    mapa = instrumentos.set_index("clave")["perfil"]
+    base = val.groupby("clave", as_index=False).agg(nombre=("nombre_corto", "first"), valor=("valor", "sum"))
+    base["perfil"] = base["clave"].map(mapa)
+    # Compras pendientes de foto: sin perfil conocido
+    sin_perfil = base[base.perfil.isna() | ~base.perfil.isin(perfiles.perfil)]
+    base.loc[sin_perfil.index, "perfil"] = "_SIN_PERFIL"
+
+    extra = pd.DataFrame([
+        dict(perfil="_SIN_PERFIL", dimension="clase", categoria="Sin clasificar", peso=1),
+        dict(perfil="_SIN_PERFIL", dimension="region", categoria="Sin desglose", peso=1),
+        dict(perfil="_EFECTIVO", dimension="clase", categoria="Monetario y efectivo", peso=1),
+        dict(perfil="_EFECTIVO", dimension="region", categoria="Sin región", peso=1),
+    ])
+    perfiles = pd.concat([perfiles, extra], ignore_index=True)
+    if efectivo:
+        base = pd.concat([base, pd.DataFrame([dict(clave="EFECTIVO", nombre="Efectivo en cuentas",
+                                                   valor=efectivo, perfil="_EFECTIVO")])], ignore_index=True)
+    filas = base.merge(perfiles, on="perfil", how="left")
+    filas["valor"] = filas["valor"] * filas["peso"]
+    return filas[["clave", "nombre", "dimension", "categoria", "valor"]], sin_perfil["nombre"].tolist()

@@ -1,0 +1,76 @@
+perfil,dimension,categoria,peso
+# Pesos aproximados de cada índice. Revísalos una vez al año con la ficha del fondo/ETF.
+# dimension: clase (tipo de activo) o region. Cada perfil debe sumar 1 en cada dimensión.
+MSCI_WORLD,clase,Renta variable,1
+MSCI_WORLD,region,EE. UU.,0.72
+MSCI_WORLD,region,Europa,0.15
+MSCI_WORLD,region,Japón,0.055
+MSCI_WORLD,region,Canadá,0.03
+MSCI_WORLD,region,Pacífico desarrollado,0.03
+MSCI_WORLD,region,Otros,0.015
+MSCI_ACWI,clase,Renta variable,1
+MSCI_ACWI,region,EE. UU.,0.64
+MSCI_ACWI,region,Europa,0.13
+MSCI_ACWI,region,Japón,0.05
+MSCI_ACWI,region,Canadá,0.03
+MSCI_ACWI,region,Pacífico desarrollado,0.025
+MSCI_ACWI,region,Emergentes,0.11
+MSCI_ACWI,region,Otros,0.015
+WORLD_SMALL,clase,Renta variable,1
+WORLD_SMALL,region,EE. UU.,0.60
+WORLD_SMALL,region,Europa,0.17
+WORLD_SMALL,region,Japón,0.11
+WORLD_SMALL,region,Canadá,0.04
+WORLD_SMALL,region,Pacífico desarrollado,0.05
+WORLD_SMALL,region,Otros,0.03
+GLOBAL_DIVIDENDO,clase,Renta variable,1
+GLOBAL_DIVIDENDO,region,EE. UU.,0.42
+GLOBAL_DIVIDENDO,region,Europa,0.30
+GLOBAL_DIVIDENDO,region,Japón,0.07
+GLOBAL_DIVIDENDO,region,Canadá,0.04
+GLOBAL_DIVIDENDO,region,Pacífico desarrollado,0.06
+GLOBAL_DIVIDENDO,region,Emergentes,0.10
+GLOBAL_DIVIDENDO,region,Otros,0.01
+WORLD_DIVIDENDO,clase,Renta variable,1
+WORLD_DIVIDENDO,region,EE. UU.,0.60
+WORLD_DIVIDENDO,region,Europa,0.25
+WORLD_DIVIDENDO,region,Japón,0.06
+WORLD_DIVIDENDO,region,Canadá,0.03
+WORLD_DIVIDENDO,region,Pacífico desarrollado,0.05
+WORLD_DIVIDENDO,region,Otros,0.01
+GLOBAL_VALUE,clase,Renta variable,1
+GLOBAL_VALUE,region,EE. UU.,0.60
+GLOBAL_VALUE,region,Europa,0.25
+GLOBAL_VALUE,region,Japón,0.10
+GLOBAL_VALUE,region,Otros,0.05
+GLOBAL_TECH,clase,Renta variable,1
+GLOBAL_TECH,region,EE. UU.,0.80
+GLOBAL_TECH,region,Europa,0.05
+GLOBAL_TECH,region,Japón,0.05
+GLOBAL_TECH,region,Emergentes,0.10
+EEUU_RV,clase,Renta variable,1
+EEUU_RV,region,EE. UU.,1
+EUROPA_RV,clase,Renta variable,1
+EUROPA_RV,region,Europa,1
+EMERGENTES_RV,clase,Renta variable,1
+EMERGENTES_RV,region,Emergentes,1
+ACCION_EEUU,clase,Renta variable,1
+ACCION_EEUU,region,EE. UU.,1
+ACCION_JAPON,clase,Renta variable,1
+ACCION_JAPON,region,Japón,1
+SIN_DATOS_RV,clase,Renta variable,1
+SIN_DATOS_RV,region,Sin desglose,1
+EEUU_RF,clase,Renta fija,1
+EEUU_RF,region,EE. UU.,1
+EUROPA_RF,clase,Renta fija,1
+EUROPA_RF,region,Europa,1
+BONO_SIN_DATOS,clase,Renta fija,1
+BONO_SIN_DATOS,region,Sin desglose,1
+MONETARIO_EUR,clase,Monetario y efectivo,1
+MONETARIO_EUR,region,Europa,1
+ORO,clase,Oro,1
+ORO,region,Sin región,1
+CRIPTO,clase,Cripto,1
+CRIPTO,region,Sin región,1
+PRIVATE_EQUITY,clase,Alternativos,1
+PRIVATE_EQUITY,region,Sin desglose,1
