@@ -79,8 +79,8 @@ def analistas(tickers: tuple[str, ...]):
 
 
 @st.cache_data(ttl=300, show_spinner="Actualizando precios…")
-def ultimos(tickers: tuple[str, ...]):
-    return mercado.descargar_ultimos(list(tickers))
+def intradia(tickers: tuple[str, ...]):
+    return mercado.descargar_intradia(list(tickers))
 
 
 def marca_datos() -> float:
@@ -98,7 +98,7 @@ with st.sidebar:
     incluir_efectivo = st.toggle("Contar el efectivo", value=False)
     refresco = st.selectbox("Refrescar precios", ["Manual", "Cada 5 min", "Cada 15 min"], index=1)
     if st.button("Actualizar ahora", width="stretch"):
-        ultimos.clear()
+        intradia.clear()
 
     st.divider()
     st.subheader("Actualizar datos")
@@ -139,7 +139,8 @@ hist = historico(tuple(sorted(tickers_mercado)))
 
 
 def pintar():
-    ult = ultimos(tuple(sorted(tickers_mercado)))
+    intr = intradia(tuple(sorted(tickers_mercado)))
+    ult = mercado.ultimos_de(intr)
     precios = mercado.precios_actuales(pos, instrumentos, hist, ult)
     val = cartera.valorar(pos, precios, instrumentos)
 
@@ -171,9 +172,9 @@ def pintar():
         ["Mercado y señales", "Cartera", "Aportaciones y objetivo", "Fiscal", "Datos"])
 
     with t_mercado:
-        pestaña_mercado(val, ult, efectivo_tr + efectivo_mi)
+        pestaña_mercado(val, ult, intr, efectivo_tr + efectivo_mi)
     with t_cartera:
-        pestaña_cartera(val, efectivo_tr, efectivo_mi)
+        pestaña_cartera(val, efectivo_tr, efectivo_mi, intr)
     with t_aport:
         pestaña_aportaciones(patrimonio)
     with t_fiscal:
@@ -185,121 +186,194 @@ def pintar():
 # --------------------------------------------------------------------------- #
 # Pestañas
 # --------------------------------------------------------------------------- #
-def pestaña_mercado(val: pd.DataFrame, ult: pd.Series, efectivo: float = 0.0):
+PERIODOS = {"1 d": 0, "1 m": 21, "6 m": 126, "1 a": 252, "2 a": 504, "3 a": 756, "5 a": 1260}
+
+
+def referencia_de(clave: str, cat: pd.DataFrame) -> tuple[str | None, str | None, bool]:
+    """(ticker de referencia, moneda, es_equivalente) de una posición."""
+    if clave not in cat.index:
+        return None, None, False
+    inst = cat.loc[clave]
+    if isinstance(inst.ticker, str) and inst.ticker:
+        return inst.ticker, inst.moneda_ticker, False
+    if isinstance(inst.proxy, str) and inst.proxy:
+        return inst.proxy, "EUR", True
+    return None, None, False
+
+
+def pesos_cartera(val: pd.DataFrame, con_efectivo: float = 0.0) -> pd.Series:
+    base = val if incluir_plan else val[val.plataforma != "MyInvestor (plan)"]
+    pesos = base.groupby("clave")["valor"].sum()
+    pesos = pesos[pesos > 0]
+    if con_efectivo:
+        pesos["EFECTIVO"] = con_efectivo
+    return pesos
+
+
+def indice_de(pesos: pd.Series, marco: pd.DataFrame) -> tuple[pd.Series, float]:
+    """Índice de la cartera sobre un marco de precios (diario o intradía) y parte del valor cubierta."""
+    cat = instrumentos.set_index("clave")
+    refs = {}
+    for clave in pesos.index:
+        t, moneda, _ = referencia_de(clave, cat)
+        if t:
+            serie = mercado.serie_eur(t, moneda, marco)
+            if serie is not None:
+                refs[clave] = serie
+    cubierto = pesos[list(refs)].sum() / pesos.sum() if refs else 0.0
+    return mercado.indice_cartera(pesos, refs), cubierto
+
+
+@st.cache_data(ttl=300, show_spinner=False)
+def reconstruccion(pesos: pd.Series, _marca: float, con_plan: bool):
+    indice, _ = indice_de(pesos, hist)
+    flujos = cartera.flujos_diarios(tr, mi, con_plan)
+    return mercado.reconstruir_valor(indice, float(pesos.sum()), flujos)
+
+
+def resultado_periodo(pesos_inv: pd.Series, periodo: str, intr: pd.DataFrame) -> float:
+    """Ganado o perdido por la cartera invertida en el periodo, sin contar aportaciones."""
+    if periodo == "1 d":
+        ind, _ = indice_de(pesos_inv, intr)
+        ind = mercado.ultimas_24h(ind)
+        return float(pesos_inv.sum() * (1 - ind.iloc[0] / ind.iloc[-1])) if len(ind) > 1 else np.nan
+    rec = reconstruccion(pesos_inv, marca_datos(), incluir_plan)
+    if rec.empty:
+        return np.nan
+    return float(rec["resultado"].tail(PERIODOS[periodo]).sum())
+
+
+def pestaña_mercado(val: pd.DataFrame, ult: pd.Series, intr: pd.DataFrame, efectivo: float = 0.0):
     if hist.empty:
         st.info("Sin históricos de mercado. En cuanto haya conexión verás mínimos de 3 meses a 5 años y las señales.")
         return
     cat = instrumentos.set_index("clave")
     agrupado = val.groupby("clave", as_index=False).agg(nombre=("nombre_corto", "first"), valor=("valor", "sum"))
+    total = agrupado.valor.sum()
     filas = []
     for r in agrupado.itertuples():
-        if r.clave not in cat.index:
-            continue
-        inst = cat.loc[r.clave]
-        ref = inst.ticker if isinstance(inst.ticker, str) else inst.proxy if isinstance(inst.proxy, str) else None
+        ref, _, equivalente = referencia_de(r.clave, cat)
         if not ref or ref not in hist.columns:
             continue
         precio = float(ult[ref]) if ref in ult.index else None
-        s = mercado.señales(hist[ref], precio)
-        if not s:
-            continue
-        filas.append(dict(clave=r.clave, activo=r.nombre, referencia=ref + ("" if ref == inst.ticker else " (equivalente)"),
-                          peso=r.valor, **s))
+        sen = mercado.señales(hist[ref], precio)
+        if sen:
+            filas.append(dict(clave=r.clave, activo=r.nombre, referencia=ref + (" (equivalente)" if equivalente else ""),
+                              en_cartera=r.valor, **sen))
     if not filas:
         st.info("Ninguna posición tiene ticker o equivalente con histórico disponible.")
         return
     df = pd.DataFrame(filas)
     numericas = [c for c in df.columns if c.startswith(("vs ", "min ", "caída", "media", "RSI", "z "))]
     df[numericas] = df[numericas].apply(pd.to_numeric, errors="coerce")
-    df = df.sort_values(["puntos", "peso"], ascending=[False, False])
-    df = df.drop_duplicates("referencia")
+    # Varios fondos con el mismo equivalente comparten fila: se suma lo que tienes en ellos
+    df = df.sort_values("en_cartera", ascending=False)
+    unidos = df.groupby("referencia", sort=False).agg(
+        activo=("activo", lambda x: x.iloc[0] + (f" y {len(x) - 1} más" if len(x) > 1 else "")),
+        en_cartera=("en_cartera", "sum"))
+    df = df.drop_duplicates("referencia").drop(columns=["activo", "en_cartera"]).merge(unidos, on="referencia")
+    df["peso"] = df.en_cartera / total
+    df = df.sort_values("en_cartera", ascending=False)
 
     zona = df[df["señal"] == "Zona de compra"]
     if not zona.empty:
         st.success("En zona de compra según los indicadores: " + ", ".join(zona.activo))
-    st.caption("La puntuación suma caída desde máximos, cercanía a mínimos, media de 200 sesiones, RSI y "
+
+    pesos_inv = pesos_cartera(val)
+    indice, cubierto = indice_de(pesos_cartera(val, efectivo if incluir_efectivo else 0.0), hist)
+    s_cartera = mercado.señales(indice) if len(indice) > 30 else {}
+    if s_cartera:
+        caida = s_cartera["caída desde máx 1 a"]
+        detalle = (f"está un {abs(caida) * 100:.1f} % por debajo de su máximo anual".replace(".", ",")
+                   if caida < -0.001 else "está en máximos del último año")
+        st.markdown(f"**Cartera completa:** {s_cartera['señal'].lower()} ({s_cartera['puntos']} puntos); {detalle}.")
+    st.caption("Ordenado por lo que tienes en cada activo; pulsa en una columna para ordenar por ella. "
+               "La puntuación suma caída desde máximos, cercanía a mínimos, media de 200 sesiones, RSI y "
                "desviación respecto a la media anual. Es una ayuda para decidir, no una recomendación.")
 
-    vista = df[["activo", "referencia", "señal", "puntos", "caída desde máx 1 a", "vs min 3 m", "vs min 6 m",
-                "vs min 1 a", "vs min 3 a", "vs min 5 a", "vs media 200", "RSI 14", "motivos"]]
+    vista = df[["activo", "en_cartera", "peso", "señal", "puntos", "caída desde máx 1 a", "vs min 3 m", "vs min 6 m",
+                "vs min 1 a", "vs min 3 a", "vs min 5 a", "vs media 200", "RSI 14", "referencia", "motivos"]]
     st.dataframe(vista, hide_index=True, width="stretch", column_config={
+        "en_cartera": st.column_config.NumberColumn("en cartera", format="%.0f €"),
+        "peso": st.column_config.NumberColumn("% cartera", format="percent"),
         **{c: st.column_config.NumberColumn(c, format="percent") for c in
            ["caída desde máx 1 a", "vs min 3 m", "vs min 6 m", "vs min 1 a", "vs min 3 a", "vs min 5 a", "vs media 200"]},
         "RSI 14": st.column_config.NumberColumn(format="%.0f"),
         "puntos": st.column_config.ProgressColumn(min_value=0, max_value=9, format="%d"),
     })
 
-    # Cartera completa: media ponderada de todos los activos con su peso actual
-    base = val if incluir_plan else val[val.plataforma != "MyInvestor (plan)"]
-    pesos = base.groupby("clave")["valor"].sum()
-    if incluir_efectivo and efectivo:
-        pesos["EFECTIVO"] = efectivo
-    referencias = {}
-    for clave in pesos.index:
-        if clave not in cat.index:
-            continue
-        inst = cat.loc[clave]
-        if isinstance(inst.ticker, str):
-            s_ref = mercado.serie_eur(inst.ticker, inst.moneda_ticker, hist)
-        elif isinstance(inst.proxy, str):
-            s_ref = mercado.serie_eur(inst.proxy, "EUR", hist)
-        else:
-            s_ref = None
-        if s_ref is not None:
-            referencias[clave] = s_ref
-    indice = mercado.indice_cartera(pesos, referencias)
-    s_cartera = mercado.señales(indice) if len(indice) > 30 else {}
-    if s_cartera:
-        cubierto = pesos[list(referencias)].sum() / pesos.sum()
-        caida = s_cartera["caída desde máx 1 a"]
-        detalle = (f"está un {abs(caida) * 100:.1f} % por debajo de su máximo anual".replace(".", ",")
-                   if caida < -0.001 else "está en máximos del último año")
-        st.markdown(f"**Cartera completa:** {s_cartera['señal'].lower()} ({s_cartera['puntos']} puntos); {detalle}.")
-
+    # ------------------------------------------------------------------ gráfico
     st.markdown("**Gráfico**")
     c1, c2 = st.columns([2, 3])
     opciones = (["Cartera completa"] if s_cartera else []) + df["activo"].tolist()
     elegido = c1.selectbox("Activo", opciones, label_visibility="collapsed")
-    periodos = {"6 m": 126, "1 a": 252, "2 a": 504, "3 a": 756, "5 a": 1260}
-    periodo = c2.segmented_control("Periodo", list(periodos), default="1 a", label_visibility="collapsed") or "1 a"
-    n = periodos[periodo]
+    periodo = c2.segmented_control("Periodo", list(PERIODOS), default="1 a", label_visibility="collapsed") or "1 a"
+    es_cartera = elegido == "Cartera completa"
 
-    if elegido == "Cartera completa":
-        serie_total, nombre = indice, "Cartera (base 100)"
+    if es_cartera:
+        nombre = "Cartera (base 100)"
+        if periodo == "1 d":
+            base_intr, _ = indice_de(pesos_cartera(val, efectivo if incluir_efectivo else 0.0), intr)
+            serie_total = mercado.ultimas_24h(base_intr)
+        else:
+            serie_total = indice
     else:
         fila = df[df.activo == elegido].iloc[0]
         ref = fila.referencia.replace(" (equivalente)", "")
-        serie_total, nombre = hist[ref].dropna(), ref
-    media = serie_total.rolling(200).mean()
-    serie = serie_total.tail(n)
-    if elegido == "Cartera completa" and not serie.empty:
-        factor = 100 / serie.iloc[0]
-        serie, media = serie * factor, media * factor
-    media = media.reindex(serie.index)
+        nombre = ref
+        serie_total = mercado.ultimas_24h(intr[ref]) if periodo == "1 d" and ref in intr else hist[ref].dropna()
 
-    variacion = serie.iloc[-1] / serie.iloc[0] - 1 if len(serie) > 1 else np.nan
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=serie.index, y=serie, name=nombre,
-                             line=dict(color=VERDE if elegido == "Cartera completa" else TINTA, width=1.8)))
-    fig.add_trace(go.Scatter(x=media.index, y=media, name="Media 200", line=dict(color=GRIS, width=1, dash="dot")))
-    if len(serie):
+    if periodo == "1 d":
+        serie, media = serie_total, None
+    else:
+        media_completa = serie_total.rolling(200).mean()
+        serie = serie_total.tail(PERIODOS[periodo])
+        media = media_completa.reindex(serie.index)
+    if es_cartera and len(serie):
+        factor = 100 / serie.iloc[0]
+        serie = serie * factor
+        media = media * factor if media is not None else None
+
+    if len(serie) < 2:
+        st.info("No hay datos de ese periodo para este activo (puede que el mercado esté cerrado).")
+    else:
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=serie.index, y=serie, name=nombre,
+                                 line=dict(color=VERDE if es_cartera else TINTA, width=1.8)))
+        if media is not None and media.notna().any():
+            fig.add_trace(go.Scatter(x=media.index, y=media, name="Media 200", line=dict(color=GRIS, width=1, dash="dot")))
         fig.add_hline(y=serie.min(), line=dict(color=ROJO, width=1, dash="dash"),
                       annotation_text=f"Mín {periodo}", annotation_position="bottom right")
         fig.add_hline(y=serie.max(), line=dict(color=VERDE, width=1, dash="dash"),
                       annotation_text=f"Máx {periodo}", annotation_position="top right")
-    fig.update_layout(height=420, margin=dict(l=10, r=10, t=20, b=10), legend=dict(orientation="h"),
-                      plot_bgcolor="rgba(0,0,0,0)")
-    st.plotly_chart(fig, width="stretch")
+        fig.update_layout(height=420, margin=dict(l=10, r=10, t=20, b=10), legend=dict(orientation="h"),
+                          plot_bgcolor="rgba(0,0,0,0)")
+        st.plotly_chart(fig, width="stretch")
 
-    años_disp = len(serie_total) / 252
-    texto = f"Variación en el periodo: {pct(variacion)}."
-    if años_disp < n / 252 * 0.95:
-        texto += f" Solo hay {años_disp:.1f} años de histórico.".replace(".", ",", 1)
-    if elegido == "Cartera completa":
-        texto += (f" Simula la evolución de tu cartera con los pesos de hoy: no es tu rentabilidad real, que depende "
-                  f"de cuándo aportaste. Cubre con precios de mercado el {cubierto * 100:.0f} % del valor; "
-                  "monetarios, bono y efectivo se toman como planos.")
-    st.caption(texto)
+    # ------------------------------------------------------------------ resultado del periodo
+    variacion = serie.iloc[-1] / serie.iloc[0] - 1 if len(serie) > 1 else np.nan
+    m = st.columns(3)
+    m[0].metric(f"Variación {periodo}", pct(variacion))
+    res_cartera = resultado_periodo(pesos_inv, periodo, intr)
+    m[1].metric(f"Resultado de la cartera en {periodo}", eur(res_cartera), delta_color="off")
+    if not es_cartera:
+        valor_pos = float(df[df.activo == elegido].en_cartera.iloc[0])
+        m[2].metric(f"Resultado de esta posición en {periodo}",
+                    eur(valor_pos * (1 - 1 / (1 + variacion)) if not np.isnan(variacion) else np.nan))
+
+    textos = []
+    if periodo != "1 d":
+        años_disp = len(serie_total) / 252
+        if años_disp < PERIODOS[periodo] / 252 * 0.95:
+            textos.append(f"Solo hay {años_disp:.1f} años de histórico.".replace(".", ",", 1))
+    textos.append("El resultado de la cartera es lo ganado o perdido sin contar lo que has aportado, estimado día a día "
+                  "con tus movimientos y los precios de mercado; no incluye el efectivo.")
+    if not es_cartera:
+        textos.append("El de la posición usa lo que tienes hoy en ella.")
+    if es_cartera:
+        textos.append(f"La línea simula tu cartera con los pesos de hoy. Cubre con precios de mercado el "
+                      f"{cubierto * 100:.0f} % del valor; monetarios, bono y efectivo se toman como planos.")
+    st.caption(" ".join(textos))
 
     seccion_analistas(val)
 
@@ -331,11 +405,43 @@ def seccion_analistas(val: pd.DataFrame):
                "ir con retraso respecto al precio; úsalo como un dato más junto a las señales.")
 
 
-def pestaña_cartera(val: pd.DataFrame, efectivo_tr: float, efectivo_mi: float):
+def seccion_resultado_mensual(val: pd.DataFrame):
+    st.subheader("Resultado por mes")
+    if hist.empty:
+        st.caption("Necesita precios de mercado para calcularse.")
+        return
+    rec = reconstruccion(pesos_cartera(val), marca_datos(), incluir_plan)
+    if rec.empty:
+        return
+    mensual = rec["resultado"].groupby(rec.index.to_period("M")).sum()
+    hoy = pd.Timestamp.today()
+    c = st.columns(4)
+    c[0].metric("Este mes", eur(mensual.iloc[-1]))
+    c[1].metric("Últimos 3 meses", eur(mensual.tail(3).sum()))
+    c[2].metric("Últimos 12 meses", eur(mensual.tail(12).sum()))
+    c[3].metric(f"En {hoy.year}", eur(mensual[mensual.index.year == hoy.year].sum()))
+
+    meses = st.segmented_control("Meses", ["12 meses", "24 meses", "Todo"], default="12 meses",
+                                 label_visibility="collapsed") or "12 meses"
+    datos = mensual if meses == "Todo" else mensual.tail(int(meses.split()[0]))
+    datos = datos[datos.index >= rec.index[rec.valor > 1].min().to_period("M")] if (rec.valor > 1).any() else datos
+    x = datos.index.to_timestamp()
+    fig = go.Figure(go.Bar(x=x, y=datos.values, marker_color=np.where(datos.values >= 0, VERDE, ROJO),
+                           text=[eur(v) for v in datos.values], textposition="outside"))
+    fig.update_layout(height=300, margin=dict(l=10, r=10, t=20, b=10), plot_bgcolor="rgba(0,0,0,0)",
+                      xaxis=dict(tickformat="%m/%y"))
+    st.plotly_chart(fig, width="stretch")
+    st.caption("Lo ganado o perdido cada mes sin contar tus aportaciones, sin efectivo. Es una estimación: se "
+               "reconstruye el valor día a día hacia atrás con tus compras y ventas y los precios de mercado.")
+
+
+def pestaña_cartera(val: pd.DataFrame, efectivo_tr: float, efectivo_mi: float, intr: pd.DataFrame):
     por_plat = val.groupby("plataforma")[["coste", "valor", "resultado"]].sum()
     por_plat.loc["Efectivo"] = [efectivo_tr + efectivo_mi, efectivo_tr + efectivo_mi, 0]
     st.subheader("Por plataforma")
     st.dataframe(por_plat.style.format(lambda x: eur(x)), width="stretch")
+
+    seccion_resultado_mensual(val)
 
     st.subheader("Diversificación")
     base = val if incluir_plan else val[val.plataforma != "MyInvestor (plan)"]

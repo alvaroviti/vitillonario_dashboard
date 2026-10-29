@@ -34,22 +34,36 @@ def descargar_historico(tickers: list[str], periodo: str = "5y") -> pd.DataFrame
     return cierres.dropna(how="all")
 
 
-def descargar_ultimos(tickers: list[str]) -> pd.Series:
-    """Último precio intradía disponible (retraso habitual de 15 min en bolsas europeas)."""
+def descargar_intradia(tickers: list[str]) -> pd.DataFrame:
+    """Cierres cada 15 minutos de los últimos 5 días, en hora de Madrid."""
     tickers = sorted({t for t in tickers if isinstance(t, str) and t})
     if yf is None or not tickers:
-        return pd.Series(dtype=float)
+        return pd.DataFrame()
     try:
         datos = yf.download(tickers, period="5d", interval="15m", auto_adjust=True,
                             progress=False, group_by="column", threads=True)
     except Exception:
-        return pd.Series(dtype=float)
+        return pd.DataFrame()
     if datos.empty:
-        return pd.Series(dtype=float)
+        return pd.DataFrame()
     cierres = datos["Close"]
     if isinstance(cierres, pd.Series):
         cierres = cierres.to_frame(tickers[0])
-    return cierres.ffill().iloc[-1].dropna()
+    idx = pd.to_datetime(cierres.index)
+    idx = idx.tz_convert("Europe/Madrid") if idx.tz is not None else idx.tz_localize("UTC").tz_convert("Europe/Madrid")
+    cierres.index = idx.tz_localize(None)
+    return cierres.sort_index()
+
+
+def ultimos_de(intradia: pd.DataFrame) -> pd.Series:
+    """Último precio disponible de cada ticker (retraso habitual de 15 min en bolsas europeas)."""
+    if intradia.empty:
+        return pd.Series(dtype=float)
+    return intradia.ffill().iloc[-1].dropna()
+
+
+def descargar_ultimos(tickers: list[str]) -> pd.Series:
+    return ultimos_de(descargar_intradia(tickers))
 
 
 def precios_actuales(pos: pd.DataFrame, instrumentos: pd.DataFrame,
@@ -209,3 +223,33 @@ def indice_cartera(pesos: pd.Series, referencias: dict[str, pd.Series], base: fl
     rend_cartera = rend.fillna(0).mul(w, axis=1).sum(axis=1) / total.replace(0, np.nan)
     rend_cartera = rend_cartera.iloc[1:].fillna(0)
     return base * (1 + rend_cartera).cumprod()
+
+
+def ultimas_24h(serie: pd.Series) -> pd.Series:
+    s = serie.dropna()
+    if s.empty:
+        return s
+    return s[s.index >= s.index[-1] - pd.Timedelta(hours=24)]
+
+
+def reconstruir_valor(indice: pd.Series, valor_hoy: float, flujos: pd.Series) -> pd.DataFrame:
+    """Valor diario estimado de la cartera hacia atrás desde hoy.
+
+    Cada día: valor = valor_anterior × (1 + rentabilidad del día) + aportación neta del día.
+    El resultado del día es lo que se ha ganado o perdido sin contar las aportaciones.
+    """
+    if indice.empty:
+        return pd.DataFrame()
+    fechas = indice.index
+    r = indice.pct_change().fillna(0).values
+    f = pd.Series(0.0, index=fechas)
+    if not flujos.empty:
+        pos = np.clip(fechas.searchsorted(pd.to_datetime(flujos.index)), 0, len(fechas) - 1)
+        for p, importe in zip(pos, flujos.values):
+            f.iloc[p] += importe
+    v = np.zeros(len(fechas))
+    v[-1] = valor_hoy
+    for t in range(len(fechas) - 1, 0, -1):
+        v[t - 1] = max(0.0, (v[t] - f.iloc[t]) / (1 + r[t]))
+    resultado = np.concatenate([[0.0], v[1:] - v[:-1] - f.values[1:]])
+    return pd.DataFrame({"valor": v, "aportacion": f.values, "resultado": resultado}, index=fechas)

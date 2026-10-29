@@ -309,3 +309,19 @@ def desglose(val: pd.DataFrame, instrumentos: pd.DataFrame, perfiles: pd.DataFra
     filas = base.merge(perfiles, on="perfil", how="left")
     filas["valor"] = filas["valor"] * filas["peso"]
     return filas[["clave", "nombre", "dimension", "categoria", "valor"]], sin_perfil["nombre"].tolist()
+
+
+def flujos_diarios(tr: pd.DataFrame, mi: pd.DataFrame, incluir_plan: bool = True) -> pd.Series:
+    """Dinero neto metido en inversiones cada día (compras − ventas)."""
+    partes = []
+    if not tr.empty:
+        b = tr[(tr.type == "BUY") & tr.amount.notna()]
+        s = tr[tr.type == "SELL"]
+        partes += [pd.Series(-b.amount.values, index=b.date), pd.Series(-s.amount.values, index=s.date)]
+    if not mi.empty:
+        tipos = MI_COMPRAS if incluir_plan else [t for t in MI_COMPRAS if t != "APORTACION PLANES"]
+        m = mi[mi.tipo.isin(tipos + MI_VENTAS)]
+        partes.append(pd.Series(-m.importe.values, index=m.fecha))
+    if not partes:
+        return pd.Series(dtype=float)
+    return pd.concat(partes).groupby(level=0).sum().sort_index()
