@@ -583,6 +583,62 @@ def pestaña_aportaciones(patrimonio: float):
         "aportacion_para_plazo": st.column_config.NumberColumn(f"€/mes para llegar en {plazo} años", format="%.0f €"),
     })
 
+    seccion_movimientos()
+
+
+def seccion_movimientos():
+    st.subheader("Movimientos de inversión")
+    mov = cartera.movimientos_inversion(tr, mi)
+    if mov.empty:
+        st.caption("Todavía no hay movimientos.")
+        return
+    c1, c2, c3, c4 = st.columns([2, 2, 2, 3])
+    desde_def = (pd.Timestamp.today() - pd.DateOffset(months=12)).date()
+    rango = c1.date_input("Fechas", value=(max(desde_def, mov.fecha.min().date()), mov.fecha.max().date()),
+                          min_value=mov.fecha.min().date(), max_value=pd.Timestamp.today().date(), format="DD/MM/YYYY")
+    plataformas = c2.multiselect("Plataforma", sorted(mov.plataforma.unique()), placeholder="Todas")
+    tipos = c3.multiselect("Tipo", sorted(mov.tipo.unique()), placeholder="Todos")
+    texto = c4.text_input("Buscar activo", placeholder="p. ej. gold, msci, bitcoin")
+
+    f = mov
+    if isinstance(rango, (list, tuple)) and len(rango) == 2:
+        f = f[(f.fecha.dt.date >= rango[0]) & (f.fecha.dt.date <= rango[1])]
+    if plataformas:
+        f = f[f.plataforma.isin(plataformas)]
+    if tipos:
+        f = f[f.tipo.isin(tipos)]
+    if texto:
+        f = f[f.activo.str.contains(texto, case=False, na=False)]
+
+    aport = f[f.cuenta_como_aportacion]
+    invertido = aport.loc[aport.importe > 0, "importe"].sum()
+    retirado = -aport.loc[aport.importe < 0, "importe"].sum()
+    m = st.columns(4)
+    m[0].metric("Invertido", eur(invertido))
+    m[1].metric("Vendido o reembolsado", eur(retirado))
+    m[2].metric("Neto", eur(invertido - retirado))
+    m[3].metric("Operaciones", f"{len(f):,}".replace(",", "."))
+
+    vista = f[["fecha", "plataforma", "tipo", "activo", "titulos", "precio", "importe"]]
+    st.dataframe(vista, hide_index=True, width="stretch", height=380, column_config={
+        "fecha": st.column_config.DateColumn(format="DD/MM/YYYY"),
+        "titulos": st.column_config.NumberColumn("títulos", format="%.4f"),
+        "precio": st.column_config.NumberColumn(format="%.2f €"),
+        "importe": st.column_config.NumberColumn(format="%.2f €"),
+    })
+    st.caption("Importe positivo = dinero invertido; negativo = ventas y reembolsos. En MyInvestor el extracto no trae "
+               "títulos ni precio. Los Saveback y regalos se listan pero no cuentan como aportación.")
+
+    with st.expander("Resumen por activo"):
+        res = aport.groupby(["activo", "plataforma"], as_index=False).agg(
+            operaciones=("importe", "size"), neto=("importe", "sum"), ultima=("fecha", "max"))
+        st.dataframe(res.sort_values("neto", ascending=False), hide_index=True, width="stretch", column_config={
+            "neto": st.column_config.NumberColumn("invertido neto", format="%.2f €"),
+            "ultima": st.column_config.DateColumn("última operación", format="DD/MM/YYYY"),
+        })
+    st.download_button("Descargar CSV", f.to_csv(index=False, sep=";", decimal=",").encode("utf-8-sig"),
+                       file_name="movimientos_inversion.csv", mime="text/csv")
+
 
 def pestaña_fiscal():
     st.caption("Estimación para preparar la declaración. Compárala siempre con el borrador y los informes fiscales "

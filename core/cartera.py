@@ -325,3 +325,38 @@ def flujos_diarios(tr: pd.DataFrame, mi: pd.DataFrame, incluir_plan: bool = True
     if not partes:
         return pd.Series(dtype=float)
     return pd.concat(partes).groupby(level=0).sum().sort_index()
+
+
+# --------------------------------------------------------------------------- #
+# Listado de movimientos de inversión (aportaciones operación a operación)
+# --------------------------------------------------------------------------- #
+def _nombre_mi(concepto: str) -> str:
+    return concepto.split(" @")[0].strip().title() if isinstance(concepto, str) else ""
+
+
+def movimientos_inversion(tr: pd.DataFrame, mi: pd.DataFrame) -> pd.DataFrame:
+    """Una fila por compra, venta, suscripción o aportación. importe > 0 = dinero invertido."""
+    filas = []
+    if not tr.empty:
+        for r in tr[tr.type.isin(["BUY", "SELL"])].itertuples():
+            desc = r.description if isinstance(r.description, str) else ""
+            if r.type == "SELL":
+                tipo, importe = "Venta", -r.amount
+            elif pd.isna(r.amount):
+                tipo, importe = "Saveback / regalo", r.shares * r.price
+            elif desc.startswith("Savings plan"):
+                tipo, importe = "Plan de inversión", -r.amount
+            else:
+                tipo, importe = "Compra", -r.amount
+            filas.append(dict(fecha=r.date, plataforma="Trade Republic", tipo=tipo, activo=r.name,
+                              titulos=abs(r.shares), precio=r.price, importe=importe,
+                              cuenta_como_aportacion=tipo != "Saveback / regalo"))
+    if not mi.empty:
+        tipos = {"SUSCRIPCION IIC": "Suscripción fondo", "COMPRA RV CONTADO": "Compra",
+                 "APORTACION PLANES": "Aportación plan de pensiones", "REEMBOLSO IIC": "Reembolso fondo",
+                 "VENTA RV CONTADO": "Venta"}
+        for r in mi[mi.tipo.isin(tipos)].itertuples():
+            filas.append(dict(fecha=r.fecha, plataforma="MyInvestor", tipo=tipos[r.tipo], activo=_nombre_mi(r.concepto),
+                              titulos=np.nan, precio=np.nan, importe=-r.importe, cuenta_como_aportacion=True))
+    df = pd.DataFrame(filas)
+    return df.sort_values("fecha", ascending=False).reset_index(drop=True) if not df.empty else df
