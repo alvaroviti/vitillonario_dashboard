@@ -167,6 +167,7 @@ def aportaciones_mensuales(tr: pd.DataFrame, mi: pd.DataFrame) -> pd.DataFrame:
     df["mes"] = df["fecha"].dt.to_period("M")
     m = df.groupby("mes")[["compras", "ventas"]].sum()
     m = m.reindex(pd.period_range(m.index.min(), pd.Timestamp.today().to_period("M"), freq="M"), fill_value=0)
+    m.index.name = "mes"
     m["neto"] = m["compras"] - m["ventas"]
     m["acumulado"] = m["neto"].cumsum()
     return m
@@ -427,6 +428,7 @@ def resumen_mensual(rec: pd.DataFrame) -> pd.DataFrame:
     capital = g["valor_inicio"] + g["aportacion"].clip(lower=0)
     g["rentabilidad"] = np.where(capital > 1, g["beneficio"] / capital, np.nan)
     g = g[(g["valor"] > 1) | (g["aportacion"].abs() > 0)]
+    g.index.name = "mes"  # el índice hereda el nombre de Yahoo («Date»): se fija para que no dependa de eso
     g["aportado_acumulado"] = g["aportacion"].cumsum()
     g["beneficio_acumulado"] = g["beneficio"].cumsum()
     return g

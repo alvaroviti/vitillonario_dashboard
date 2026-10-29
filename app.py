@@ -666,7 +666,7 @@ def seccion_resultado_mensual(val: pd.DataFrame):
                "mes, que es la rentabilidad real del año.")
 
     with st.expander("Detalle mes a mes"):
-        det = mens.reset_index().rename(columns={"index": "mes"})
+        det = mens.rename_axis("mes").reset_index()
         det["mes"] = det["mes"].astype(str)
         det = det[["mes", "valor", "aportacion", "aportado_acumulado", "rentabilidad", "beneficio", "beneficio_acumulado"]]
         det = det.rename(columns={"valor": "valor actual", "aportacion": "inversión", "aportado_acumulado": "inversión acumulada",
@@ -784,7 +784,7 @@ def pestaña_aportaciones(patrimonio: float):
     for col, r in zip(cols, medias.itertuples()):
         col.metric(r.periodo, eur(r.neto_mes), f"compras {eur(r.compras_mes)}", delta_color="off")
 
-    df = m.reset_index().rename(columns={"index": "mes"})
+    df = m.rename_axis("mes").reset_index()
     df["mes"] = df["mes"].dt.to_timestamp()
     fig = go.Figure()
     fig.add_bar(x=df.mes, y=df.neto, name="Neto", marker_color=np.where(df.neto >= 0, VERDE, ROJO))
