@@ -256,7 +256,7 @@ def pestaña_hoy(val: pd.DataFrame, intr: pd.DataFrame):
                                  label_visibility="collapsed") or "Últimos 12 meses"
     doce = largo == "Últimos 12 meses"
     col_largo = "var_12m" if doce else "var_año"
-    c = st.columns(5)
+    c = st.columns(6)
     hoy_eur, sem_eur = df.hoy_eur.sum(), df.semana_eur.sum()
     c[0].metric("Valor de la cartera", eur(total))
     c[1].metric("Hoy", eur(hoy_eur), pct(hoy_eur / (total - hoy_eur)))
@@ -268,11 +268,17 @@ def pestaña_hoy(val: pd.DataFrame, intr: pd.DataFrame):
         c[3].metric("Este mes", eur(mens["beneficio"].iloc[-1]), pct(mens["rentabilidad"].iloc[-1]))
         tramo = mens.tail(12) if doce else mens[mens.index.year == hoy.year]
         c[4].metric(etiqueta_largo, eur(tramo["beneficio"].sum()), pct((1 + tramo["rentabilidad"].dropna()).prod() - 1))
+        # Como en la Excel: 12 meses → entre 12; año en curso → entre el número del mes actual
+        meses = min(12, len(tramo)) if doce else hoy.month
+        c[5].metric("Promedio al mes", eur(tramo["beneficio"].sum() / meses),
+                    pct(tramo["rentabilidad"].dropna().mean()), delta_color="normal",
+                    help=f"Ganancia del periodo entre {meses} meses. El % es la rentabilidad media mensual.")
     else:
         mes_eur = (df.valor * (1 - 1 / (1 + df.var_mes.fillna(0)))).sum()
         largo_eur = (df.valor * (1 - 1 / (1 + df[col_largo].fillna(0)))).sum()
         c[3].metric("Este mes", eur(mes_eur), pct(mes_eur / (total - mes_eur)))
         c[4].metric(etiqueta_largo, eur(largo_eur), pct(largo_eur / (total - largo_eur)))
+        c[5].metric("Promedio al mes", eur(largo_eur / (12 if doce else hoy.month)))
 
     nombre_largo = "12 meses %" if doce else "Año %"
     orden = st.segmented_control("Ordenar por", ["% cartera", "Hoy %", "Semana %", "Mes %", nombre_largo, "Ganancia"],
@@ -293,12 +299,19 @@ def pestaña_hoy(val: pd.DataFrame, intr: pd.DataFrame):
 
     df["var_largo"] = df[col_largo]
     vista = df[["activo", "var_dia", "var_semana", "var_mes", "var_largo", "peso", "invertido", "valor", "ganancia", "ganancia_pct", "hoy_eur"]]
-    estilo = (vista.style
-              .format({"var_dia": flecha, "var_semana": flecha, "var_mes": flecha, "var_largo": flecha, "ganancia_pct": flecha,
-                       "peso": lambda x: f"{x * 100:.1f} %".replace(".", ","),
+    # Las variaciones se pasan a texto para que las vacías salgan como «—» (Streamlit pinta «None» en las
+    # celdas numéricas vacías). Se ordena con los botones de arriba, así que no se pierde nada.
+    variaciones = ["var_dia", "var_semana", "var_mes", "var_largo"]
+    colores = vista[variaciones].map(color)
+    texto = vista.copy()
+    for c_ in variaciones:
+        texto[c_] = vista[c_].map(flecha)
+    estilo = (texto.style
+              .format({"ganancia_pct": flecha, "peso": lambda x: f"{x * 100:.1f} %".replace(".", ","),
                        "invertido": lambda x: eur(x), "valor": lambda x: eur(x),
                        "ganancia": lambda x: eur(x), "hoy_eur": lambda x: eur(x)}, na_rep="—")
-              .map(color, subset=["var_dia", "var_semana", "var_mes", "var_largo", "ganancia", "ganancia_pct", "hoy_eur"]))
+              .apply(lambda _: colores, axis=None, subset=variaciones)
+              .map(color, subset=["ganancia", "ganancia_pct", "hoy_eur"]))
     st.dataframe(estilo, hide_index=True, width="stretch", height=min(40 + 35 * len(vista), 640), column_config={
         "var_dia": st.column_config.Column("hoy"), "var_semana": st.column_config.Column("semana"),
         "var_mes": st.column_config.Column("mes"), "var_largo": st.column_config.Column("12 meses" if doce else "año"),
