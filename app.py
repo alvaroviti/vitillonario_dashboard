@@ -642,7 +642,8 @@ def seccion_resultado_mensual(val: pd.DataFrame):
                       xaxis=dict(tickformat="%m/%y"))
     st.plotly_chart(fig, width="stretch")
     st.caption("Lo ganado o perdido cada mes sin contar tus aportaciones, sin efectivo. Es una estimación: se "
-               "reconstruye el valor día a día hacia atrás con tus compras y ventas y los precios de mercado.")
+               "reconstruye el valor día a día desde tu primera compra con tus movimientos y los precios de mercado, "
+               "ajustado para que cuadre con el valor de hoy.")
 
     mens = cartera.resumen_mensual(rec)
     anual = cartera.resumen_anual(mens)

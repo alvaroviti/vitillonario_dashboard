@@ -407,3 +407,40 @@ def estimar_renta(d: dict, tipo_marginal: float, incluir_otros: bool = True,
                 retenciones=ret, reduccion_plan=reduccion_plan, ahorro_plan=ahorro_plan,
                 efecto_neto=cuota - ret - ahorro_plan,
                 perdida_pendiente=min(gp_neto, 0.0) * -1 + (perdidas_previas - usadas))
+
+
+# --------------------------------------------------------------------------- #
+# Resumen mensual y anual (mismo criterio que la Excel de seguimiento)
+# --------------------------------------------------------------------------- #
+def resumen_mensual(rec: pd.DataFrame) -> pd.DataFrame:
+    """A partir del valor diario reconstruido: valor, aportación, beneficio y rentabilidad de cada mes.
+    Rentabilidad del mes = beneficio / (valor al empezar el mes + aportado en el mes)."""
+    if rec.empty:
+        return pd.DataFrame()
+    mes = rec.index.to_period("M")
+    g = pd.DataFrame({
+        "valor": rec["valor"].groupby(mes).last(),
+        "aportacion": rec["aportacion"].groupby(mes).sum(),
+        "beneficio": rec["resultado"].groupby(mes).sum(),
+    })
+    g["valor_inicio"] = g["valor"].shift(1).fillna(0.0)
+    capital = g["valor_inicio"] + g["aportacion"].clip(lower=0)
+    g["rentabilidad"] = np.where(capital > 1, g["beneficio"] / capital, np.nan)
+    g = g[(g["valor"] > 1) | (g["aportacion"].abs() > 0)]
+    g["aportado_acumulado"] = g["aportacion"].cumsum()
+    g["beneficio_acumulado"] = g["beneficio"].cumsum()
+    return g
+
+
+def resumen_anual(mensual: pd.DataFrame, hoy: pd.Timestamp | None = None) -> pd.DataFrame:
+    if mensual.empty:
+        return pd.DataFrame()
+    hoy = hoy or pd.Timestamp.today()
+    filas = []
+    for año, m in mensual.groupby(mensual.index.year):
+        meses = hoy.month if año == hoy.year else 12  # como en la Excel: lo que va de año / mes actual
+        r = m["rentabilidad"].dropna()
+        filas.append(dict(año=año, aportado=m["aportacion"].sum(), beneficio=m["beneficio"].sum(),
+                          rentabilidad_suma=r.sum(), rentabilidad_encadenada=(1 + r).prod() - 1,
+                          promedio_mes=m["beneficio"].sum() / meses, valor_final=m["valor"].iloc[-1]))
+    return pd.DataFrame(filas)

@@ -170,11 +170,23 @@ def objetivos_analistas(tickers: list[str]) -> pd.DataFrame:
     for t in sorted(set(tickers)):
         try:
             tk = yf.Ticker(t)
-            obj = tk.analyst_price_targets or {}
+            try:
+                obj = tk.analyst_price_targets or {}
+            except Exception:
+                obj = {}
+            if not obj.get("mean"):
+                # Alternativa: los mismos datos vienen también en la ficha general del valor
+                info = tk.get_info() or {}
+                obj = dict(current=info.get("currentPrice") or info.get("regularMarketPrice"),
+                           mean=info.get("targetMeanPrice"), median=info.get("targetMedianPrice"),
+                           low=info.get("targetLowPrice"), high=info.get("targetHighPrice"))
             fila = dict(ticker=t, actual=obj.get("current"), objetivo_medio=obj.get("mean"),
                         objetivo_mediano=obj.get("median"), objetivo_min=obj.get("low"),
                         objetivo_max=obj.get("high"))
-            rec = tk.recommendations_summary
+            try:
+                rec = tk.recommendations_summary
+            except Exception:
+                rec = None
             if rec is not None and not rec.empty:
                 r = rec[rec["period"] == "0m"].iloc[0] if "0m" in set(rec["period"]) else rec.iloc[0]
                 compra = int(r.get("strongBuy", 0) + r.get("buy", 0))
@@ -238,23 +250,38 @@ def ultimas_24h(serie: pd.Series) -> pd.Series:
 
 
 def reconstruir_valor(indice: pd.Series, valor_hoy: float, flujos: pd.Series) -> pd.DataFrame:
-    """Valor diario estimado de la cartera hacia atrás desde hoy.
+    """Valor diario estimado de la cartera desde la primera aportación hasta hoy.
 
-    Cada día: valor = valor_anterior × (1 + rentabilidad del día) + aportación neta del día.
-    El resultado del día es lo que se ha ganado o perdido sin contar las aportaciones.
+    Cada día: valor = valor_anterior × (1 + rentabilidad del día + ajuste) + aportación neta del día.
+    El índice usa los pesos de hoy, así que no acierta exactamente; el «ajuste» es una corrección diaria
+    constante que se calcula para que el valor final coincida con el valor real de hoy. Así la ganancia
+    total cuadra con valor actual − dinero aportado, y se reparte en el tiempo según el mercado.
     """
     if indice.empty:
         return pd.DataFrame()
     fechas = indice.index
     r = indice.pct_change().fillna(0).values
-    f = pd.Series(0.0, index=fechas)
+    f = np.zeros(len(fechas))
     if not flujos.empty:
-        pos = np.clip(fechas.searchsorted(pd.to_datetime(flujos.index)), 0, len(fechas) - 1)
+        idx_flujos = pd.to_datetime(flujos.index)
+        pos = np.clip(fechas.searchsorted(idx_flujos), 0, len(fechas) - 1)
         for p, importe in zip(pos, flujos.values):
-            f.iloc[p] += importe
-    v = np.zeros(len(fechas))
-    v[-1] = valor_hoy
-    for t in range(len(fechas) - 1, 0, -1):
-        v[t - 1] = max(0.0, (v[t] - f.iloc[t]) / (1 + r[t]))
-    resultado = np.concatenate([[0.0], v[1:] - v[:-1] - f.values[1:]])
-    return pd.DataFrame({"valor": v, "aportacion": f.values, "resultado": resultado}, index=fechas)
+            f[p] += importe
+
+    def simular(ajuste: float) -> np.ndarray:
+        v = np.zeros(len(fechas))
+        for t in range(1, len(fechas)):
+            v[t] = max(0.0, v[t - 1] * (1 + r[t] + ajuste) + f[t])
+        v[0] = max(0.0, f[0])
+        return v
+
+    bajo, alto = -0.01, 0.01
+    for _ in range(60):  # bisección sobre el ajuste diario
+        medio = (bajo + alto) / 2
+        if simular(medio)[-1] < valor_hoy:
+            bajo = medio
+        else:
+            alto = medio
+    v = simular((bajo + alto) / 2)
+    resultado = np.concatenate([[0.0], v[1:] - v[:-1] - f[1:]])
+    return pd.DataFrame({"valor": v, "aportacion": f, "resultado": resultado}, index=fechas)
