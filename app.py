@@ -291,16 +291,18 @@ def pestaña_mercado(val: pd.DataFrame, ult: pd.Series, intr: pd.DataFrame, efec
                "La puntuación suma caída desde máximos, cercanía a mínimos, media de 200 sesiones, RSI y "
                "desviación respecto a la media anual. Es una ayuda para decidir, no una recomendación.")
 
-    vista = df[["activo", "en_cartera", "peso", "señal", "puntos", "caída desde máx 1 a", "vs min 3 m", "vs min 6 m",
-                "vs min 1 a", "vs min 3 a", "vs min 5 a", "vs media 200", "RSI 14", "referencia", "motivos"]]
-    st.dataframe(vista, hide_index=True, width="stretch", column_config={
-        "en_cartera": st.column_config.NumberColumn("en cartera", format="%.0f €"),
-        "peso": st.column_config.NumberColumn("% cartera", format="percent"),
-        **{c: st.column_config.NumberColumn(c, format="percent") for c in
-           ["caída desde máx 1 a", "vs min 3 m", "vs min 6 m", "vs min 1 a", "vs min 3 a", "vs min 5 a", "vs media 200"]},
-        "RSI 14": st.column_config.NumberColumn(format="%.0f"),
+    porcentajes = ["caída desde máx 1 a", "vs min 3 m", "vs min 6 m", "vs min 1 a", "vs min 2 a", "vs min 3 a",
+                   "vs min 5 a", "vs media 200"]
+    vista = df[["activo", "en_cartera", "peso", "señal", "puntos"] + porcentajes + ["RSI 14", "referencia", "motivos"]]
+    formato_pct = lambda x: f"{x * 100:.1f} %".replace(".", ",")
+    estilo = vista.style.format({c: formato_pct for c in porcentajes + ["peso"]}, na_rep="—").format(
+        {"en_cartera": lambda x: eur(x), "RSI 14": "{:.0f}"}, na_rep="—")
+    st.dataframe(estilo, hide_index=True, width="stretch", column_config={
+        "en_cartera": st.column_config.Column("en cartera"),
+        "peso": st.column_config.Column("% cartera"),
         "puntos": st.column_config.ProgressColumn(min_value=0, max_value=9, format="%d"),
     })
+    st.caption("«—» significa que el activo no tiene histórico suficiente para ese plazo.")
 
     # ------------------------------------------------------------------ gráfico
     st.markdown("**Gráfico**")

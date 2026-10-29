@@ -10,7 +10,7 @@ except ImportError:  # el dashboard sigue funcionando con los últimos precios c
     yf = None
 
 FX = {"USD": "EURUSD=X", "JPY": "EURJPY=X", "GBP": "EURGBP=X"}
-VENTANAS = {"3 m": 63, "6 m": 126, "1 a": 252, "3 a": 756, "5 a": 1260}
+VENTANAS = {"3 m": 63, "6 m": 126, "1 a": 252, "2 a": 504, "3 a": 756, "5 a": 1260}
 
 
 def descargar_historico(tickers: list[str], periodo: str = "5y") -> pd.DataFrame:
