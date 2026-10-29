@@ -174,9 +174,11 @@ def pintar():
     c[2].metric("Hasta el objetivo", eur(max(0, objetivo - patrimonio)), f"{patrimonio / objetivo:.0%} conseguido".replace(".", ","), delta_color="off")
     c[3].metric("Efectivo", eur(efectivo_tr + efectivo_mi), "TR " + eur(efectivo_tr) + " · MI " + eur(efectivo_mi), delta_color="off")
 
-    t_mercado, t_cartera, t_aport, t_fiscal, t_datos = st.tabs(
-        ["Mercado y señales", "Cartera", "Aportaciones y objetivo", "Fiscal", "Datos"])
+    t_hoy, t_mercado, t_cartera, t_aport, t_fiscal, t_datos = st.tabs(
+        ["Hoy", "Mercado y señales", "Cartera", "Aportaciones y objetivo", "Fiscal", "Datos"])
 
+    with t_hoy:
+        pestaña_hoy(val, intr)
     with t_mercado:
         pestaña_mercado(val, ult, intr, efectivo_tr + efectivo_mi)
     with t_cartera:
@@ -192,6 +194,106 @@ def pintar():
 # --------------------------------------------------------------------------- #
 # Pestañas
 # --------------------------------------------------------------------------- #
+def variacion_activo(ref: str, moneda: str | None, intr: pd.DataFrame) -> dict:
+    """Precio en euros y variación del día (frente al cierre anterior) y de la semana."""
+    out = dict(precio=np.nan, var_dia=np.nan, var_semana=np.nan, sesion=None)
+    s_i = mercado.serie_eur(ref, moneda, intr) if not intr.empty else None
+    s_d = mercado.serie_eur(ref, moneda, hist) if not hist.empty else None
+    if s_i is not None and len(s_i):
+        ultimo, momento = float(s_i.iloc[-1]), s_i.index[-1]
+        dia = momento.date()
+        antes = s_i[s_i.index.date < dia]
+        cierre_ant = float(antes.iloc[-1]) if len(antes) else np.nan
+        if np.isnan(cierre_ant) and s_d is not None:
+            previos = s_d[s_d.index.date < dia]
+            cierre_ant = float(previos.iloc[-1]) if len(previos) else np.nan
+        out.update(precio=ultimo, var_dia=ultimo / cierre_ant - 1 if cierre_ant else np.nan, sesion=momento)
+    elif s_d is not None and len(s_d) > 1:
+        out.update(precio=float(s_d.iloc[-1]), var_dia=float(s_d.iloc[-1] / s_d.iloc[-2] - 1), sesion=s_d.index[-1])
+    if s_d is not None and len(s_d) and not np.isnan(out["precio"]):
+        hace_semana = pd.Timestamp(out["sesion"]).tz_localize(None) - pd.Timedelta(days=7) if out["sesion"] is not None else None
+        base = s_d[:hace_semana] if hace_semana is not None else s_d.iloc[:-5]
+        if len(base):
+            out["var_semana"] = out["precio"] / float(base.iloc[-1]) - 1
+    return out
+
+
+def pestaña_hoy(val: pd.DataFrame, intr: pd.DataFrame):
+    if intr.empty and hist.empty:
+        st.info("Sin conexión con el mercado: aquí verás las subidas y bajadas del día en cuanto haya datos.")
+        return
+    cat = instrumentos.set_index("clave")
+    base = val if incluir_plan else val[val.plataforma != "MyInvestor (plan)"]
+    pos = base.groupby("clave", as_index=False).agg(activo=("nombre_corto", "first"), coste=("coste", "sum"),
+                                                     valor=("valor", "sum"))
+    pos = pos[pos.valor > 0.5]
+    filas = []
+    for r in pos.itertuples():
+        ref, moneda, equivalente = referencia_de(r.clave, cat)
+        v = variacion_activo(ref, moneda, intr) if ref else dict(var_dia=np.nan, var_semana=np.nan, sesion=None)
+        filas.append(dict(activo=r.activo + (" *" if equivalente else ""), var_dia=v["var_dia"],
+                          var_semana=v["var_semana"], invertido=r.coste, valor=r.valor,
+                          ganancia=r.valor - r.coste, ganancia_pct=(r.valor - r.coste) / r.coste if r.coste else np.nan))
+    df = pd.DataFrame(filas)
+    df["peso"] = df.valor / df.valor.sum()
+    df["hoy_eur"] = df.valor * (1 - 1 / (1 + df.var_dia.fillna(0)))
+    df["semana_eur"] = df.valor * (1 - 1 / (1 + df.var_semana.fillna(0)))
+    total = df.valor.sum()
+
+    c = st.columns(4)
+    hoy_eur, sem_eur = df.hoy_eur.sum(), df.semana_eur.sum()
+    c[0].metric("Valor de la cartera", eur(total))
+    c[1].metric("Hoy", eur(hoy_eur), pct(hoy_eur / (total - hoy_eur)))
+    c[2].metric("Esta semana", eur(sem_eur), pct(sem_eur / (total - sem_eur)))
+    c[3].metric("Ganancia total", eur(df.ganancia.sum()), pct(df.ganancia.sum() / df.invertido.sum()))
+
+    orden = st.segmented_control("Ordenar por", ["% cartera", "Hoy %", "Semana %", "Ganancia"], default="% cartera",
+                                 label_visibility="collapsed") or "% cartera"
+    clave_orden = {"% cartera": "peso", "Hoy %": "var_dia", "Semana %": "var_semana", "Ganancia": "ganancia"}[orden]
+    df = df.sort_values(clave_orden, ascending=False, na_position="last")
+
+    def flecha(x):
+        if pd.isna(x):
+            return "—"
+        return ("▲ " if x > 0 else "▼ " if x < 0 else "● ") + f"{abs(x) * 100:.2f} %".replace(".", ",")
+
+    def color(x):
+        if pd.isna(x) or abs(x) < 1e-9:
+            return f"color: {GRIS}"
+        return f"color: {VERDE}; font-weight: 600" if x > 0 else f"color: {ROJO}; font-weight: 600"
+
+    vista = df[["activo", "var_dia", "var_semana", "peso", "invertido", "valor", "ganancia", "ganancia_pct", "hoy_eur"]]
+    estilo = (vista.style
+              .format({"var_dia": flecha, "var_semana": flecha, "ganancia_pct": flecha,
+                       "peso": lambda x: f"{x * 100:.1f} %".replace(".", ","),
+                       "invertido": lambda x: eur(x), "valor": lambda x: eur(x),
+                       "ganancia": lambda x: eur(x), "hoy_eur": lambda x: eur(x)}, na_rep="—")
+              .map(color, subset=["var_dia", "var_semana", "ganancia", "ganancia_pct", "hoy_eur"]))
+    st.dataframe(estilo, hide_index=True, width="stretch", height=min(40 + 35 * len(vista), 640), column_config={
+        "var_dia": st.column_config.Column("hoy"), "var_semana": st.column_config.Column("semana"),
+        "peso": st.column_config.Column("% cartera"), "ganancia_pct": st.column_config.Column("ganancia %"),
+        "hoy_eur": st.column_config.Column("hoy €"),
+    })
+
+    movidos = df.dropna(subset=["var_dia"])
+    movidos = movidos[movidos.var_dia.abs() > 1e-9].sort_values("var_dia")
+    if len(movidos):
+        st.markdown("**Movimiento de hoy**")
+        fig = go.Figure(go.Bar(x=movidos.var_dia, y=movidos.activo, orientation="h",
+                               marker_color=np.where(movidos.var_dia >= 0, VERDE, ROJO),
+                               text=[flecha(x) for x in movidos.var_dia], textposition="outside",
+                               customdata=movidos.hoy_eur,
+                               hovertemplate="%{y}: %{x:.2%} (%{customdata:.0f} €)<extra></extra>"))
+        fig.update_layout(height=max(260, 28 * len(movidos)), margin=dict(l=10, r=60, t=10, b=10),
+                          xaxis=dict(tickformat=".1%", title=None), yaxis=dict(title=None),
+                          plot_bgcolor="rgba(0,0,0,0)")
+        st.plotly_chart(fig, width="stretch")
+
+    st.caption("«Hoy» compara con el cierre de la sesión anterior; si la bolsa está cerrada, muestra la última sesión. "
+               "Precios cada 15 minutos (con retraso en bolsas europeas). * = fondo estimado con un ETF equivalente. "
+               "Monetarios, bono y Private Equity no cotizan a diario y aparecen con «—». Variaciones en euros.")
+
+
 PERIODOS = {"1 d": 0, "1 m": 21, "6 m": 126, "1 a": 252, "2 a": 504, "3 a": 756, "5 a": 1260}
 
 
@@ -541,6 +643,37 @@ def seccion_resultado_mensual(val: pd.DataFrame):
     st.plotly_chart(fig, width="stretch")
     st.caption("Lo ganado o perdido cada mes sin contar tus aportaciones, sin efectivo. Es una estimación: se "
                "reconstruye el valor día a día hacia atrás con tus compras y ventas y los precios de mercado.")
+
+    mens = cartera.resumen_mensual(rec)
+    anual = cartera.resumen_anual(mens)
+    if anual.empty:
+        return
+    st.subheader("Resumen anual")
+    pct_es = lambda x: f"{x * 100:.2f} %".replace(".", ",")
+    vista = anual.rename(columns={"año": "Año", "aportado": "Inversión del año", "beneficio": "Ganancia",
+                                  "rentabilidad_suma": "Rentabilidad (suma mensual)",
+                                  "rentabilidad_encadenada": "Rentabilidad encadenada",
+                                  "promedio_mes": "Promedio ganancia / mes", "valor_final": "Valor final"})
+    st.dataframe(vista.style.format({
+        "Año": "{:d}", "Inversión del año": lambda x: eur(x), "Ganancia": lambda x: eur(x),
+        "Rentabilidad (suma mensual)": pct_es, "Rentabilidad encadenada": pct_es,
+        "Promedio ganancia / mes": lambda x: eur(x, 2), "Valor final": lambda x: eur(x)}),
+        hide_index=True, width="stretch")
+    st.caption("«Promedio ganancia / mes» divide la ganancia del año entre 12, o entre el mes actual en el año en "
+               "curso. La rentabilidad mensual es el beneficio del mes entre el valor al empezar el mes más lo "
+               "aportado. «Suma mensual» suma esas rentabilidades, como tu Excel; «encadenada» las compone mes a "
+               "mes, que es la rentabilidad real del año.")
+
+    with st.expander("Detalle mes a mes"):
+        det = mens.reset_index().rename(columns={"index": "mes"})
+        det["mes"] = det["mes"].astype(str)
+        det = det[["mes", "valor", "aportacion", "aportado_acumulado", "rentabilidad", "beneficio", "beneficio_acumulado"]]
+        det = det.rename(columns={"valor": "valor actual", "aportacion": "inversión", "aportado_acumulado": "inversión acumulada",
+                                  "beneficio_acumulado": "beneficio acumulado"})
+        st.dataframe(det.iloc[::-1].style.format({
+            "valor actual": lambda x: eur(x), "inversión": lambda x: eur(x), "inversión acumulada": lambda x: eur(x),
+            "rentabilidad": pct_es, "beneficio": lambda x: eur(x), "beneficio acumulado": lambda x: eur(x)}, na_rep="—"),
+            hide_index=True, width="stretch", height=380)
 
 
 def pestaña_cartera(val: pd.DataFrame, efectivo_tr: float, efectivo_mi: float, intr: pd.DataFrame):
