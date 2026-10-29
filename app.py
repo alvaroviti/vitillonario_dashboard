@@ -95,7 +95,7 @@ with st.sidebar:
     st.header("Vitillonario")
     objetivo = st.number_input("Objetivo (€)", value=100_000, step=5_000)
     incluir_plan = st.toggle("Contar el plan de pensiones", value=True)
-    incluir_efectivo = st.toggle("Contar el efectivo", value=True)
+    incluir_efectivo = st.toggle("Contar el efectivo", value=False)
     refresco = st.selectbox("Refrescar precios", ["Manual", "Cada 5 min", "Cada 15 min"], index=1)
     if st.button("Actualizar ahora", width="stretch"):
         ultimos.clear()
@@ -171,7 +171,7 @@ def pintar():
         ["Mercado y señales", "Cartera", "Aportaciones y objetivo", "Fiscal", "Datos"])
 
     with t_mercado:
-        pestaña_mercado(val, ult)
+        pestaña_mercado(val, ult, efectivo_tr + efectivo_mi)
     with t_cartera:
         pestaña_cartera(val, efectivo_tr, efectivo_mi)
     with t_aport:
@@ -185,7 +185,7 @@ def pintar():
 # --------------------------------------------------------------------------- #
 # Pestañas
 # --------------------------------------------------------------------------- #
-def pestaña_mercado(val: pd.DataFrame, ult: pd.Series):
+def pestaña_mercado(val: pd.DataFrame, ult: pd.Series, efectivo: float = 0.0):
     if hist.empty:
         st.info("Sin históricos de mercado. En cuanto haya conexión verás mínimos de 3 meses a 5 años y las señales.")
         return
@@ -229,23 +229,77 @@ def pestaña_mercado(val: pd.DataFrame, ult: pd.Series):
         "puntos": st.column_config.ProgressColumn(min_value=0, max_value=9, format="%d"),
     })
 
-    elegido = st.selectbox("Ver gráfico", df["activo"].tolist())
-    fila = df[df.activo == elegido].iloc[0]
-    ref = fila.referencia.replace(" (equivalente)", "")
-    serie = hist[ref].dropna()
+    # Cartera completa: media ponderada de todos los activos con su peso actual
+    base = val if incluir_plan else val[val.plataforma != "MyInvestor (plan)"]
+    pesos = base.groupby("clave")["valor"].sum()
+    if incluir_efectivo and efectivo:
+        pesos["EFECTIVO"] = efectivo
+    referencias = {}
+    for clave in pesos.index:
+        if clave not in cat.index:
+            continue
+        inst = cat.loc[clave]
+        if isinstance(inst.ticker, str):
+            s_ref = mercado.serie_eur(inst.ticker, inst.moneda_ticker, hist)
+        elif isinstance(inst.proxy, str):
+            s_ref = mercado.serie_eur(inst.proxy, "EUR", hist)
+        else:
+            s_ref = None
+        if s_ref is not None:
+            referencias[clave] = s_ref
+    indice = mercado.indice_cartera(pesos, referencias)
+    s_cartera = mercado.señales(indice) if len(indice) > 30 else {}
+    if s_cartera:
+        cubierto = pesos[list(referencias)].sum() / pesos.sum()
+        caida = s_cartera["caída desde máx 1 a"]
+        detalle = (f"está un {abs(caida) * 100:.1f} % por debajo de su máximo anual".replace(".", ",")
+                   if caida < -0.001 else "está en máximos del último año")
+        st.markdown(f"**Cartera completa:** {s_cartera['señal'].lower()} ({s_cartera['puntos']} puntos); {detalle}.")
+
+    st.markdown("**Gráfico**")
+    c1, c2 = st.columns([2, 3])
+    opciones = (["Cartera completa"] if s_cartera else []) + df["activo"].tolist()
+    elegido = c1.selectbox("Activo", opciones, label_visibility="collapsed")
+    periodos = {"6 m": 126, "1 a": 252, "2 a": 504, "3 a": 756, "5 a": 1260}
+    periodo = c2.segmented_control("Periodo", list(periodos), default="1 a", label_visibility="collapsed") or "1 a"
+    n = periodos[periodo]
+
+    if elegido == "Cartera completa":
+        serie_total, nombre = indice, "Cartera (base 100)"
+    else:
+        fila = df[df.activo == elegido].iloc[0]
+        ref = fila.referencia.replace(" (equivalente)", "")
+        serie_total, nombre = hist[ref].dropna(), ref
+    media = serie_total.rolling(200).mean()
+    serie = serie_total.tail(n)
+    if elegido == "Cartera completa" and not serie.empty:
+        factor = 100 / serie.iloc[0]
+        serie, media = serie * factor, media * factor
+    media = media.reindex(serie.index)
+
+    variacion = serie.iloc[-1] / serie.iloc[0] - 1 if len(serie) > 1 else np.nan
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=serie.index, y=serie, name=ref, line=dict(color=TINTA, width=1.6)))
-    fig.add_trace(go.Scatter(x=serie.index, y=serie.rolling(200).mean(), name="Media 200",
-                             line=dict(color=GRIS, width=1, dash="dot")))
-    for etiqueta, n, color in [("Mín 6 m", 126, "#C9A227"), ("Mín 1 a", 252, ROJO), ("Mín 5 a", 1260, "#6B2D26")]:
-        if len(serie) >= n * 0.9:
-            fig.add_hline(y=serie.tail(n).min(), line=dict(color=color, width=1, dash="dash"),
-                          annotation_text=etiqueta, annotation_position="bottom right")
+    fig.add_trace(go.Scatter(x=serie.index, y=serie, name=nombre,
+                             line=dict(color=VERDE if elegido == "Cartera completa" else TINTA, width=1.8)))
+    fig.add_trace(go.Scatter(x=media.index, y=media, name="Media 200", line=dict(color=GRIS, width=1, dash="dot")))
+    if len(serie):
+        fig.add_hline(y=serie.min(), line=dict(color=ROJO, width=1, dash="dash"),
+                      annotation_text=f"Mín {periodo}", annotation_position="bottom right")
+        fig.add_hline(y=serie.max(), line=dict(color=VERDE, width=1, dash="dash"),
+                      annotation_text=f"Máx {periodo}", annotation_position="top right")
     fig.update_layout(height=420, margin=dict(l=10, r=10, t=20, b=10), legend=dict(orientation="h"),
                       plot_bgcolor="rgba(0,0,0,0)")
     st.plotly_chart(fig, width="stretch")
-    if fila.historia_años < 4.9:
-        st.caption(f"Solo hay {fila.historia_años:.1f} años de histórico para {ref}.".replace(".", ","))
+
+    años_disp = len(serie_total) / 252
+    texto = f"Variación en el periodo: {pct(variacion)}."
+    if años_disp < n / 252 * 0.95:
+        texto += f" Solo hay {años_disp:.1f} años de histórico.".replace(".", ",", 1)
+    if elegido == "Cartera completa":
+        texto += (f" Simula la evolución de tu cartera con los pesos de hoy: no es tu rentabilidad real, que depende "
+                  f"de cuándo aportaste. Cubre con precios de mercado el {cubierto * 100:.0f} % del valor; "
+                  "monetarios, bono y efectivo se toman como planos.")
+    st.caption(texto)
 
     seccion_analistas(val)
 

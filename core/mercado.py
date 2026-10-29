@@ -174,3 +174,38 @@ def objetivos_analistas(tickers: list[str]) -> pd.DataFrame:
     df = df.dropna(subset=["objetivo_medio"])
     df["potencial"] = df["objetivo_medio"] / df["actual"] - 1
     return df
+
+
+# --------------------------------------------------------------------------- #
+# Índice de la cartera completa (composición actual)
+# --------------------------------------------------------------------------- #
+def serie_eur(ticker: str, moneda: str | None, historico: pd.DataFrame) -> pd.Series | None:
+    if ticker not in historico.columns:
+        return None
+    s = historico[ticker].dropna()
+    if moneda and moneda != "EUR" and not pd.isna(moneda):
+        fx = historico.get(FX.get(moneda, ""))
+        if fx is None:
+            return None
+        s = (s / fx.reindex(s.index).ffill()).dropna()
+    return s if len(s) > 30 else None
+
+
+def indice_cartera(pesos: pd.Series, referencias: dict[str, pd.Series], base: float = 100.0) -> pd.Series:
+    """Evolución que habría tenido la cartera con la composición de hoy.
+
+    pesos: valor actual por activo. referencias: serie de precios en EUR por activo
+    (los activos sin serie, como monetarios o el efectivo, se toman como planos).
+    Los días en que un activo todavía no cotizaba, su peso se reparte entre el resto.
+    """
+    if not referencias:
+        return pd.Series(dtype=float)
+    precios = pd.DataFrame(referencias).sort_index().ffill()
+    rend = precios.pct_change()
+    w = pesos.reindex(precios.columns).fillna(0)
+    peso_plano = pesos.drop(labels=list(referencias), errors="ignore").sum()
+    disponible = rend.notna().mul(w, axis=1)
+    total = disponible.sum(axis=1) + peso_plano
+    rend_cartera = rend.fillna(0).mul(w, axis=1).sum(axis=1) / total.replace(0, np.nan)
+    rend_cartera = rend_cartera.iloc[1:].fillna(0)
+    return base * (1 + rend_cartera).cumprod()
