@@ -141,3 +141,36 @@ def señales(serie: pd.Series, precio_actual: float | None = None) -> dict:
     d["señal"] = "Zona de compra" if puntos >= 4 else "Vigilar" if puntos >= 2 else "Sin señal"
     d["motivos"] = ", ".join(motivos) if motivos else "—"
     return d
+
+
+# --------------------------------------------------------------------------- #
+# Consenso de analistas (solo acciones individuales)
+# --------------------------------------------------------------------------- #
+def objetivos_analistas(tickers: list[str]) -> pd.DataFrame:
+    """Precio objetivo y recomendaciones de Yahoo Finance, en la moneda del ticker."""
+    if yf is None:
+        return pd.DataFrame()
+    filas = []
+    for t in sorted(set(tickers)):
+        try:
+            tk = yf.Ticker(t)
+            obj = tk.analyst_price_targets or {}
+            fila = dict(ticker=t, actual=obj.get("current"), objetivo_medio=obj.get("mean"),
+                        objetivo_mediano=obj.get("median"), objetivo_min=obj.get("low"),
+                        objetivo_max=obj.get("high"))
+            rec = tk.recommendations_summary
+            if rec is not None and not rec.empty:
+                r = rec[rec["period"] == "0m"].iloc[0] if "0m" in set(rec["period"]) else rec.iloc[0]
+                compra = int(r.get("strongBuy", 0) + r.get("buy", 0))
+                mantener = int(r.get("hold", 0))
+                venta = int(r.get("sell", 0) + r.get("strongSell", 0))
+                fila.update(analistas=compra + mantener + venta, comprar=compra, mantener=mantener, vender=venta)
+            filas.append(fila)
+        except Exception:
+            continue
+    df = pd.DataFrame(filas)
+    if df.empty or "objetivo_medio" not in df:
+        return pd.DataFrame()
+    df = df.dropna(subset=["objetivo_medio"])
+    df["potencial"] = df["objetivo_medio"] / df["actual"] - 1
+    return df

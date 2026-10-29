@@ -73,6 +73,11 @@ def historico(tickers: tuple[str, ...]):
     return mercado.descargar_historico(list(tickers), "5y")
 
 
+@st.cache_data(ttl=6 * 3600, show_spinner="Consultando a los analistas…")
+def analistas(tickers: tuple[str, ...]):
+    return mercado.objetivos_analistas(list(tickers))
+
+
 @st.cache_data(ttl=300, show_spinner="Actualizando precios…")
 def ultimos(tickers: tuple[str, ...]):
     return mercado.descargar_ultimos(list(tickers))
@@ -203,7 +208,10 @@ def pestaña_mercado(val: pd.DataFrame, ult: pd.Series):
     if not filas:
         st.info("Ninguna posición tiene ticker o equivalente con histórico disponible.")
         return
-    df = pd.DataFrame(filas).sort_values(["puntos", "peso"], ascending=[False, False])
+    df = pd.DataFrame(filas)
+    numericas = [c for c in df.columns if c.startswith(("vs ", "min ", "caída", "media", "RSI", "z "))]
+    df[numericas] = df[numericas].apply(pd.to_numeric, errors="coerce")
+    df = df.sort_values(["puntos", "peso"], ascending=[False, False])
     df = df.drop_duplicates("referencia")
 
     zona = df[df["señal"] == "Zona de compra"]
@@ -238,6 +246,35 @@ def pestaña_mercado(val: pd.DataFrame, ult: pd.Series):
     st.plotly_chart(fig, width="stretch")
     if fila.historia_años < 4.9:
         st.caption(f"Solo hay {fila.historia_años:.1f} años de histórico para {ref}.".replace(".", ","))
+
+    seccion_analistas(val)
+
+
+def seccion_analistas(val: pd.DataFrame):
+    st.subheader("Precio objetivo de los analistas")
+    cat = instrumentos.set_index("clave")
+    acciones = [c for c in val.clave.unique() if c in cat.index and cat.loc[c, "tipo"] == "accion"
+                and isinstance(cat.loc[c, "ticker"], str)]
+    if not acciones:
+        st.caption("No tienes acciones individuales en cartera.")
+        return
+    mapa = {cat.loc[c, "ticker"]: cat.loc[c, "nombre"] for c in acciones}
+    df = analistas(tuple(sorted(mapa)))
+    if df.empty:
+        st.info("Yahoo Finance no ha devuelto datos de analistas ahora mismo. Se vuelve a intentar cada pocas horas.")
+        return
+    df.insert(0, "activo", df.ticker.map(mapa))
+    monedas = {cat.loc[c, "ticker"]: cat.loc[c, "moneda_ticker"] for c in acciones}
+    df["moneda"] = df.ticker.map(monedas)
+    cols = ["activo", "ticker", "moneda", "actual", "objetivo_medio", "potencial", "objetivo_min", "objetivo_max",
+            "analistas", "comprar", "mantener", "vender"]
+    st.dataframe(df[[c for c in cols if c in df.columns]], hide_index=True, width="stretch", column_config={
+        **{c: st.column_config.NumberColumn(format="%.2f") for c in ["actual", "objetivo_medio", "objetivo_min", "objetivo_max"]},
+        "potencial": st.column_config.NumberColumn("potencial al objetivo medio", format="percent"),
+    })
+    st.caption("Consenso de Yahoo Finance a 12 meses, en la moneda de cotización. Solo existe para acciones: "
+               "los ETFs, fondos, oro y cripto no tienen precio objetivo. Los analistas fallan a menudo y suelen "
+               "ir con retraso respecto al precio; úsalo como un dato más junto a las señales.")
 
 
 def pestaña_cartera(val: pd.DataFrame, efectivo_tr: float, efectivo_mi: float):
