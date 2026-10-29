@@ -15,7 +15,10 @@ from core import almacen, cartera, mercado, parsers
 RAIZ = Path(__file__).resolve().parent
 st.set_page_config(page_title="Vitillonario", page_icon="📈", layout="wide")
 
-VERDE, ROJO, TINTA, GRIS = "#1F6F5C", "#B5483B", "#1D2B36", "#8A97A0"
+# Colores legibles tanto en tema claro como oscuro
+VERDE, ROJO, TINTA, GRIS = "#2BB673", "#E5534B", "#4C9EEB", "#9AA5B1"
+ORO, MORADO, TURQUESA, NARANJA = "#D4A72C", "#A371F7", "#3CC8C8", "#F0883E"
+PALETA = [TINTA, VERDE, ORO, MORADO, NARANJA, TURQUESA, ROJO, GRIS]
 
 
 # --------------------------------------------------------------------------- #
@@ -65,7 +68,9 @@ def cargar(_marca: float):
     f_manual = RAIZ / "config" / "fiscal_manual.csv"
     fiscal_manual = pd.read_csv(f_manual) if f_manual.exists() else pd.DataFrame(columns=["año", "casilla", "concepto", "importe"])
     perfiles, avisos_perfiles = cartera.leer_perfiles(RAIZ / "config" / "perfiles.csv")
-    return tr, mi, avisos_mi + avisos_perfiles, pos_mi, instrumentos, fiscal_manual, perfiles
+    f_seg = RAIZ / "config" / "seguimiento.csv"
+    seguimiento = pd.read_csv(f_seg) if f_seg.exists() else pd.DataFrame(columns=["ticker", "nombre", "moneda"])
+    return tr, mi, avisos_mi + avisos_perfiles, pos_mi, instrumentos, fiscal_manual, perfiles, seguimiento
 
 
 @st.cache_data(ttl=3600, show_spinner="Descargando históricos de 5 años…")
@@ -130,11 +135,12 @@ with st.sidebar:
                        ". Sin GitHub configurado, se perderán si la app se reinicia."))
         cargar.clear()
 
-tr, mi, avisos_mi, pos_mi, instrumentos, fiscal_manual, perfiles = cargar(marca_datos())
+tr, mi, avisos_mi, pos_mi, instrumentos, fiscal_manual, perfiles, seguimiento = cargar(marca_datos())
 ventas_tr, abiertas_tr, avisos_fifo = cartera.fifo_tr(tr) if not tr.empty else (pd.DataFrame(), pd.DataFrame(), [])
 pos = cartera.posiciones(abiertas_tr, pos_mi, mi, instrumentos)
 
-tickers_mercado = set(instrumentos.ticker.dropna()) | set(instrumentos.proxy.dropna()) | set(mercado.FX.values())
+tickers_mercado = (set(instrumentos.ticker.dropna()) | set(instrumentos.proxy.dropna()) | set(mercado.FX.values())
+                   | set(seguimiento.ticker.dropna()))
 hist = historico(tuple(sorted(tickers_mercado)))
 
 
@@ -260,6 +266,12 @@ def pestaña_mercado(val: pd.DataFrame, ult: pd.Series, intr: pd.DataFrame, efec
         if sen:
             filas.append(dict(clave=r.clave, activo=r.nombre, referencia=ref + (" (equivalente)" if equivalente else ""),
                               en_cartera=r.valor, **sen))
+    for r in seguimiento.itertuples():
+        if r.ticker in hist.columns:
+            sen = mercado.señales(hist[r.ticker], float(ult[r.ticker]) if r.ticker in ult.index else None)
+            if sen:
+                filas.append(dict(clave=f"SEG_{r.ticker}", activo=f"{r.nombre} (seguimiento)", referencia=r.ticker,
+                                  en_cartera=0.0, **sen))
     if not filas:
         st.info("Ninguna posición tiene ticker o equivalente con histórico disponible.")
         return
@@ -378,7 +390,100 @@ def pestaña_mercado(val: pd.DataFrame, ult: pd.Series, intr: pd.DataFrame, efec
                       f"{cubierto * 100:.0f} % del valor; monetarios, bono y efectivo se toman como planos.")
     st.caption(" ".join(textos))
 
+    seccion_comparador(df, indice)
+    seccion_seguimiento()
     seccion_analistas(val)
+
+
+def nombre_ticker(t: str) -> str:
+    try:
+        import yfinance as yf
+        info = yf.Ticker(t).get_info()
+        return info.get("shortName") or info.get("longName") or t
+    except Exception:
+        return t
+
+
+def seccion_comparador(df: pd.DataFrame, indice: pd.Series):
+    st.subheader("Comparador")
+    opciones = {"Cartera completa": None} if len(indice) > 30 else {}
+    for r in df.itertuples():
+        opciones[r.activo] = r.referencia.replace(" (equivalente)", "")
+    c1, c2 = st.columns([3, 2])
+    elegidos = c1.multiselect("Activos de tu cartera o seguimiento", list(opciones),
+                              default=list(opciones)[:2], placeholder="Elige uno o varios")
+    extra = c2.text_input("Añadir tickers de Yahoo Finance", placeholder="p. ej. ^GSPC, AAPL, IWDA.AS",
+                          help="Separados por comas. Índices con ^ (^GSPC S&P 500, ^STOXX50E Euro Stoxx 50, ^IBEX).")
+    periodo = st.segmented_control("Periodo del comparador", [p for p in PERIODOS if p != "1 d"], default="1 a",
+                                   label_visibility="collapsed") or "1 a"
+
+    series = {}
+    for nombre in elegidos:
+        t = opciones[nombre]
+        s_ = indice if t is None else hist[t].dropna() if t in hist.columns else None
+        if s_ is not None:
+            series[nombre] = s_
+    nuevos = [t.strip().upper() if not t.strip().startswith("^") else t.strip() for t in extra.split(",") if t.strip()]
+    if nuevos:
+        h_extra = historico(tuple(sorted(nuevos)))
+        for t in nuevos:
+            if t in h_extra.columns and h_extra[t].notna().sum() > 30:
+                series[t] = h_extra[t].dropna()
+            else:
+                st.warning(f"No he encontrado datos de «{t}» en Yahoo Finance. Revisa el ticker.")
+    if not series:
+        st.caption("Elige algún activo o escribe un ticker para compararlos.")
+        return
+
+    n = PERIODOS[periodo]
+    fig, filas = go.Figure(), []
+    for (nombre, s_), color in zip(series.items(), PALETA * 3):
+        tramo = s_.tail(n)
+        if len(tramo) < 2:
+            continue
+        norm = 100 * tramo / tramo.iloc[0]
+        fig.add_trace(go.Scatter(x=norm.index, y=norm, name=nombre, line=dict(color=color, width=1.8)))
+        rend = tramo.pct_change().dropna()
+        filas.append(dict(activo=nombre, rentabilidad=norm.iloc[-1] / 100 - 1,
+                          volatilidad=rend.std() * np.sqrt(252),
+                          peor_caida=(tramo / tramo.cummax() - 1).min()))
+    fig.add_hline(y=100, line=dict(color=GRIS, width=1, dash="dot"))
+    fig.update_layout(height=420, margin=dict(l=10, r=10, t=20, b=10), legend=dict(orientation="h"),
+                      plot_bgcolor="rgba(0,0,0,0)", yaxis=dict(title="Base 100"))
+    st.plotly_chart(fig, width="stretch")
+    st.dataframe(pd.DataFrame(filas).style.format({c: lambda x: f"{x * 100:.1f} %".replace(".", ",")
+                                                   for c in ["rentabilidad", "volatilidad", "peor_caida"]}),
+                 hide_index=True, width="stretch",
+                 column_config={"peor_caida": st.column_config.Column("peor caída"),
+                                "volatilidad": st.column_config.Column("volatilidad anual")})
+    st.caption("Todas las líneas parten de 100 al inicio del periodo. Los tickers en dólares se comparan en su "
+               "moneda, sin convertir a euros.")
+
+
+def seccion_seguimiento():
+    with st.expander("Valores en seguimiento"):
+        st.caption("Activos que no tienes pero quieres vigilar: aparecen en la tabla de señales y en el comparador.")
+        tabla = st.data_editor(seguimiento, num_rows="dynamic", hide_index=True, width="stretch",
+                               column_config={
+                                   "ticker": st.column_config.TextColumn("ticker de Yahoo", required=True),
+                                   "nombre": st.column_config.TextColumn("nombre (opcional)"),
+                                   "moneda": st.column_config.SelectboxColumn(options=["EUR", "USD", "GBP", "JPY"], default="EUR"),
+                               }, key="editor_seguimiento")
+        if st.button("Guardar seguimiento"):
+            tabla = tabla.dropna(subset=["ticker"])
+            tabla["ticker"] = tabla["ticker"].str.strip()
+            tabla["nombre"] = [n if isinstance(n, str) and n.strip() else nombre_ticker(t)
+                               for t, n in zip(tabla.ticker, tabla.nombre)]
+            contenido = tabla.to_csv(index=False).encode("utf-8")
+            (RAIZ / "config" / "seguimiento.csv").write_bytes(contenido)
+            if almacen.configurado(st.secrets):
+                ok, detalle = almacen.subir(st.secrets, "config/seguimiento.csv", contenido, "Seguimiento actualizado")
+                st.success("Guardado en GitHub.") if ok else st.error(f"No se ha guardado en GitHub. {detalle}")
+            else:
+                st.info("Guardado mientras la app siga encendida (sin GitHub configurado no es permanente).")
+            cargar.clear()
+            historico.clear()
+            st.rerun()
 
 
 def seccion_analistas(val: pd.DataFrame):
@@ -458,7 +563,7 @@ def pestaña_cartera(val: pd.DataFrame, efectivo_tr: float, efectivo_mi: float, 
     with c1:
         st.markdown("**Tipo de activo**")
         colores = {"Renta variable": VERDE, "Renta fija": TINTA, "Monetario y efectivo": GRIS,
-                   "Oro": "#C9A227", "Cripto": ROJO, "Alternativos": "#5B8C85", "Sin clasificar": "#BFC7CC"}
+                   "Oro": ORO, "Cripto": NARANJA, "Alternativos": MORADO, "Sin clasificar": "#6E7781"}
         fig = px.pie(clases, names="categoria", values="valor", hole=0.55, color="categoria",
                      color_discrete_map=colores)
         fig.update_traces(textinfo="percent", sort=False)
@@ -567,7 +672,7 @@ def pestaña_aportaciones(patrimonio: float):
     escenarios = {"Prudente (4 %)": 0.04, "Base (7 %)": 0.07, "Optimista (9 %)": 0.09}
     fig = go.Figure()
     filas = []
-    for (nombre, r), color in zip(escenarios.items(), [GRIS, VERDE, TINTA]):
+    for (nombre, r), color in zip(escenarios.items(), [GRIS, VERDE, TINTA]):  # prudente, base, optimista
         p = cartera.proyeccion(patrimonio, aport, r, objetivo)
         alcanzado = p.valor.iloc[-1] >= objetivo
         filas.append(dict(escenario=nombre,
@@ -640,6 +745,52 @@ def seccion_movimientos():
                        file_name="movimientos_inversion.csv", mime="text/csv")
 
 
+def seccion_estimacion_renta(año: int, d: dict):
+    st.subheader(f"¿A pagar o a devolver? Renta {año}")
+    c1, c2, c3 = st.columns(3)
+    tipo = c1.number_input("Tu tipo marginal en la base general (%)", min_value=0.0, max_value=55.0, value=30.0,
+                           step=1.0, help="El tramo más alto de IRPF que pagas por tu sueldo. Lo ves en tu declaración "
+                           "anterior o en un simulador. Sirve para calcular lo que te ahorra el plan de pensiones.")
+    previas = c2.number_input("Pérdidas pendientes de años anteriores (€)", min_value=0.0, value=0.0, step=50.0,
+                              help="Pérdidas de los últimos 4 años que aún no hayas compensado. Salen en tu última declaración.")
+    otros = c3.toggle("Incluir Saveback, regalos y staking", value=True,
+                      help="Trade Republic ya les aplica retención, así que lo normal es que aparezcan en el borrador.")
+    e = cartera.estimar_renta(d, tipo / 100, otros, previas)
+
+    filas = [("Ganancias y pérdidas por ventas", e["ganancias"]),
+             ("Intereses, dividendos y otros rendimientos", e["rendimientos"]),
+             ("Base del ahorro", e["base_ahorro"]),
+             ("Impuesto sobre el ahorro (19 % a 30 %)", e["cuota_ahorro"]),
+             ("Retenciones ya pagadas", -e["retenciones"]),
+             (f"Ahorro por el plan de pensiones ({eur(e['reduccion_plan'])} × {tipo:.0f} %)", -e["ahorro_plan"])]
+    if e["perdidas_compensadas"]:
+        filas.insert(1, ("Pérdidas de años anteriores compensadas", -e["perdidas_compensadas"]))
+    tabla = pd.DataFrame(filas, columns=["concepto", "importe"])
+    st.dataframe(tabla.style.format({"importe": lambda x: eur(x, 2)}), hide_index=True, width="stretch")
+
+    neto = e["efecto_neto"]
+    if neto > 0:
+        st.warning(f"Tus inversiones te sumarían unos **{eur(neto)} a pagar** en la declaración.")
+    else:
+        st.success(f"Tus inversiones te restarían unos **{eur(-neto)}**: empujan la declaración hacia **a devolver**.")
+
+    base_sin = st.number_input("Opcional: resultado de tu declaración sin inversiones (€, negativo = a devolver)",
+                               value=0.0, step=50.0, help="Por ejemplo, lo que te sale en un simulador solo con tu nómina.")
+    if base_sin:
+        total = base_sin + neto
+        st.metric("Resultado aproximado de la declaración", ("A pagar " if total > 0 else "A devolver ") + eur(abs(total)))
+
+    margen = d["plan_margen"]
+    if año == pd.Timestamp.today().year and margen > 0:
+        st.info(f"Aún puedes aportar {eur(margen)} al plan de pensiones este año: te ahorraría unos "
+                f"{eur(margen * tipo / 100)} más.")
+    st.caption("Estimación orientativa. Que salga a pagar o a devolver depende sobre todo de las retenciones de tu "
+               "nómina, que aquí no se conocen: esto calcula cuánto mueven ese resultado tus inversiones. "
+               "No incluye la deducción por doble imposición internacional de los dividendos extranjeros, ni las "
+               "ganancias de MyInvestor que no hayas copiado en config/fiscal_manual.csv. No sustituye al borrador "
+               "ni a un asesor.")
+
+
 def pestaña_fiscal():
     st.caption("Estimación para preparar la declaración. Compárala siempre con el borrador y los informes fiscales "
                "de cada plataforma; no sustituye a un asesor.")
@@ -648,6 +799,9 @@ def pestaña_fiscal():
         return
     año = st.selectbox("Ejercicio", sorted(res, reverse=True))
     d = res[año]
+    seccion_estimacion_renta(año, d)
+    st.divider()
+    st.markdown("**Detalle**")
     c = st.columns(4)
     c[0].metric("Ganancias/pérdidas (TR)", eur(d["gp_tr"], 2))
     rcm = d["rcm"]

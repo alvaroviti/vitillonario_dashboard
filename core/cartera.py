@@ -360,3 +360,50 @@ def movimientos_inversion(tr: pd.DataFrame, mi: pd.DataFrame) -> pd.DataFrame:
                               titulos=np.nan, precio=np.nan, importe=-r.importe, cuenta_como_aportacion=True))
     df = pd.DataFrame(filas)
     return df.sort_values("fecha", ascending=False).reset_index(drop=True) if not df.empty else df
+
+
+# --------------------------------------------------------------------------- #
+# Estimación del efecto de las inversiones en la declaración de la renta
+# --------------------------------------------------------------------------- #
+ESCALA_AHORRO = [(6_000, 0.19), (50_000, 0.21), (200_000, 0.23), (300_000, 0.27), (float("inf"), 0.30)]
+
+
+def cuota_ahorro(base: float) -> float:
+    cuota, desde = 0.0, 0.0
+    for hasta, tipo in ESCALA_AHORRO:
+        if base <= desde:
+            break
+        cuota += (min(base, hasta) - desde) * tipo
+        desde = hasta
+    return cuota
+
+
+def estimar_renta(d: dict, tipo_marginal: float, incluir_otros: bool = True,
+                  perdidas_previas: float = 0.0) -> dict:
+    """d: el diccionario de un año de resumen_fiscal()."""
+    gp = d["gp_tr"] + d["gp_manual"]
+    rcm = d["rcm"]["bruto"].sum() if not d["rcm"].empty else 0.0
+    ret = d["rcm"]["retencion"].sum() if not d["rcm"].empty else 0.0
+    if incluir_otros and not d["otros"].empty:
+        rcm += d["otros"]["importe"].sum()
+        ret += d["otros"]["retencion"].sum()
+
+    # Pérdidas de años anteriores (hasta 4 años) contra ganancias de este año
+    usadas = min(max(gp, 0.0), perdidas_previas)
+    gp_neto = gp - usadas
+    # Compensación cruzada entre ganancias y rendimientos: hasta el 25 %
+    if gp_neto < 0 and rcm > 0:
+        comp = min(-gp_neto, 0.25 * rcm)
+        gp_neto, rcm = gp_neto + comp, rcm - comp
+    elif rcm < 0 and gp_neto > 0:
+        comp = min(-rcm, 0.25 * gp_neto)
+        rcm, gp_neto = rcm + comp, gp_neto - comp
+    base = max(gp_neto, 0.0) + max(rcm, 0.0)
+    cuota = cuota_ahorro(base)
+
+    reduccion_plan = min(d["plan_pensiones"], LIMITE_PLAN_PENSIONES)
+    ahorro_plan = reduccion_plan * tipo_marginal
+    return dict(ganancias=gp, perdidas_compensadas=usadas, rendimientos=rcm, base_ahorro=base, cuota_ahorro=cuota,
+                retenciones=ret, reduccion_plan=reduccion_plan, ahorro_plan=ahorro_plan,
+                efecto_neto=cuota - ret - ahorro_plan,
+                perdida_pendiente=min(gp_neto, 0.0) * -1 + (perdidas_previas - usadas))
