@@ -295,8 +295,9 @@ def pestaña_mercado(val: pd.DataFrame, ult: pd.Series, intr: pd.DataFrame, efec
                    "vs min 5 a", "vs media 200"]
     vista = df[["activo", "en_cartera", "peso", "señal", "puntos"] + porcentajes + ["RSI 14", "referencia", "motivos"]]
     formato_pct = lambda x: f"{x * 100:.1f} %".replace(".", ",")
-    estilo = vista.style.format({c: formato_pct for c in porcentajes + ["peso"]}, na_rep="—").format(
-        {"en_cartera": lambda x: eur(x), "RSI 14": "{:.0f}"}, na_rep="—")
+    formatos = {c: formato_pct for c in porcentajes + ["peso"]}
+    formatos.update({"en_cartera": lambda x: eur(x), "RSI 14": "{:.0f}"})
+    estilo = vista.style.format(formatos, na_rep="—")  # una sola llamada: una segunda borraría la primera
     st.dataframe(estilo, hide_index=True, width="stretch", column_config={
         "en_cartera": st.column_config.Column("en cartera"),
         "peso": st.column_config.Column("% cartera"),
