@@ -196,7 +196,7 @@ def pintar():
 # --------------------------------------------------------------------------- #
 def variacion_activo(ref: str, moneda: str | None, intr: pd.DataFrame) -> dict:
     """Precio en euros y variación del día (frente al cierre anterior) y de la semana."""
-    out = dict(precio=np.nan, var_dia=np.nan, var_semana=np.nan, sesion=None)
+    out = dict(precio=np.nan, var_dia=np.nan, var_semana=np.nan, var_mes=np.nan, var_año=np.nan, var_12m=np.nan, sesion=None)
     s_i = mercado.serie_eur(ref, moneda, intr) if not intr.empty else None
     s_d = mercado.serie_eur(ref, moneda, hist) if not hist.empty else None
     if s_i is not None and len(s_i):
@@ -210,6 +210,17 @@ def variacion_activo(ref: str, moneda: str | None, intr: pd.DataFrame) -> dict:
         out.update(precio=ultimo, var_dia=ultimo / cierre_ant - 1 if cierre_ant else np.nan, sesion=momento)
     elif s_d is not None and len(s_d) > 1:
         out.update(precio=float(s_d.iloc[-1]), var_dia=float(s_d.iloc[-1] / s_d.iloc[-2] - 1), sesion=s_d.index[-1])
+    if s_d is not None and len(s_d) and not np.isnan(out["precio"]) and out["sesion"] is not None:
+        inicio_mes = pd.Timestamp(out["sesion"]).tz_localize(None).normalize().replace(day=1)
+        previo = s_d[s_d.index < inicio_mes]
+        if len(previo):
+            out["var_mes"] = out["precio"] / float(previo.iloc[-1]) - 1
+        previo_año = s_d[s_d.index < inicio_mes.replace(month=1)]
+        if len(previo_año):
+            out["var_año"] = out["precio"] / float(previo_año.iloc[-1]) - 1
+        hace_año = s_d[s_d.index <= pd.Timestamp(out["sesion"]).tz_localize(None) - pd.Timedelta(days=365)]
+        if len(hace_año):
+            out["var_12m"] = out["precio"] / float(hace_año.iloc[-1]) - 1
     if s_d is not None and len(s_d) and not np.isnan(out["precio"]):
         hace_semana = pd.Timestamp(out["sesion"]).tz_localize(None) - pd.Timedelta(days=7) if out["sesion"] is not None else None
         base = s_d[:hace_semana] if hace_semana is not None else s_d.iloc[:-5]
@@ -230,9 +241,9 @@ def pestaña_hoy(val: pd.DataFrame, intr: pd.DataFrame):
     filas = []
     for r in pos.itertuples():
         ref, moneda, equivalente = referencia_de(r.clave, cat)
-        v = variacion_activo(ref, moneda, intr) if ref else dict(var_dia=np.nan, var_semana=np.nan, sesion=None)
+        v = variacion_activo(ref, moneda, intr) if ref else dict(var_dia=np.nan, var_semana=np.nan, var_mes=np.nan, var_año=np.nan, var_12m=np.nan)
         filas.append(dict(activo=r.activo + (" *" if equivalente else ""), var_dia=v["var_dia"],
-                          var_semana=v["var_semana"], invertido=r.coste, valor=r.valor,
+                          var_semana=v["var_semana"], var_mes=v["var_mes"], var_año=v["var_año"], var_12m=v["var_12m"], invertido=r.coste, valor=r.valor,
                           ganancia=r.valor - r.coste, ganancia_pct=(r.valor - r.coste) / r.coste if r.coste else np.nan))
     df = pd.DataFrame(filas)
     df["peso"] = df.valor / df.valor.sum()
@@ -240,16 +251,34 @@ def pestaña_hoy(val: pd.DataFrame, intr: pd.DataFrame):
     df["semana_eur"] = df.valor * (1 - 1 / (1 + df.var_semana.fillna(0)))
     total = df.valor.sum()
 
-    c = st.columns(4)
+    hoy = pd.Timestamp.today()
+    largo = st.segmented_control("Periodo largo", ["Últimos 12 meses", f"Año {hoy.year}"], default="Últimos 12 meses",
+                                 label_visibility="collapsed") or "Últimos 12 meses"
+    doce = largo == "Últimos 12 meses"
+    col_largo = "var_12m" if doce else "var_año"
+    c = st.columns(5)
     hoy_eur, sem_eur = df.hoy_eur.sum(), df.semana_eur.sum()
     c[0].metric("Valor de la cartera", eur(total))
     c[1].metric("Hoy", eur(hoy_eur), pct(hoy_eur / (total - hoy_eur)))
     c[2].metric("Esta semana", eur(sem_eur), pct(sem_eur / (total - sem_eur)))
-    c[3].metric("Ganancia total", eur(df.ganancia.sum()), pct(df.ganancia.sum() / df.invertido.sum()))
+    # Mes: mismo cálculo que «Resultado por mes» de Cartera (descuenta lo comprado este mes)
+    mens = cartera.resumen_mensual(reconstruccion(pesos_cartera(val), marca_datos(), incluir_plan)) if not hist.empty else pd.DataFrame()
+    etiqueta_largo = "Últimos 12 meses" if doce else f"En {hoy.year}"
+    if not mens.empty and mens.index[-1] == hoy.to_period("M"):
+        c[3].metric("Este mes", eur(mens["beneficio"].iloc[-1]), pct(mens["rentabilidad"].iloc[-1]))
+        tramo = mens.tail(12) if doce else mens[mens.index.year == hoy.year]
+        c[4].metric(etiqueta_largo, eur(tramo["beneficio"].sum()), pct((1 + tramo["rentabilidad"].dropna()).prod() - 1))
+    else:
+        mes_eur = (df.valor * (1 - 1 / (1 + df.var_mes.fillna(0)))).sum()
+        largo_eur = (df.valor * (1 - 1 / (1 + df[col_largo].fillna(0)))).sum()
+        c[3].metric("Este mes", eur(mes_eur), pct(mes_eur / (total - mes_eur)))
+        c[4].metric(etiqueta_largo, eur(largo_eur), pct(largo_eur / (total - largo_eur)))
 
-    orden = st.segmented_control("Ordenar por", ["% cartera", "Hoy %", "Semana %", "Ganancia"], default="% cartera",
-                                 label_visibility="collapsed") or "% cartera"
-    clave_orden = {"% cartera": "peso", "Hoy %": "var_dia", "Semana %": "var_semana", "Ganancia": "ganancia"}[orden]
+    nombre_largo = "12 meses %" if doce else "Año %"
+    orden = st.segmented_control("Ordenar por", ["% cartera", "Hoy %", "Semana %", "Mes %", nombre_largo, "Ganancia"],
+                                 default="% cartera", label_visibility="collapsed") or "% cartera"
+    clave_orden = {"% cartera": "peso", "Hoy %": "var_dia", "Semana %": "var_semana", "Mes %": "var_mes",
+                   nombre_largo: col_largo, "Ganancia": "ganancia"}.get(orden, "peso")
     df = df.sort_values(clave_orden, ascending=False, na_position="last")
 
     def flecha(x):
@@ -262,15 +291,17 @@ def pestaña_hoy(val: pd.DataFrame, intr: pd.DataFrame):
             return f"color: {GRIS}"
         return f"color: {VERDE}; font-weight: 600" if x > 0 else f"color: {ROJO}; font-weight: 600"
 
-    vista = df[["activo", "var_dia", "var_semana", "peso", "invertido", "valor", "ganancia", "ganancia_pct", "hoy_eur"]]
+    df["var_largo"] = df[col_largo]
+    vista = df[["activo", "var_dia", "var_semana", "var_mes", "var_largo", "peso", "invertido", "valor", "ganancia", "ganancia_pct", "hoy_eur"]]
     estilo = (vista.style
-              .format({"var_dia": flecha, "var_semana": flecha, "ganancia_pct": flecha,
+              .format({"var_dia": flecha, "var_semana": flecha, "var_mes": flecha, "var_largo": flecha, "ganancia_pct": flecha,
                        "peso": lambda x: f"{x * 100:.1f} %".replace(".", ","),
                        "invertido": lambda x: eur(x), "valor": lambda x: eur(x),
                        "ganancia": lambda x: eur(x), "hoy_eur": lambda x: eur(x)}, na_rep="—")
-              .map(color, subset=["var_dia", "var_semana", "ganancia", "ganancia_pct", "hoy_eur"]))
+              .map(color, subset=["var_dia", "var_semana", "var_mes", "var_largo", "ganancia", "ganancia_pct", "hoy_eur"]))
     st.dataframe(estilo, hide_index=True, width="stretch", height=min(40 + 35 * len(vista), 640), column_config={
         "var_dia": st.column_config.Column("hoy"), "var_semana": st.column_config.Column("semana"),
+        "var_mes": st.column_config.Column("mes"), "var_largo": st.column_config.Column("12 meses" if doce else "año"),
         "peso": st.column_config.Column("% cartera"), "ganancia_pct": st.column_config.Column("ganancia %"),
         "hoy_eur": st.column_config.Column("hoy €"),
     })
@@ -291,7 +322,8 @@ def pestaña_hoy(val: pd.DataFrame, intr: pd.DataFrame):
 
     st.caption("«Hoy» compara con el cierre de la sesión anterior; si la bolsa está cerrada, muestra la última sesión. "
                "Precios cada 15 minutos (con retraso en bolsas europeas). * = fondo estimado con un ETF equivalente. "
-               "Monetarios, bono y Private Equity no cotizan a diario y aparecen con «—». Variaciones en euros.")
+               "Monetarios, bono y Private Equity no cotizan a diario y aparecen con «—». Variaciones en euros. "
+               "«Este mes» y el periodo largo descuentan lo que hayas comprado en ese tiempo, igual que en la pestaña Cartera.")
 
 
 PERIODOS = {"1 d": 0, "1 m": 21, "6 m": 126, "1 a": 252, "2 a": 504, "3 a": 756, "5 a": 1260}
@@ -642,7 +674,8 @@ def seccion_resultado_mensual(val: pd.DataFrame):
                       xaxis=dict(tickformat="%m/%y"))
     st.plotly_chart(fig, width="stretch")
     st.caption("Lo ganado o perdido cada mes sin contar tus aportaciones, sin efectivo. Es una estimación: se "
-               "reconstruye el valor día a día hacia atrás con tus compras y ventas y los precios de mercado.")
+               "reconstruye el valor día a día desde tu primera compra con tus movimientos y los precios de mercado, "
+               "ajustado para que cuadre con el valor de hoy.")
 
     mens = cartera.resumen_mensual(rec)
     anual = cartera.resumen_anual(mens)
@@ -665,7 +698,7 @@ def seccion_resultado_mensual(val: pd.DataFrame):
                "mes, que es la rentabilidad real del año.")
 
     with st.expander("Detalle mes a mes"):
-        det = mens.reset_index().rename(columns={"index": "mes"})
+        det = mens.rename_axis("mes").reset_index()
         det["mes"] = det["mes"].astype(str)
         det = det[["mes", "valor", "aportacion", "aportado_acumulado", "rentabilidad", "beneficio", "beneficio_acumulado"]]
         det = det.rename(columns={"valor": "valor actual", "aportacion": "inversión", "aportado_acumulado": "inversión acumulada",
@@ -783,7 +816,7 @@ def pestaña_aportaciones(patrimonio: float):
     for col, r in zip(cols, medias.itertuples()):
         col.metric(r.periodo, eur(r.neto_mes), f"compras {eur(r.compras_mes)}", delta_color="off")
 
-    df = m.reset_index().rename(columns={"index": "mes"})
+    df = m.rename_axis("mes").reset_index()
     df["mes"] = df["mes"].dt.to_timestamp()
     fig = go.Figure()
     fig.add_bar(x=df.mes, y=df.neto, name="Neto", marker_color=np.where(df.neto >= 0, VERDE, ROJO))
