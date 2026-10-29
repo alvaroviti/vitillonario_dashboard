@@ -50,9 +50,11 @@ def descargar_intradia(tickers: list[str]) -> pd.DataFrame:
     if isinstance(cierres, pd.Series):
         cierres = cierres.to_frame(tickers[0])
     idx = pd.to_datetime(cierres.index)
-    idx = idx.tz_convert("Europe/Madrid") if idx.tz is not None else idx.tz_localize("UTC").tz_convert("Europe/Madrid")
-    cierres.index = idx.tz_localize(None)
-    return cierres.sort_index()
+    idx = idx.tz_localize("UTC") if idx.tz is None else idx
+    # Se mantiene la zona horaria: al quitarla, el cambio de hora de octubre
+    # duplicaría la franja de 2:00 a 3:00 y rompería los cálculos.
+    cierres.index = idx.tz_convert("Europe/Madrid")
+    return cierres[~cierres.index.duplicated(keep="last")].sort_index()
 
 
 def ultimos_de(intradia: pd.DataFrame) -> pd.Series:
@@ -197,11 +199,14 @@ def serie_eur(ticker: str, moneda: str | None, historico: pd.DataFrame) -> pd.Se
     if ticker not in historico.columns:
         return None
     s = historico[ticker].dropna()
+    s = s[~s.index.duplicated(keep="last")]
     if moneda and moneda != "EUR" and not pd.isna(moneda):
         fx = historico.get(FX.get(moneda, ""))
         if fx is None:
             return None
-        s = (s / fx.reindex(s.index).ffill()).dropna()
+        fx = fx.dropna()
+        fx = fx[~fx.index.duplicated(keep="last")]
+        s = (s / fx.reindex(s.index, method="ffill")).dropna()
     return s if len(s) > 30 else None
 
 
