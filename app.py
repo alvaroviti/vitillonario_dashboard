@@ -339,7 +339,7 @@ def pestaña_hoy(val: pd.DataFrame, intr: pd.DataFrame):
                "«Este mes» y el periodo largo descuentan lo que hayas comprado en ese tiempo, igual que en la pestaña Cartera.")
 
 
-PERIODOS = {"1 d": 0, "1 m": 21, "6 m": 126, "1 a": 252, "2 a": 504, "3 a": 756, "5 a": 1260}
+PERIODOS = {"1 d": 0, "1 m": 1, "6 m": 6, "1 a": 12, "2 a": 24, "3 a": 36, "5 a": 60}  # en meses
 
 
 def referencia_de(clave: str, cat: pd.DataFrame) -> tuple[str | None, str | None, bool]:
@@ -393,7 +393,8 @@ def resultado_periodo(pesos_inv: pd.Series, periodo: str, intr: pd.DataFrame) ->
     rec = reconstruccion(pesos_inv, marca_datos(), incluir_plan)
     if rec.empty:
         return np.nan
-    return float(rec["resultado"].tail(PERIODOS[periodo]).sum())
+    desde = rec.index[-1] - pd.DateOffset(months=PERIODOS[periodo])
+    return float(rec.loc[rec.index > desde, "resultado"].sum())
 
 
 def pestaña_mercado(val: pd.DataFrame, ult: pd.Series, intr: pd.DataFrame, efectivo: float = 0.0):
@@ -473,7 +474,7 @@ def pestaña_mercado(val: pd.DataFrame, ult: pd.Series, intr: pd.DataFrame, efec
     es_cartera = elegido == "Cartera completa"
 
     if es_cartera:
-        nombre = "Cartera (base 100)"
+        nombre = "Cartera"
         if periodo == "1 d":
             base_intr, _ = indice_de(pesos_cartera(val, efectivo if incluir_efectivo else 0.0), intr)
             serie_total = mercado.ultimas_24h(base_intr)
@@ -489,12 +490,13 @@ def pestaña_mercado(val: pd.DataFrame, ult: pd.Series, intr: pd.DataFrame, efec
         serie, media = serie_total, None
     else:
         media_completa = serie_total.rolling(200).mean()
-        serie = serie_total.tail(PERIODOS[periodo])
+        serie = mercado.recortar(serie_total, PERIODOS[periodo])
         media = media_completa.reindex(serie.index)
     if es_cartera and len(serie):
-        factor = 100 / serie.iloc[0]
-        serie = serie * factor
-        media = media * factor if media is not None else None
+        # La cartera se muestra como % ganado o perdido desde el inicio del periodo
+        inicio = serie.iloc[0]
+        serie = serie / inicio - 1
+        media = media / inicio - 1 if media is not None else None
 
     if len(serie) < 2:
         st.info("No hay datos de ese periodo para este activo (puede que el mercado esté cerrado).")
@@ -508,12 +510,21 @@ def pestaña_mercado(val: pd.DataFrame, ult: pd.Series, intr: pd.DataFrame, efec
                       annotation_text=f"Mín {periodo}", annotation_position="bottom right")
         fig.add_hline(y=serie.max(), line=dict(color=VERDE, width=1, dash="dash"),
                       annotation_text=f"Máx {periodo}", annotation_position="top right")
+        if es_cartera:
+            fig.add_hline(y=0, line=dict(color=GRIS, width=1))
         fig.update_layout(height=420, margin=dict(l=10, r=10, t=20, b=10), legend=dict(orientation="h"),
-                          plot_bgcolor="rgba(0,0,0,0)")
+                          plot_bgcolor="rgba(0,0,0,0)",
+                          yaxis=dict(tickformat="+.0%" if es_cartera else None,
+                                     title="desde el inicio del periodo" if es_cartera else None))
         st.plotly_chart(fig, width="stretch")
 
     # ------------------------------------------------------------------ resultado del periodo
-    variacion = serie.iloc[-1] / serie.iloc[0] - 1 if len(serie) > 1 else np.nan
+    if len(serie) < 2:
+        variacion = np.nan
+    elif es_cartera:
+        variacion = (1 + serie.iloc[-1]) / (1 + serie.iloc[0]) - 1
+    else:
+        variacion = serie.iloc[-1] / serie.iloc[0] - 1
     m = st.columns(3)
     m[0].metric(f"Variación {periodo}", pct(variacion))
     res_cartera = resultado_periodo(pesos_inv, periodo, intr)
@@ -525,8 +536,8 @@ def pestaña_mercado(val: pd.DataFrame, ult: pd.Series, intr: pd.DataFrame, efec
 
     textos = []
     if periodo != "1 d":
-        años_disp = len(serie_total) / 252
-        if años_disp < PERIODOS[periodo] / 252 * 0.95:
+        años_disp = (serie_total.index[-1] - serie_total.index[0]).days / 365.25 if len(serie_total) > 1 else 0
+        if not mercado.cubre(serie_total, PERIODOS[periodo]):
             textos.append(f"Solo hay {años_disp:.1f} años de histórico.".replace(".", ",", 1))
     textos.append("El resultado de la cartera es lo ganado o perdido sin contar lo que has aportado, estimado día a día "
                   "con tus movimientos y los precios de mercado; no incluye el efectivo.")
@@ -582,28 +593,29 @@ def seccion_comparador(df: pd.DataFrame, indice: pd.Series):
         st.caption("Elige algún activo o escribe un ticker para compararlos.")
         return
 
-    n = PERIODOS[periodo]
     fig, filas = go.Figure(), []
     for (nombre, s_), color in zip(series.items(), PALETA * 3):
-        tramo = s_.tail(n)
+        tramo = mercado.recortar(s_, PERIODOS[periodo])
         if len(tramo) < 2:
             continue
-        norm = 100 * tramo / tramo.iloc[0]
-        fig.add_trace(go.Scatter(x=norm.index, y=norm, name=nombre, line=dict(color=color, width=1.8)))
+        norm = tramo / tramo.iloc[0] - 1
+        fig.add_trace(go.Scatter(x=norm.index, y=norm, name=nombre, line=dict(color=color, width=1.8),
+                                 hovertemplate="%{y:+.1%}"))
         rend = tramo.pct_change().dropna()
-        filas.append(dict(activo=nombre, rentabilidad=norm.iloc[-1] / 100 - 1,
+        filas.append(dict(activo=nombre, rentabilidad=norm.iloc[-1],
                           volatilidad=rend.std() * np.sqrt(252),
                           peor_caida=(tramo / tramo.cummax() - 1).min()))
-    fig.add_hline(y=100, line=dict(color=GRIS, width=1, dash="dot"))
+    fig.add_hline(y=0, line=dict(color=GRIS, width=1))
     fig.update_layout(height=420, margin=dict(l=10, r=10, t=20, b=10), legend=dict(orientation="h"),
-                      plot_bgcolor="rgba(0,0,0,0)", yaxis=dict(title="Base 100"))
+                      plot_bgcolor="rgba(0,0,0,0)", hovermode="x unified",
+                      yaxis=dict(tickformat="+.0%", title="desde el inicio del periodo"))
     st.plotly_chart(fig, width="stretch")
     st.dataframe(pd.DataFrame(filas).style.format({c: lambda x: f"{x * 100:.1f} %".replace(".", ",")
                                                    for c in ["rentabilidad", "volatilidad", "peor_caida"]}),
                  hide_index=True, width="stretch",
                  column_config={"peor_caida": st.column_config.Column("peor caída"),
                                 "volatilidad": st.column_config.Column("volatilidad anual")})
-    st.caption("Todas las líneas parten de 100 al inicio del periodo. Los tickers en dólares se comparan en su "
+    st.caption("Todas las líneas parten de 0 % al inicio del periodo. Los tickers en dólares se comparan en su "
                "moneda, sin convertir a euros.")
 
 

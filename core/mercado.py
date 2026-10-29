@@ -10,7 +10,22 @@ except ImportError:  # el dashboard sigue funcionando con los últimos precios c
     yf = None
 
 FX = {"USD": "EURUSD=X", "JPY": "EURJPY=X", "GBP": "EURGBP=X"}
-VENTANAS = {"3 m": 63, "6 m": 126, "1 a": 252, "2 a": 504, "3 a": 756, "5 a": 1260}
+# Ventanas por tiempo (meses), no por número de filas: la cripto cotiza también en fin de semana
+VENTANAS = {"3 m": 3, "6 m": 6, "1 a": 12, "2 a": 24, "3 a": 36, "5 a": 60}
+
+
+def recortar(serie: pd.Series, meses: int) -> pd.Series:
+    """Último tramo de `meses` meses de una serie."""
+    s = serie.dropna()
+    if s.empty:
+        return s
+    return s[s.index >= s.index[-1] - pd.DateOffset(months=meses)]
+
+
+def cubre(serie: pd.Series, meses: int) -> bool:
+    """¿Hay histórico suficiente para ese plazo? (con un pequeño margen)"""
+    s = serie.dropna()
+    return len(s) > 1 and s.index[0] <= s.index[-1] - pd.DateOffset(months=meses) + pd.Timedelta(days=10)
 
 
 def descargar_historico(tickers: list[str], periodo: str = "5y") -> pd.DataFrame:
@@ -122,12 +137,11 @@ def señales(serie: pd.Series, precio_actual: float | None = None) -> dict:
     if len(s) < 30:
         return {}
     p = precio_actual if precio_actual and not np.isnan(precio_actual) else float(s.iloc[-1])
-    d = {"precio": p, "historia_años": len(s) / 252}
-    for etiqueta, n in VENTANAS.items():
-        tramo = s.tail(n)
-        d[f"min {etiqueta}"] = float(tramo.min()) if len(s) >= n * 0.9 else np.nan
+    d = {"precio": p, "historia_años": (s.index[-1] - s.index[0]).days / 365.25}
+    for etiqueta, meses in VENTANAS.items():
+        d[f"min {etiqueta}"] = float(recortar(s, meses).min()) if cubre(s, meses) else np.nan
         d[f"vs min {etiqueta}"] = p / d[f"min {etiqueta}"] - 1 if not np.isnan(d[f"min {etiqueta}"]) else np.nan
-    año = s.tail(252)
+    año = recortar(s, 12)
     d["caída desde máx 1 a"] = p / año.max() - 1
     d["media 200"] = float(s.tail(200).mean()) if len(s) >= 200 else np.nan
     d["vs media 200"] = p / d["media 200"] - 1 if not np.isnan(d["media 200"]) else np.nan
