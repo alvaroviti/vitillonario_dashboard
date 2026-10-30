@@ -3,7 +3,7 @@ name: Alertas
 on:
   schedule:
     # De lunes a viernes a las 17:30 UTC (18:30 en invierno, 19:30 en verano, hora de Madrid)
-    - cron: "30 17 * * 1-5"
+     - cron: "45 16 * * 1-5"
   workflow_dispatch:
     inputs:
       dry_run:
