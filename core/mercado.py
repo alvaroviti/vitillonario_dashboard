@@ -83,6 +83,27 @@ def descargar_ultimos(tickers: list[str]) -> pd.Series:
     return ultimos_de(descargar_intradia(tickers))
 
 
+# Tickers cuyo precio no cuadra con el de tus extractos (otra clase del fondo, otra moneda…)
+TICKERS_DESCARTADOS: dict[str, tuple[str, float]] = {}
+
+
+def ticker_coherente(ticker: str, moneda, precio_ref, fecha_ref, historico: pd.DataFrame,
+                     tolerancia: float = 0.15) -> tuple[bool, float]:
+    """Compara el precio del ticker en la fecha de tu foto/última operación con el precio real de entonces.
+    Si se separan más de un 15 %, el ticker no es el mismo producto (clase, moneda o unidad distinta)."""
+    if pd.isna(precio_ref) or pd.isna(fecha_ref) or not precio_ref:
+        return True, np.nan
+    serie = serie_eur(ticker, moneda, historico)
+    if serie is None:
+        return True, np.nan
+    fecha = pd.Timestamp(fecha_ref).tz_localize(None) if pd.Timestamp(fecha_ref).tzinfo else pd.Timestamp(fecha_ref)
+    antes = serie[serie.index <= fecha + pd.Timedelta(days=1)]
+    if antes.empty or (fecha - antes.index[-1]).days > 10:
+        return True, np.nan
+    ratio = float(antes.iloc[-1]) / float(precio_ref)
+    return abs(ratio - 1) <= tolerancia, ratio
+
+
 def precios_actuales(pos: pd.DataFrame, instrumentos: pd.DataFrame,
                      historico: pd.DataFrame, ultimos: pd.Series) -> dict:
     """Devuelve {clave: (precio_eur, fuente)} para cada posición con dato de mercado."""
@@ -102,12 +123,18 @@ def precios_actuales(pos: pd.DataFrame, instrumentos: pd.DataFrame,
         fx = ultimo(FX.get(moneda, ""))
         return precio / fx if fx and not np.isnan(fx) else np.nan
 
+    TICKERS_DESCARTADOS.clear()
     for r in pos.drop_duplicates("clave").itertuples():
         if r.clave not in cat.index:
             continue
         inst = cat.loc[r.clave]
         if isinstance(inst.ticker, str) and inst.ticker:
-            p = a_eur(ultimo(inst.ticker), inst.moneda_ticker)
+            ok, ratio = ticker_coherente(inst.ticker, inst.moneda_ticker, r.precio_ref, r.fecha_ref, historico)
+            if not ok:
+                TICKERS_DESCARTADOS[inst.ticker] = (r.clave, ratio)
+                p = np.nan
+            else:
+                p = a_eur(ultimo(inst.ticker), inst.moneda_ticker)
             if not np.isnan(p):
                 out[r.clave] = (p, f"mercado ({inst.ticker})")
                 continue

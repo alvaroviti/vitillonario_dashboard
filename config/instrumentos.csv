@@ -24,18 +24,18 @@ XS2800678224,Bono ago-2029,bono,,EUR,,manual,Precio manual (% nominal x nominal)
 LU3170240538,Private Equity (TR),privado,,EUR,,manual,Sin cotización pública,PRIVATE_EQUITY
 MI_IB1T,iShares Bitcoin ETP,etn,IB1T.DE,EUR,,revisar,,CRIPTO
 MI_GALAXY_BTC,X Galaxy Physical Bitcoin ETC,etc,,EUR,BTC-EUR,revisar,Se estima con BTC-EUR,CRIPTO
-MI_AXA_TRESOR,AXA Trésor Court Terme C,monetario,,EUR,,manual,Monetario: valor del último extracto,MONETARIO_EUR
-MI_CRED_ULTRA,Cred Ultra Short Plus R C,monetario,,EUR,,manual,,MONETARIO_EUR
-MI_DWS_FRN,Deutsche Floating Rate Notes LC,renta_fija,,EUR,,manual,,EUROPA_RF
+MI_AXA_TRESOR,AXA Trésor Court Terme C,monetario,0P00000F24.F,EUR,,si,Valor liquidativo propio (Yahoo); el equivalente se usa solo si falla,MONETARIO_EUR
+MI_CRED_ULTRA,Ostrum Credit Ultra Short Plus R/C EUR,monetario,0P0001QKUD.F,EUR,,si,Valor liquidativo propio (Yahoo); el equivalente se usa solo si falla,MONETARIO_EUR
+MI_DWS_FRN,DWS Floating Rate Notes LC,renta_fija,DI4A.F,EUR,,si,Valor liquidativo propio (Yahoo); el equivalente se usa solo si falla,EUROPA_RF
 MI_STORM_BOND,Storm Bond Fund RC,renta_fija,,EUR,,manual,,EUROPA_RF
-MI_DIP_VALUE,DIP Value Catalyst Equity A,fondo,,EUR,EUNL.DE,revisar,Proxy MSCI World,SIN_DATOS_RV
-MI_ROBECO_GPE,Robeco BP Global Premium Equities D,fondo,,EUR,EUNL.DE,revisar,Proxy MSCI World,GLOBAL_VALUE
-MI_POLAR_TECH,Polar Capital Global Technology R,fondo,,EUR,QDVE.DE,revisar,Proxy S&P 500 IT,GLOBAL_TECH
+MI_DIP_VALUE,DIP Paradigma Value Catalyst Eq A EUR Acc,fondo,0P0001NLM6.F,EUR,EUNL.DE,si,Valor liquidativo propio (Yahoo); el equivalente se usa solo si falla,SIN_DATOS_RV
+MI_ROBECO_GPE,Robeco BP Global Premium Equities D EUR,fondo,LU0203975437.SG,EUR,EUNL.DE,si,Valor liquidativo propio (Yahoo); el equivalente se usa solo si falla,GLOBAL_VALUE
+MI_POLAR_TECH,Polar Capital Global Technology R EUR Hdg Acc,fondo,0P0001ANEI.F,EUR,QDVE.DE,si,Valor liquidativo propio (Yahoo); el equivalente se usa solo si falla,GLOBAL_TECH
 MI_AMUNDI_EM,Amundi Index MSCI EM,fondo,,EUR,IS3N.DE,si,Proxy EM IMI,EMERGENTES_RV
-MI_ISH_DEV_WORLD,iShares Developed World Index S,fondo,,EUR,EUNL.DE,si,Proxy MSCI World,MSCI_WORLD
-MI_ISH_EM,iShares Emerging Markets Index S,fondo,,EUR,IS3N.DE,si,Proxy EM IMI,EMERGENTES_RV
+MI_ISH_DEV_WORLD,iShares Developed World Index (IE) S Acc EUR,fondo,0P0001XF40.F,EUR,EUNL.DE,si,Valor liquidativo propio (Yahoo); el equivalente se usa solo si falla,MSCI_WORLD
+MI_ISH_EM,iShares Emerging Markets Index (IE) S Acc EUR,fondo,0P0001XF3Z.F,EUR,IS3N.DE,si,Valor liquidativo propio (Yahoo); el equivalente se usa solo si falla,EMERGENTES_RV
 MI_ISH_US,iShares US Index Fund S,fondo,,EUR,SXR8.DE,si,Proxy S&P 500,EEUU_RV
-MI_FID_WORLD,Fidelity MSCI World Index P,fondo,,EUR,EUNL.DE,si,Proxy MSCI World,MSCI_WORLD
-MI_VAN_SMALL,Vanguard Global Small-Cap Index Inv,fondo,,EUR,IUSN.DE,si,Proxy World Small Cap,WORLD_SMALL
+MI_FID_WORLD,Fidelity MSCI World Index EUR P Acc,fondo,0P0001CLDK.F,EUR,EUNL.DE,si,Valor liquidativo propio (Yahoo); el equivalente se usa solo si falla,MSCI_WORLD
+MI_VAN_SMALL,Vanguard Global Small-Cap Index Inv EUR Acc,fondo,0P00012I66.F,EUR,IUSN.DE,si,Valor liquidativo propio (Yahoo); el equivalente se usa solo si falla,WORLD_SMALL
 MI_NASDAQ_FI,MyInvestor Nasdaq 100 FI,fondo,,EUR,SXRV.DE,revisar,Proxy Nasdaq 100,EEUU_RV
 MI_PP_GLOBAL,MyInvestor Indexado Global PP,plan_pensiones,,EUR,IUSQ.DE,revisar,Proxy MSCI ACWI,MSCI_ACWI

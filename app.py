@@ -347,10 +347,14 @@ def referencia_de(clave: str, cat: pd.DataFrame) -> tuple[str | None, str | None
     if clave not in cat.index:
         return None, None, False
     inst = cat.loc[clave]
-    if isinstance(inst.ticker, str) and inst.ticker:
+    tiene_datos = lambda t: t in hist.columns and hist[t].notna().sum() > 30
+    if (isinstance(inst.ticker, str) and inst.ticker and inst.ticker not in mercado.TICKERS_DESCARTADOS
+            and (hist.empty or tiene_datos(inst.ticker))):
         return inst.ticker, inst.moneda_ticker, False
     if isinstance(inst.proxy, str) and inst.proxy:
         return inst.proxy, "EUR", True
+    if isinstance(inst.ticker, str) and inst.ticker and inst.ticker not in mercado.TICKERS_DESCARTADOS:
+        return inst.ticker, inst.moneda_ticker, False
     return None, None, False
 
 
@@ -1037,6 +1041,10 @@ def pestaña_datos(val: pd.DataFrame):
     c[0].metric("Movimientos Trade Republic", len(tr), f"{tr.date.min():%m/%Y} – {tr.date.max():%m/%Y}" if not tr.empty else "", delta_color="off")
     c[1].metric("Movimientos MyInvestor", len(mi), f"{mi.fecha.min():%m/%Y} – {mi.fecha.max():%m/%Y}" if not mi.empty else "", delta_color="off")
     c[2].metric("Foto de posiciones MyInvestor", f"{pos_mi.fecha.max():%d/%m/%Y}" if not pos_mi.empty else "—")
+    for t, (clave, ratio) in mercado.TICKERS_DESCARTADOS.items():
+        st.warning(f"El ticker {t} ({clave}) da un precio un {abs(ratio - 1) * 100:.0f} % distinto del de tus extractos: "
+                   "probablemente sea otra clase del fondo u otra moneda. Se usa el equivalente hasta que lo corrijas "
+                   "en config/instrumentos.csv.")
     st.markdown("**Cómo se valora cada posición**")
     st.dataframe(val[["nombre_corto", "plataforma", "fuente", "precio"]].drop_duplicates(), hide_index=True, width="stretch")
     sin_cat = sorted(set(val.clave) - set(instrumentos.clave))
