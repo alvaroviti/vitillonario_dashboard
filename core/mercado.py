@@ -50,8 +50,9 @@ def descargar_historico(tickers: list[str], periodo: str = "5y") -> pd.DataFrame
 
 
 def descargar_intradia(tickers: list[str]) -> pd.DataFrame:
-    """Cierres cada 15 minutos de los últimos 5 días, en hora de Madrid."""
-    tickers = sorted({t for t in tickers if isinstance(t, str) and t})
+    """Cierres cada 15 minutos de los últimos 5 días, en hora de Madrid.
+    Los fondos (tickers 0P… de Morningstar) no tienen precios intradía y se omiten."""
+    tickers = sorted({t for t in tickers if isinstance(t, str) and t and not t.startswith("0P")})
     if yf is None or not tickers:
         return pd.DataFrame()
     try:

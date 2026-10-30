@@ -32,6 +32,7 @@ from core import cartera, mercado, parsers  # noqa: E402
 DRY_RUN = os.environ.get("DRY_RUN", "0").lower() in ("1", "true", "si", "sí", "yes")
 UMBRAL_CAIDA = float(os.environ.get("UMBRAL_CAIDA_SEMANA", "5")) / 100
 RESUMEN_DIA = int(os.environ.get("RESUMEN_DIA", "4"))
+SIN_SEÑALES = {"monetario", "renta_fija", "bono", "privado"}
 
 
 def h(texto: str) -> str:
@@ -105,6 +106,9 @@ def main() -> None:
     pesos = val.groupby("clave").valor.sum()
     vistas = set()
     for clave in pesos.sort_values(ascending=False).index:
+        # Monetarios y renta fija suben casi en línea recta: siempre parecerían «en máximos»
+        if clave in cat.index and cat.loc[clave, "tipo"] in SIN_SEÑALES:
+            continue
         ref, _ = referencia(clave, cat, hist)
         if not ref or ref in vistas or ref not in hist.columns:
             continue

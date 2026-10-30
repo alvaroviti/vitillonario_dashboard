@@ -566,7 +566,12 @@ def pestaña_mercado(val: pd.DataFrame, ult: pd.Series, intr: pd.DataFrame, efec
                                                     if g.coste.sum() else np.nan)
     pesos_clave = val.groupby("clave").valor.sum() / val.valor.sum()
 
+    tipos_sin_señal = {"monetario", "renta_fija", "bono", "privado"}
+
     def venta(r):
+        if r.clave in cat.index and cat.loc[r.clave, "tipo"] in tipos_sin_señal:
+            # Monetarios y renta fija suben casi en línea recta: siempre parecerían «en máximos»
+            return pd.Series({"puntos venta": 0, "señal venta": "—", "motivos venta": "no aplica a monetarios ni renta fija"})
         pv, mv = r["puntos venta"], list(r["motivos venta"]) if isinstance(r["motivos venta"], list) else []
         gan = ganancia_por_clave.get(r.clave, np.nan)
         if pd.notna(gan) and gan >= 0.40:
@@ -576,6 +581,9 @@ def pestaña_mercado(val: pd.DataFrame, ult: pd.Series, intr: pd.DataFrame, efec
         return pd.Series({"puntos venta": pv, "señal venta": mercado.señal_venta(pv),
                           "motivos venta": ", ".join(mv) if mv else "—"})
     df[["puntos venta", "señal venta", "motivos venta"]] = df.apply(venta, axis=1)
+    sin_señal = df.clave.map(lambda c: c in cat.index and cat.loc[c, "tipo"] in tipos_sin_señal)
+    df.loc[sin_señal, ["señal", "motivos"]] = ["—", "no aplica a monetarios ni renta fija"]
+    df.loc[sin_señal, "puntos"] = 0
 
     zona = df[df["señal"] == "Zona de compra"]
     if not zona.empty:
