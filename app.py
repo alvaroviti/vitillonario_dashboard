@@ -70,7 +70,9 @@ def cargar(_marca: float):
     perfiles, avisos_perfiles = cartera.leer_perfiles(RAIZ / "config" / "perfiles.csv")
     f_seg = RAIZ / "config" / "seguimiento.csv"
     seguimiento = pd.read_csv(f_seg) if f_seg.exists() else pd.DataFrame(columns=["ticker", "nombre", "moneda"])
-    return tr, mi, avisos_mi + avisos_perfiles, pos_mi, instrumentos, fiscal_manual, perfiles, seguimiento
+    f_uni = RAIZ / "config" / "universo.csv"
+    universo = pd.read_csv(f_uni) if f_uni.exists() else pd.DataFrame(columns=["ticker", "nombre", "categoria"])
+    return tr, mi, avisos_mi + avisos_perfiles, pos_mi, instrumentos, fiscal_manual, perfiles, seguimiento, universo
 
 
 @st.cache_data(ttl=3600, show_spinner="Descargando históricos de 5 años…")
@@ -135,7 +137,7 @@ with st.sidebar:
                        ". Sin GitHub configurado, se perderán si la app se reinicia."))
         cargar.clear()
 
-tr, mi, avisos_mi, pos_mi, instrumentos, fiscal_manual, perfiles, seguimiento = cargar(marca_datos())
+tr, mi, avisos_mi, pos_mi, instrumentos, fiscal_manual, perfiles, seguimiento, universo = cargar(marca_datos())
 ventas_tr, abiertas_tr, avisos_fifo = cartera.fifo_tr(tr) if not tr.empty else (pd.DataFrame(), pd.DataFrame(), [])
 pos = cartera.posiciones(abiertas_tr, pos_mi, mi, instrumentos)
 
@@ -174,13 +176,15 @@ def pintar():
     c[2].metric("Hasta el objetivo", eur(max(0, objetivo - patrimonio)), f"{patrimonio / objetivo:.0%} conseguido".replace(".", ","), delta_color="off")
     c[3].metric("Efectivo", eur(efectivo_tr + efectivo_mi), "TR " + eur(efectivo_tr) + " · MI " + eur(efectivo_mi), delta_color="off")
 
-    t_hoy, t_mercado, t_cartera, t_aport, t_fiscal, t_datos = st.tabs(
-        ["Hoy", "Mercado y señales", "Cartera", "Aportaciones y objetivo", "Fiscal", "Datos"])
+    t_hoy, t_mercado, t_ranking, t_cartera, t_aport, t_fiscal, t_datos = st.tabs(
+        ["Hoy", "Mercado y señales", "Ranking", "Cartera", "Aportaciones y objetivo", "Fiscal", "Datos"])
 
     with t_hoy:
         pestaña_hoy(val, intr)
     with t_mercado:
         pestaña_mercado(val, ult, intr, efectivo_tr + efectivo_mi)
+    with t_ranking:
+        pestaña_ranking(val)
     with t_cartera:
         pestaña_cartera(val, efectivo_tr, efectivo_mi, intr)
     with t_aport:
@@ -227,6 +231,88 @@ def variacion_activo(ref: str, moneda: str | None, intr: pd.DataFrame) -> dict:
         if len(base):
             out["var_semana"] = out["precio"] / float(base.iloc[-1]) - 1
     return out
+
+
+def pestaña_ranking(val: pd.DataFrame):
+    st.subheader("Ranking de fondos y ETFs")
+    # Universo: lista de config/universo.csv + tus activos + tus valores en seguimiento
+    cat = instrumentos.set_index("clave")
+    filas = universo.assign(origen="Lista").to_dict("records")
+    tickers_tuyos = set()
+    for clave in val.clave.unique():
+        t, _, _ = referencia_de(clave, cat)
+        if t and clave in cat.index and cat.loc[clave, "tipo"] not in ("accion", "cripto"):
+            tickers_tuyos.add(t)
+            filas.append(dict(ticker=t, nombre=cat.loc[clave, "nombre"], categoria="Tus fondos y ETFs", origen="Cartera"))
+    for r in seguimiento.itertuples():
+        filas.append(dict(ticker=r.ticker, nombre=r.nombre, categoria="Seguimiento", origen="Seguimiento"))
+    lista = pd.DataFrame(filas).drop_duplicates("ticker")
+    h = historico(tuple(sorted(lista.ticker)))
+    if h.empty:
+        st.info("Sin conexión con Yahoo Finance: el ranking necesita los históricos de precios.")
+        return
+
+    c1, c2 = st.columns([2, 3])
+    periodo = c1.segmented_control("Plazo", ["1 a", "2 a", "3 a", "5 a"], default="3 a",
+                                   label_visibility="collapsed") or "3 a"
+    categorias = sorted(lista.categoria.unique())
+    elegidas = c2.multiselect("Categorías", categorias, placeholder="Todas las categorías")
+    meses = PERIODOS[periodo]
+
+    res, sin_datos = [], []
+    for r in lista.itertuples():
+        m = mercado.metricas_periodo(h[r.ticker], meses) if r.ticker in h.columns else None
+        if m is None:
+            sin_datos.append(r.nombre)
+            continue
+        res.append(dict(nombre=r.nombre, ticker=r.ticker, categoria=r.categoria,
+                        tuyo="✓" if r.ticker in tickers_tuyos else "", **m))
+    df = pd.DataFrame(res)
+    if df.empty:
+        st.info("Ningún activo tiene histórico suficiente para ese plazo.")
+        return
+    if elegidas:
+        df = df[df.categoria.isin(elegidas)]
+
+    p = lambda x: f"{x * 100:+.1f} %".replace(".", ",") if pd.notna(x) else "—"
+    p_sin = lambda x: f"{x * 100:.1f} %".replace(".", ",") if pd.notna(x) else "—"
+    formatos = {"rentabilidad": p, "anualizada": p, "volatilidad": p_sin, "peor_caida": p,
+                "rent_riesgo": lambda x: f"{x:.2f}".replace(".", ",") if pd.notna(x) else "—"}
+    columnas = {"anualizada": st.column_config.Column("anual"), "rentabilidad": st.column_config.Column(f"total {periodo}"),
+                "peor_caida": st.column_config.Column("peor caída"), "rent_riesgo": st.column_config.Column(
+                    "rentab./riesgo", help="Rentabilidad anual entre volatilidad: cuánto has ganado por cada unidad de sustos.")}
+    orden_cols = ["nombre", "categoria", "tuyo", "anualizada", "rentabilidad", "volatilidad", "peor_caida", "rent_riesgo", "ticker"]
+    n = st.slider("Cuántos mostrar", 5, 30, 10)
+
+    st.markdown(f"**Más rentables en {periodo}**")
+    top = df.sort_values("anualizada", ascending=False).head(n)[orden_cols]
+    st.dataframe(top.style.format(formatos), hide_index=True, width="stretch", column_config=columnas)
+
+    st.markdown(f"**Más estables en {periodo}**: los que menos han caído desde un máximo")
+    sin_liquidez = st.toggle("Excluir monetarios y renta fija", value=True,
+                             help="Los monetarios casi no caen nunca y coparían el ranking.")
+    estables = df[~df.categoria.isin(["Monetario", "Renta fija"])] if sin_liquidez else df
+    est = estables.sort_values(["peor_caida", "volatilidad"], ascending=[False, True]).head(n)[orden_cols]
+    st.dataframe(est.style.format(formatos), hide_index=True, width="stretch", column_config=columnas)
+
+    st.markdown("**Rentabilidad frente a caída**")
+    fig = px.scatter(df, x="peor_caida", y="anualizada", color="categoria", hover_name="nombre",
+                     color_discrete_sequence=PALETA * 2,
+                     symbol=df.tuyo.map(lambda t: "Tuyo" if t else "Otros"), symbol_sequence=["diamond", "circle"])
+    fig.update_traces(marker=dict(size=11, line=dict(width=0)))
+    fig.update_layout(height=460, margin=dict(l=10, r=10, t=10, b=10), plot_bgcolor="rgba(0,0,0,0)",
+                      xaxis=dict(tickformat=".0%", title="peor caída en el periodo (más a la derecha = más estable)"),
+                      yaxis=dict(tickformat=".0%", title="rentabilidad anual"), legend=dict(orientation="h", title=None))
+    st.plotly_chart(fig, width="stretch")
+    st.caption("Arriba a la derecha están los que más han ganado cayendo poco. Rentabilidades pasadas, en la moneda de "
+               "cotización de cada ETF (los de esta lista cotizan en euros). Que algo haya sido lo mejor de los "
+               "últimos años no dice nada de los próximos: los sectores y temas que lideran un periodo suelen "
+               "quedarse atrás en el siguiente. Úsalo para comparar, no como recomendación.")
+    if sin_datos:
+        with st.expander(f"{len(sin_datos)} sin histórico suficiente para {periodo}"):
+            st.write(", ".join(sorted(set(sin_datos))))
+    st.caption("Puedes añadir o quitar ETFs editando config/universo.csv (ticker de Yahoo, nombre y categoría), "
+               "o añadirlos a «Valores en seguimiento» en la pestaña Mercado.")
 
 
 def pestaña_hoy(val: pd.DataFrame, intr: pd.DataFrame):
@@ -1046,7 +1132,18 @@ def pestaña_datos(val: pd.DataFrame):
                    "probablemente sea otra clase del fondo u otra moneda. Se usa el equivalente hasta que lo corrijas "
                    "en config/instrumentos.csv.")
     st.markdown("**Cómo se valora cada posición**")
-    st.dataframe(val[["nombre_corto", "plataforma", "fuente", "precio"]].drop_duplicates(), hide_index=True, width="stretch")
+    cat = instrumentos.set_index("clave")
+    diag = val[["clave", "nombre_corto", "plataforma", "fuente", "precio"]].drop_duplicates("clave").copy()
+    diag["ticker configurado"] = diag.clave.map(cat["ticker"]).fillna("—")
+    diag["días de histórico en Yahoo"] = diag["ticker configurado"].map(
+        lambda t: int(hist[t].notna().sum()) if t in hist.columns else 0)
+    st.dataframe(diag.drop(columns="clave"), hide_index=True, width="stretch",
+                 column_config={"precio": st.column_config.NumberColumn(format="%.4f")})
+    st.caption("Si un activo tiene ticker configurado pero 0 días de histórico, Yahoo no está devolviendo datos de "
+               "ese ticker. Si la columna de ticker no muestra el que esperas, el fichero config/instrumentos.csv "
+               "del repositorio no es el último.")
+    st.caption(f"config/instrumentos.csv cargado: {len(instrumentos)} activos, "
+               f"modificado el {pd.Timestamp((RAIZ / 'config' / 'instrumentos.csv').stat().st_mtime, unit='s'):%d/%m/%Y %H:%M} (UTC).")
     sin_cat = sorted(set(val.clave) - set(instrumentos.clave))
     sin_cat = [s for s in sin_cat if not str(s).startswith("PEND_")]
     if sin_cat:

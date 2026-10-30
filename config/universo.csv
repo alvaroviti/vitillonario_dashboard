@@ -1,0 +1,36 @@
+ticker,nombre,categoria
+EUNL.DE,iShares Core MSCI World,RV global
+IWDA.AS,iShares Core MSCI World (Ámsterdam),RV global
+XDWD.DE,Xtrackers MSCI World,RV global
+IUSQ.DE,iShares MSCI ACWI,RV global
+SPYI.DE,SPDR MSCI ACWI IMI,RV global
+VWCE.DE,Vanguard FTSE All-World Acc,RV global
+IS3Q.DE,iShares MSCI World Quality Factor,RV global factores
+IS3R.DE,iShares MSCI World Momentum Factor,RV global factores
+IS3S.DE,iShares MSCI World Value Factor,RV global factores
+IQQ0.DE,iShares MSCI World Minimum Volatility,RV global factores
+IUSN.DE,iShares MSCI World Small Cap,RV global factores
+VGWD.DE,Vanguard FTSE All-World High Dividend,RV dividendos
+TDIV.AS,VanEck Morningstar Developed Markets Dividend Leaders,RV dividendos
+WQDV.DE,iShares MSCI World Quality Dividend,RV dividendos
+SXR8.DE,iShares Core S&P 500,RV EE. UU.
+VUAA.DE,Vanguard S&P 500 Acc,RV EE. UU.
+SXRV.DE,iShares Nasdaq 100,RV EE. UU.
+ZPRV.DE,SPDR MSCI USA Small Cap Value Weighted,RV EE. UU.
+EXSA.DE,iShares STOXX Europe 600,RV Europa
+SXR7.DE,iShares Core MSCI EMU,RV Europa
+EXW1.DE,iShares Core EURO STOXX 50,RV Europa
+ZPRX.DE,SPDR MSCI Europe Small Cap Value Weighted,RV Europa
+IS3N.DE,iShares Core MSCI EM IMI,RV emergentes
+XMME.DE,Xtrackers MSCI Emerging Markets,RV emergentes
+QDVE.DE,iShares S&P 500 Information Technology,RV sectores
+XDWT.DE,Xtrackers MSCI World Information Technology,RV sectores
+XDWH.DE,Xtrackers MSCI World Health Care,RV sectores
+IQQH.DE,iShares Global Clean Energy,RV sectores
+EUNH.DE,iShares Core Euro Government Bond,Renta fija
+EUN5.DE,iShares Core Euro Corporate Bond,Renta fija
+EUNA.DE,iShares Core Global Aggregate Bond EUR Hedged,Renta fija
+XEON.DE,Xtrackers II EUR Overnight Rate Swap,Monetario
+PPFB.DE,iShares Physical Gold ETC,Oro
+4GLD.DE,Xetra-Gold,Oro
+IB1T.DE,iShares Bitcoin ETP,Cripto

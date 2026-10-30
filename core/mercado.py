@@ -326,3 +326,26 @@ def reconstruir_valor(indice: pd.Series, valor_hoy: float, flujos: pd.Series) ->
     v = simular((bajo + alto) / 2)
     resultado = np.concatenate([[0.0], v[1:] - v[:-1] - f[1:]])
     return pd.DataFrame({"valor": v, "aportacion": f, "resultado": resultado}, index=fechas)
+
+
+# --------------------------------------------------------------------------- #
+# Ranking de rentabilidad y estabilidad
+# --------------------------------------------------------------------------- #
+def metricas_periodo(serie: pd.Series, meses: int) -> dict | None:
+    """Rentabilidad, volatilidad y peor caída de una serie en los últimos `meses`.
+    None si no hay histórico suficiente para ese plazo."""
+    s = serie.dropna()
+    if not cubre(s, meses):
+        return None
+    t = recortar(s, meses)
+    if len(t) < 20:
+        return None
+    total = float(t.iloc[-1] / t.iloc[0] - 1)
+    años = meses / 12
+    dias = max((t.index[-1] - t.index[0]).days, 1)
+    obs_año = len(t) / (dias / 365.25)  # 252 en bolsa, 365 en cripto
+    vol = float(t.pct_change().dropna().std() * np.sqrt(obs_año))
+    caida = float((t / t.cummax() - 1).min())
+    anual = (1 + total) ** (1 / años) - 1 if total > -1 else -1.0
+    return dict(rentabilidad=total, anualizada=anual, volatilidad=vol, peor_caida=caida,
+                rent_riesgo=anual / vol if vol > 0 else np.nan)
