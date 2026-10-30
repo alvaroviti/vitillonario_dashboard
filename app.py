@@ -24,6 +24,24 @@ PALETA = [TINTA, VERDE, ORO, MORADO, NARANJA, TURQUESA, ROJO, GRIS]
 # --------------------------------------------------------------------------- #
 # Acceso: si hay contraseña en secrets, se pide antes de mostrar nada
 # --------------------------------------------------------------------------- #
+def clave_edicion() -> str | None:
+    try:
+        return st.secrets.get("clave_edicion") or st.secrets.get("password")
+    except Exception:
+        return None
+
+
+def puede_editar() -> bool:
+    """Sin «clave_edicion» en los secrets, solo se puede editar en local (sin GitHub configurado)."""
+    clave = clave_edicion()
+    if clave:
+        return bool(st.session_state.get("editor"))
+    try:
+        return not almacen.configurado(st.secrets)
+    except Exception:
+        return True
+
+
 def acceso() -> bool:
     try:
         clave = st.secrets["password"]
@@ -112,19 +130,30 @@ with st.sidebar:
 
     st.divider()
     st.subheader("Actualizar datos")
+    if not puede_editar():
+        st.caption("Introduce la clave de edición para subir ficheros o guardar cambios.")
+        clave_ed = st.text_input("Clave de edición", type="password")
+        if clave_ed and hmac.compare_digest(clave_ed, clave_edicion() or ""):
+            st.session_state["editor"] = True
+            st.rerun()
+        elif clave_ed:
+            st.error("Clave incorrecta.")
     st.caption("Puedes subir exportaciones solapadas: los duplicados se eliminan solos.")
-    subida_tr = st.file_uploader("Trade Republic (.csv)", type=["csv"], accept_multiple_files=True)
-    subida_mi = st.file_uploader("MyInvestor · extracto de cuenta (.xls)", type=["xls", "html"], accept_multiple_files=True)
-    subida_pos = st.file_uploader("MyInvestor · foto de posiciones (.csv)", type=["csv"])
-    if st.button("Guardar ficheros", width="stretch", type="primary"):
+    subida_tr = subida_mi = subida_pos = None
+    if puede_editar():
+        subida_tr = st.file_uploader("Trade Republic (.csv)", type=["csv"], accept_multiple_files=True)
+        subida_mi = st.file_uploader("MyInvestor · extracto de cuenta (.xls)", type=["xls", "html"], accept_multiple_files=True)
+        subida_pos = st.file_uploader("MyInvestor · foto de posiciones (.csv)", type=["csv"])
+    if puede_editar() and st.button("Guardar ficheros", width="stretch", type="primary"):
         pendientes = []
         hoy = pd.Timestamp.today()
         for f in subida_tr or []:
-            pendientes.append((f"tr_{hoy:%Y%m%d}_{f.name}", f.getvalue(), parsers.TR_DIR, "data/tr"))
+            pendientes.append((parsers.nombre_seguro(f"tr_{hoy:%Y%m%d}_{f.name}"), f.getvalue(), parsers.TR_DIR, "data/tr"))
         for f in subida_mi or []:
-            pendientes.append((f"mi_{hoy:%Y%m%d}_{f.name}", f.getvalue(), parsers.MI_DIR, "data/myinvestor"))
+            pendientes.append((parsers.nombre_seguro(f"mi_{hoy:%Y%m%d}_{f.name}"), f.getvalue(), parsers.MI_DIR, "data/myinvestor"))
         if subida_pos:
-            nombre = subida_pos.name if subida_pos.name.startswith("posiciones_") else f"posiciones_{hoy:%Y-%m-%d}.csv"
+            nombre = parsers.nombre_seguro(subida_pos.name)
+            nombre = nombre if nombre.startswith("posiciones_") and nombre.endswith(".csv") else f"posiciones_{hoy:%Y-%m-%d}.csv"
             pendientes.append((nombre, subida_pos.getvalue(), parsers.MI_DIR, "data/myinvestor"))
         if not pendientes:
             st.info("No has seleccionado ningún fichero.")
@@ -798,7 +827,7 @@ def seccion_seguimiento():
                                    "nombre": st.column_config.TextColumn("nombre (opcional)"),
                                    "moneda": st.column_config.SelectboxColumn(options=["EUR", "USD", "GBP", "JPY"], default="EUR"),
                                }, key="editor_seguimiento")
-        if st.button("Guardar seguimiento"):
+        if puede_editar() and st.button("Guardar seguimiento"):
             tabla = tabla.dropna(subset=["ticker"])
             tabla["ticker"] = tabla["ticker"].str.strip()
             tabla["nombre"] = [n if isinstance(n, str) and n.strip() else nombre_ticker(t)
@@ -1090,7 +1119,7 @@ def seccion_rebalanceo(val: pd.DataFrame, media_12m: float):
         suma = editor.objetivo.sum()
         if abs(suma - 100) > 0.01:
             st.warning(f"El objetivo suma {suma:.0f} %: se reparte en proporción hasta que sume 100.")
-        if st.button("Guardar objetivo"):
+        if puede_editar() and st.button("Guardar objetivo"):
             contenido = editor.to_csv(index=False).encode("utf-8")
             (RAIZ / "config" / "objetivo_reparto.csv").write_bytes(contenido)
             if almacen.configurado(st.secrets):

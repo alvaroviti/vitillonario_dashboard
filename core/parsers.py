@@ -121,8 +121,19 @@ def leer_posiciones_mi(carpeta: Path = MI_DIR) -> pd.DataFrame:
     return pos
 
 
+def nombre_seguro(nombre: str) -> str:
+    """Deja solo el nombre del fichero, sin carpetas ni caracteres raros, para que una subida
+    nunca pueda escribir fuera de data/ (por ejemplo con «../app.py»)."""
+    import re
+    base = Path(str(nombre).replace("\\", "/")).name
+    base = re.sub(r"[^A-Za-z0-9._-]+", "_", base).strip("._") or "fichero"
+    return base[:120]
+
+
 def guardar_subida(nombre: str, contenido: bytes, destino: Path) -> Path:
     destino.mkdir(parents=True, exist_ok=True)
-    ruta = destino / nombre
+    ruta = (destino / nombre_seguro(nombre)).resolve()
+    if destino.resolve() not in ruta.parents:
+        raise ValueError("Nombre de fichero no permitido")
     ruta.write_bytes(contenido)
     return ruta
