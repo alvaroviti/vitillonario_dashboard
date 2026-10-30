@@ -548,6 +548,8 @@ def pestaña_mercado(val: pd.DataFrame, ult: pd.Series, intr: pd.DataFrame, efec
         st.info("Ninguna posición tiene ticker o equivalente con histórico disponible.")
         return
     df = pd.DataFrame(filas)
+    if "motivos venta" in df:
+        df["motivos venta"] = df["motivos venta"].map(lambda x: x if isinstance(x, list) else [])
     numericas = [c for c in df.columns if c.startswith(("vs ", "min ", "caída", "media", "RSI", "z "))]
     df[numericas] = df[numericas].apply(pd.to_numeric, errors="coerce")
     # Varios fondos con el mismo equivalente comparten fila: se suma lo que tienes en ellos
@@ -559,9 +561,29 @@ def pestaña_mercado(val: pd.DataFrame, ult: pd.Series, intr: pd.DataFrame, efec
     df["peso"] = df.en_cartera / total
     df = df.sort_values("en_cartera", ascending=False)
 
+    # Señales de venta: a los indicadores de precio se suman dos de tu posición
+    ganancia_por_clave = val.groupby("clave").apply(lambda g: (g.valor.sum() - g.coste.sum()) / g.coste.sum()
+                                                    if g.coste.sum() else np.nan)
+    pesos_clave = val.groupby("clave").valor.sum() / val.valor.sum()
+
+    def venta(r):
+        pv, mv = r["puntos venta"], list(r["motivos venta"]) if isinstance(r["motivos venta"], list) else []
+        gan = ganancia_por_clave.get(r.clave, np.nan)
+        if pd.notna(gan) and gan >= 0.40:
+            pv += 1; mv.append(f"ganas un {gan * 100:.0f} % en esta posición")
+        if pesos_clave.get(r.clave, 0) >= 0.20:
+            pv += 1; mv.append(f"pesa un {pesos_clave.get(r.clave, 0) * 100:.0f} % de tu cartera")
+        return pd.Series({"puntos venta": pv, "señal venta": mercado.señal_venta(pv),
+                          "motivos venta": ", ".join(mv) if mv else "—"})
+    df[["puntos venta", "señal venta", "motivos venta"]] = df.apply(venta, axis=1)
+
     zona = df[df["señal"] == "Zona de compra"]
     if not zona.empty:
         st.success("En zona de compra según los indicadores: " + ", ".join(zona.activo))
+    calientes = df[(df["señal venta"] == "Recoger beneficios") & (df.en_cartera > 0)]
+    if not calientes.empty:
+        st.warning("Zona de recoger beneficios: " + ", ".join(calientes.activo) +
+                   ". Mira «Qué hacer con una señal de venta» antes de decidir.")
 
     pesos_inv = pesos_cartera(val)
     indice, cubierto = indice_de(pesos_cartera(val, efectivo if incluir_efectivo else 0.0), hist)
@@ -577,7 +599,9 @@ def pestaña_mercado(val: pd.DataFrame, ult: pd.Series, intr: pd.DataFrame, efec
 
     porcentajes = ["caída desde máx 1 a", "vs min 3 m", "vs min 6 m", "vs min 1 a", "vs min 2 a", "vs min 3 a",
                    "vs min 5 a", "vs media 200"]
-    vista = df[["activo", "en_cartera", "peso", "señal", "puntos"] + porcentajes + ["RSI 14", "referencia", "motivos"]]
+    vista = df[["activo", "en_cartera", "peso", "señal", "puntos", "señal venta", "puntos venta"] + porcentajes
+               + [c for c in ["vs max 1 a", "vs max 3 a"] if c in df] + ["RSI 14", "referencia", "motivos", "motivos venta"]]
+    porcentajes = porcentajes + [c for c in ["vs max 1 a", "vs max 3 a"] if c in df]
     formato_pct = lambda x: f"{x * 100:.1f} %".replace(".", ",")
     formatos = {c: formato_pct for c in porcentajes + ["peso"]}
     formatos.update({"en_cartera": lambda x: eur(x), "RSI 14": "{:.0f}"})
@@ -585,9 +609,23 @@ def pestaña_mercado(val: pd.DataFrame, ult: pd.Series, intr: pd.DataFrame, efec
     st.dataframe(estilo, hide_index=True, width="stretch", column_config={
         "en_cartera": st.column_config.Column("en cartera"),
         "peso": st.column_config.Column("% cartera"),
-        "puntos": st.column_config.ProgressColumn(min_value=0, max_value=9, format="%d"),
+        "puntos": st.column_config.ProgressColumn("puntos compra", min_value=0, max_value=9, format="%d"),
+        "puntos venta": st.column_config.ProgressColumn(min_value=0, max_value=10, format="%d"),
+        "señal": st.column_config.Column("señal compra"),
     })
-    st.caption("«—» significa que el activo no tiene histórico suficiente para ese plazo.")
+    st.caption("«—» significa que el activo no tiene histórico suficiente para ese plazo. La señal de venta suma "
+               "cercanía a máximos de 1 y 3 años, distancia sobre la media de 200 sesiones, RSI alto, precio muy "
+               "por encima de su media anual y, en tus posiciones, ganancia acumulada alta o demasiado peso en la cartera.")
+    with st.expander("Qué hacer con una señal de venta"):
+        st.markdown(
+            "- **En fondos e índices amplios (MSCI World, emergentes…) casi nunca compensa vender por estar en "
+            "máximos**: el mercado pasa mucho tiempo cerca de máximos y salir suele costar más rentabilidad de la que "
+            "ahorra. Lo útil es **pausar o reducir aportaciones** a ese fondo y llevarlas a otro que esté más barato.\n"
+            "- **En acciones sueltas, sectores, oro o cripto** sí puede tener sentido **recoger parte del beneficio**, "
+            "sobre todo si la posición ha crecido mucho y pesa demasiado en tu cartera.\n"
+            "- **Ojo con Hacienda:** vender un ETF, una acción o una cripto tributa por la ganancia (19 % los primeros "
+            "6.000 €). En fondos de inversión puedes **traspasar** a otro fondo sin pagar nada hasta que reembolses.\n"
+            "- Como las de compra, son indicadores para ayudarte a decidir, no recomendaciones.")
 
     # ------------------------------------------------------------------ gráfico
     st.markdown("**Gráfico**")

@@ -197,7 +197,36 @@ def señales(serie: pd.Series, precio_actual: float | None = None) -> dict:
     d["puntos"] = puntos
     d["señal"] = "Zona de compra" if puntos >= 4 else "Vigilar" if puntos >= 2 else "Sin señal"
     d["motivos"] = ", ".join(motivos) if motivos else "—"
+
+    # Señales de venta / recoger beneficios: el espejo de las de compra
+    pv, mv = 0, []
+    maximos = {etq: float(recortar(s, m).max()) for etq, m in [("1 a", 12), ("3 a", 36), ("5 a", 60)] if cubre(s, m)}
+    for etq, maximo in maximos.items():
+        d[f"vs max {etq}"] = p / maximo - 1
+    if "1 a" in maximos and p >= maximos["1 a"] * 0.98:
+        pv += 1; mv.append("en máximos del último año")
+    if "3 a" in maximos and p >= maximos["3 a"] * 0.98:
+        pv += 1; mv.append("en máximos de 3 años")
+    if not np.isnan(d["vs media 200"]):
+        if d["vs media 200"] >= 0.25:
+            pv += 2; mv.append("más de un 25 % sobre la media de 200 sesiones")
+        elif d["vs media 200"] >= 0.15:
+            pv += 1; mv.append("más de un 15 % sobre la media de 200 sesiones")
+    if d["RSI 14"] > 75:
+        pv += 2; mv.append("RSI en sobrecompra (> 75)")
+    elif d["RSI 14"] > 70:
+        pv += 1; mv.append("RSI alto (> 70)")
+    if d["z 1 a"] > 2:
+        pv += 2; mv.append("precio muy por encima de su media anual")
+    elif d["z 1 a"] > 1.5:
+        pv += 1; mv.append("precio por encima de lo normal en el año")
+    d["puntos venta"] = pv
+    d["motivos venta"] = mv
     return d
+
+
+def señal_venta(puntos: int) -> str:
+    return "Recoger beneficios" if puntos >= 5 else "Caliente" if puntos >= 3 else "—"
 
 
 # --------------------------------------------------------------------------- #
