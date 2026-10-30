@@ -527,3 +527,90 @@ def aplicar_movimientos(pos: pd.DataFrame, movs: pd.DataFrame) -> pd.DataFrame:
                 nuevas[c] = np.nan
         pos = pd.concat([pos, nuevas[pos.columns]], ignore_index=True)
     return pos
+
+
+# --------------------------------------------------------------------------- #
+# Comparación con un indexado y TIR
+# --------------------------------------------------------------------------- #
+def xirr(flujos: pd.Series, valor_final: float, fecha_final: pd.Timestamp) -> float:
+    """TIR anual de una serie de aportaciones (importe > 0 = dinero metido) y un valor final."""
+    if flujos.empty:
+        return np.nan
+    fechas = list(pd.to_datetime(flujos.index)) + [pd.Timestamp(fecha_final)]
+    importes = list(-flujos.values) + [valor_final]
+    t0 = fechas[0]
+    años = np.array([(f - t0).days / 365.25 for f in fechas])
+    imp = np.array(importes, dtype=float)
+    vpn = lambda r: float(np.sum(imp / (1 + r) ** años))
+    bajo, alto = -0.99, 10.0
+    if vpn(bajo) * vpn(alto) > 0:
+        return np.nan
+    for _ in range(200):
+        medio = (bajo + alto) / 2
+        if vpn(bajo) * vpn(medio) <= 0:
+            alto = medio
+        else:
+            bajo = medio
+    return (bajo + alto) / 2
+
+
+def simular_indexado(flujos: pd.Series, precios: pd.Series) -> pd.DataFrame:
+    """Qué valdría hoy haber metido cada aportación (y sacado cada venta) en un índice el mismo día."""
+    p = precios.dropna().sort_index()
+    if p.empty or flujos.empty:
+        return pd.DataFrame()
+    f = flujos.copy()
+    f.index = pd.to_datetime(f.index)
+    f = f[f.index >= p.index[0]]
+    pos = np.clip(p.index.searchsorted(f.index), 0, len(p) - 1)
+    diario = pd.Series(0.0, index=p.index)
+    for i, importe in zip(pos, f.values):
+        diario.iloc[i] += importe
+    participaciones = (diario / p).cumsum().clip(lower=0)
+    valor = participaciones * p
+    inicio = diario[diario != 0].index.min()
+    return pd.DataFrame({"valor": valor, "aportado": diario.cumsum()})[lambda d: d.index >= inicio]
+
+
+# --------------------------------------------------------------------------- #
+# Reparto objetivo y dónde poner la siguiente aportación
+# --------------------------------------------------------------------------- #
+GRUPOS = ["RV desarrollada", "RV emergentes", "Renta fija", "Monetario", "Oro", "Cripto", "Alternativos"]
+
+
+def reparto_por_grupo(filas: pd.DataFrame) -> pd.DataFrame:
+    """filas: salida de desglose(). Devuelve valor por (clave, grupo)."""
+    clase = filas[filas.dimension == "clase"]
+    region = filas[filas.dimension == "region"]
+    out = []
+    for clave, g in clase.groupby("clave"):
+        total_clave = g.valor.sum()
+        if total_clave <= 0:
+            continue
+        nombre = g.nombre.iloc[0]
+        for r in g.itertuples():
+            if r.categoria == "Renta variable":
+                reg = region[region.clave == clave]
+                em = reg.loc[reg.categoria == "Emergentes", "valor"].sum() / reg.valor.sum() if reg.valor.sum() else 0
+                out += [dict(clave=clave, nombre=nombre, grupo="RV desarrollada", valor=r.valor * (1 - em)),
+                        dict(clave=clave, nombre=nombre, grupo="RV emergentes", valor=r.valor * em)]
+            else:
+                grupo = {"Renta fija": "Renta fija", "Monetario y efectivo": "Monetario", "Oro": "Oro",
+                         "Cripto": "Cripto", "Alternativos": "Alternativos"}.get(r.categoria, "Alternativos")
+                out.append(dict(clave=clave, nombre=nombre, grupo=grupo, valor=r.valor))
+    df = pd.DataFrame(out)
+    return df[df.valor > 0.005] if not df.empty else df
+
+
+def repartir_aportacion(actual: pd.Series, objetivo: pd.Series, aportacion: float) -> pd.Series:
+    """Reparte una aportación entre grupos para acercarse al objetivo sin vender nada."""
+    objetivo = objetivo / objetivo.sum() if objetivo.sum() else objetivo
+    actual = actual.reindex(objetivo.index).fillna(0)
+    total = actual.sum() + aportacion
+    deficit = (objetivo * total - actual).clip(lower=0)
+    if deficit.sum() <= 0:
+        return objetivo * aportacion
+    if deficit.sum() >= aportacion:
+        return deficit / deficit.sum() * aportacion
+    resto = aportacion - deficit.sum()
+    return deficit + objetivo * resto

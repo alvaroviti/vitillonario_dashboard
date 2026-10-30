@@ -222,7 +222,7 @@ def pintar():
     with t_cartera:
         pestaña_cartera(val, efectivo_tr, efectivo_mi, intr)
     with t_aport:
-        pestaña_aportaciones(patrimonio)
+        pestaña_aportaciones(patrimonio, val)
     with t_fiscal:
         pestaña_fiscal()
     with t_datos:
@@ -903,6 +903,7 @@ def pestaña_cartera(val: pd.DataFrame, efectivo_tr: float, efectivo_mi: float, 
     st.dataframe(por_plat.style.format(lambda x: eur(x)), width="stretch")
 
     seccion_resultado_mensual(val)
+    seccion_vs_indexado(val)
 
     st.subheader("Diversificación")
     base = val if incluir_plan else val[val.plataforma != "MyInvestor (plan)"]
@@ -990,12 +991,161 @@ def pestaña_cartera(val: pd.DataFrame, efectivo_tr: float, efectivo_mi: float, 
                      column_config={c: st.column_config.NumberColumn(format="%.2f €") for c in ["transmision", "adquisicion", "resultado"]})
 
 
-def pestaña_aportaciones(patrimonio: float):
+REFERENCIAS_INDEXADO = {"MSCI World (EUNL.DE)": "EUNL.DE", "MSCI ACWI (IUSQ.DE)": "IUSQ.DE",
+                        "FTSE All-World (VWCE.DE)": "VWCE.DE", "S&P 500 (SXR8.DE)": "SXR8.DE"}
+
+
+def seccion_vs_indexado(val: pd.DataFrame):
+    st.subheader("¿Mejor que un indexado?")
+    if hist.empty:
+        st.caption("Necesita precios de mercado.")
+        return
+    c1, c2 = st.columns([2, 2])
+    elegido = c1.selectbox("Comparar con", list(REFERENCIAS_INDEXADO) + ["Otro ticker…"])
+    ticker = REFERENCIAS_INDEXADO.get(elegido)
+    if ticker is None:
+        ticker = c2.text_input("Ticker de Yahoo", value="IWDA.AS").strip()
+    h = historico((ticker,)) if ticker else pd.DataFrame()
+    if h.empty or ticker not in h.columns:
+        st.warning(f"No hay datos de {ticker} en Yahoo Finance.")
+        return
+
+    flujos = cartera.flujos_diarios(tr, mi, incluir_plan)
+    pesos = pesos_cartera(val)
+    valor_real = float(pesos.sum())
+    sim = cartera.simular_indexado(flujos, h[ticker])
+    if sim.empty:
+        return
+    valor_idx = float(sim.valor.iloc[-1])
+    hoy = pd.Timestamp.today().normalize()
+    flujos_cubiertos = flujos[pd.to_datetime(flujos.index) >= h[ticker].dropna().index[0]]
+    tir_real = cartera.xirr(flujos, valor_real, hoy)
+    tir_idx = cartera.xirr(flujos_cubiertos, valor_idx, hoy)
+
+    m = st.columns(3)
+    m[0].metric("Tu cartera hoy", eur(valor_real), f"TIR {pct(tir_real)} al año", delta_color="off")
+    m[1].metric(f"Todo en {ticker}", eur(valor_idx), f"TIR {pct(tir_idx)} al año", delta_color="off")
+    dif = valor_real - valor_idx
+    m[2].metric("Diferencia", eur(dif), "a tu favor" if dif >= 0 else "a favor del indexado",
+                delta_color="normal" if dif >= 0 else "inverse")
+
+    rec = reconstruccion(pesos, marca_datos(), incluir_plan)
+    fig = go.Figure()
+    if not rec.empty:
+        r = rec[rec.index >= sim.index[0]]
+        fig.add_scatter(x=r.index, y=r.valor, name="Tu cartera", line=dict(color=VERDE, width=2))
+    fig.add_scatter(x=sim.index, y=sim.valor, name=f"Todo en {ticker}", line=dict(color=TINTA, width=2))
+    fig.add_scatter(x=sim.index, y=sim.aportado, name="Dinero aportado", line=dict(color=GRIS, width=1, dash="dot"))
+    fig.update_layout(height=360, margin=dict(l=10, r=10, t=10, b=10), legend=dict(orientation="h"),
+                      plot_bgcolor="rgba(0,0,0,0)", hovermode="x unified")
+    st.plotly_chart(fig, width="stretch")
+    st.caption("Simula que cada euro que has aportado (y cada venta) hubiera ido al indexado ese mismo día. Así se "
+               "compara lo que has elegido, con independencia de cuándo aportaste. La TIR es tu rentabilidad anual "
+               "real teniendo en cuenta las fechas de cada aportación. No incluye el efectivo"
+               + ("; sí el plan de pensiones." if incluir_plan else ".") +
+               " La línea de tu cartera es la estimación día a día de «Resultado por mes».")
+
+
+def leer_objetivo_reparto() -> pd.Series | None:
+    f = RAIZ / "config" / "objetivo_reparto.csv"
+    if not f.exists():
+        return None
+    df = pd.read_csv(f)
+    return df.set_index("grupo")["objetivo"].reindex(cartera.GRUPOS).fillna(0)
+
+
+def seccion_rebalanceo(val: pd.DataFrame, media_12m: float):
+    st.subheader("¿Dónde meto la siguiente aportación?")
+    base = val if incluir_plan else val[val.plataforma != "MyInvestor (plan)"]
+    filas, _ = cartera.desglose(base, instrumentos, perfiles, 0.0)
+    grupos = cartera.reparto_por_grupo(filas)
+    if grupos.empty:
+        st.caption("Sin posiciones para calcular el reparto.")
+        return
+    actual = grupos.groupby("grupo").valor.sum().reindex(cartera.GRUPOS).fillna(0)
+    total = actual.sum()
+
+    guardado = leer_objetivo_reparto()
+    if guardado is None:
+        # Primera vez: propone tu reparto actual redondeado a múltiplos de 5 %
+        propuesta = (actual / total * 20).round() * 5
+        propuesta.iloc[0] += 100 - propuesta.sum()
+        guardado = propuesta
+        st.info("Define tu reparto objetivo. De momento te propongo el actual redondeado: cámbialo y pulsa «Guardar objetivo».")
+
+    c1, c2 = st.columns([3, 2])
+    with c1:
+        editor = st.data_editor(pd.DataFrame({"grupo": cartera.GRUPOS, "objetivo": guardado.values}),
+                                hide_index=True, width="stretch", disabled=["grupo"], key="editor_objetivo",
+                                column_config={"objetivo": st.column_config.NumberColumn("objetivo %", min_value=0,
+                                                                                         max_value=100, step=1)})
+        suma = editor.objetivo.sum()
+        if abs(suma - 100) > 0.01:
+            st.warning(f"El objetivo suma {suma:.0f} %: se reparte en proporción hasta que sume 100.")
+        if st.button("Guardar objetivo"):
+            contenido = editor.to_csv(index=False).encode("utf-8")
+            (RAIZ / "config" / "objetivo_reparto.csv").write_bytes(contenido)
+            if almacen.configurado(st.secrets):
+                ok, det = almacen.subir(st.secrets, "config/objetivo_reparto.csv", contenido, "Objetivo de reparto")
+                st.success("Guardado en GitHub.") if ok else st.error(f"No se ha guardado en GitHub. {det}")
+            else:
+                st.info("Guardado mientras la app siga encendida.")
+    with c2:
+        aportacion = st.number_input("¿Cuánto vas a aportar? (€)", min_value=0.0,
+                                     value=float(max(50, round(media_12m / 50) * 50)), step=50.0,
+                                     help="Por defecto, tu aportación media de los últimos 12 meses.")
+
+    objetivo = editor.set_index("grupo").objetivo.reindex(cartera.GRUPOS).fillna(0)
+    reparto = cartera.repartir_aportacion(actual, objetivo, aportacion)
+
+    # Vehículo sugerido en cada grupo: tu posición más grande que no esté «caliente»
+    cat = instrumentos.set_index("clave")
+    vehiculos = {}
+    for g, sub in grupos.groupby("grupo"):
+        for clave in sub.groupby("clave").valor.sum().sort_values(ascending=False).index:
+            ref, _, _ = referencia_de(clave, cat)
+            sen = mercado.señales(hist[ref]) if ref and ref in hist.columns else {}
+            caliente = sen and mercado.señal_venta(sen.get("puntos venta", 0)) == "Recoger beneficios"
+            if not caliente:
+                nombre = cat.loc[clave, "nombre"] if clave in cat.index else sub[sub.clave == clave].nombre.iloc[0]
+                vehiculos[g] = (nombre, sen.get("señal", "—") if sen else "—")
+                break
+
+    obj_pct = objetivo / objetivo.sum() if objetivo.sum() else objetivo
+    tabla = pd.DataFrame({
+        "grupo": cartera.GRUPOS, "actual": actual.values, "actual_pct": (actual / total).values,
+        "objetivo_pct": obj_pct.values, "aportar": reparto.reindex(cartera.GRUPOS).fillna(0).values})
+    tabla["despues_pct"] = (tabla.actual + tabla.aportar) / (total + aportacion)
+    tabla["con qué"] = tabla.grupo.map(lambda g: vehiculos.get(g, ("—", ""))[0])
+    tabla["señal"] = tabla.grupo.map(lambda g: vehiculos.get(g, ("", "—"))[1])
+    tabla = tabla[(tabla.actual > 0) | (tabla.objetivo_pct > 0)]
+    pct0 = lambda x: f"{x * 100:.1f} %".replace(".", ",")
+    st.dataframe(tabla.style.format({"actual": lambda x: eur(x), "actual_pct": pct0, "objetivo_pct": pct0,
+                                     "aportar": lambda x: eur(x), "despues_pct": pct0}),
+                 hide_index=True, width="stretch", column_config={
+                     "actual_pct": st.column_config.Column("ahora"), "objetivo_pct": st.column_config.Column("objetivo"),
+                     "aportar": st.column_config.Column("aportar"), "despues_pct": st.column_config.Column("después")})
+
+    fig = go.Figure()
+    fig.add_bar(x=tabla.grupo, y=tabla.actual_pct, name="Ahora", marker_color=GRIS)
+    fig.add_bar(x=tabla.grupo, y=tabla.objetivo_pct, name="Objetivo", marker_color=VERDE)
+    fig.update_layout(barmode="group", height=280, margin=dict(l=10, r=10, t=10, b=10),
+                      yaxis=dict(tickformat=".0%"), legend=dict(orientation="h"), plot_bgcolor="rgba(0,0,0,0)")
+    st.plotly_chart(fig, width="stretch")
+    st.caption("Reparte la aportación entre los grupos que están por debajo de su objetivo, sin vender nada. "
+               "«Con qué» propone tu posición más grande de cada grupo, saltándose las que están en «Recoger "
+               "beneficios». Los fondos con varias regiones se reparten entre desarrollados y emergentes según "
+               "config/perfiles.csv. No incluye el efectivo.")
+
+
+def pestaña_aportaciones(patrimonio: float, val: pd.DataFrame):
     m = cartera.aportaciones_mensuales(tr, mi)
     if m.empty:
         st.info("Sube tus movimientos para ver las aportaciones.")
         return
     medias = cartera.medias_aportacion(m)
+    seccion_rebalanceo(val, float(medias.set_index("periodo").loc["12 meses", "neto_mes"]))
+    st.divider()
     st.subheader("Aportación media al mes")
     st.caption("«Compras» suma todo lo invertido; «neto» resta las ventas. Una venta y su reinversión "
                "en otra plataforma meses después afean las medias cortas: mira las de 12 meses o más.")
