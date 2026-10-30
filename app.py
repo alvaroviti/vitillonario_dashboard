@@ -70,9 +70,12 @@ def cargar(_marca: float):
     perfiles, avisos_perfiles = cartera.leer_perfiles(RAIZ / "config" / "perfiles.csv")
     f_seg = RAIZ / "config" / "seguimiento.csv"
     seguimiento = pd.read_csv(f_seg) if f_seg.exists() else pd.DataFrame(columns=["ticker", "nombre", "moneda"])
+    f_map = RAIZ / "config" / "mapeo_myinvestor.csv"
+    mapeo_mi = pd.read_csv(f_map) if f_map.exists() else pd.DataFrame(columns=["patron", "clave"])
     f_uni = RAIZ / "config" / "universo.csv"
     universo = pd.read_csv(f_uni) if f_uni.exists() else pd.DataFrame(columns=["ticker", "nombre", "categoria"])
-    return tr, mi, avisos_mi + avisos_perfiles, pos_mi, instrumentos, fiscal_manual, perfiles, seguimiento, universo
+    return (tr, mi, avisos_mi + avisos_perfiles, pos_mi, instrumentos, fiscal_manual, perfiles, seguimiento,
+            universo, mapeo_mi)
 
 
 @st.cache_data(ttl=3600, show_spinner="Descargando históricos de 5 años…")
@@ -137,16 +140,47 @@ with st.sidebar:
                        ". Sin GitHub configurado, se perderán si la app se reinicia."))
         cargar.clear()
 
-tr, mi, avisos_mi, pos_mi, instrumentos, fiscal_manual, perfiles, seguimiento, universo = cargar(marca_datos())
+(tr, mi, avisos_mi, pos_mi, instrumentos, fiscal_manual, perfiles, seguimiento,
+ universo, mapeo_mi) = cargar(marca_datos())
 ventas_tr, abiertas_tr, avisos_fifo = cartera.fifo_tr(tr) if not tr.empty else (pd.DataFrame(), pd.DataFrame(), [])
-pos = cartera.posiciones(abiertas_tr, pos_mi, mi, instrumentos)
+pos_base = cartera.posiciones(abiertas_tr, pos_mi, mi, instrumentos)
+pos, movs_mi = pos_base, pd.DataFrame()
 
 tickers_mercado = (set(instrumentos.ticker.dropna()) | set(instrumentos.proxy.dropna()) | set(mercado.FX.values())
                    | set(seguimiento.ticker.dropna()))
 hist = historico(tuple(sorted(tickers_mercado)))
 
 
+def precio_en_fecha(clave: str, fecha) -> tuple[float | None, str]:
+    """Precio en euros de un activo de MyInvestor en una fecha pasada (para estimar participaciones)."""
+    cat = instrumentos.set_index("clave")
+    if clave not in cat.index or hist.empty:
+        return None, "sin precio de mercado"
+    ref, moneda, equivalente = referencia_de(clave, cat)
+    if not ref:
+        return None, "sin precio de mercado"
+    serie = mercado.serie_eur(ref, moneda if not equivalente else "EUR", hist)
+    if serie is None:
+        return None, "sin precio de mercado"
+    hasta = serie[serie.index <= pd.Timestamp(fecha) + pd.Timedelta(days=1)]
+    if hasta.empty:
+        return None, "sin precio de mercado"
+    if not equivalente:
+        return float(hasta.iloc[-1]), f"valor liquidativo ({ref})"
+    # Con equivalente: precio de la foto × variación del equivalente entre la foto y la fecha
+    foto = pos_mi[pos_mi.clave == clave]
+    if foto.empty:
+        return None, "sin foto de referencia"
+    base = serie[serie.index <= foto.fecha.iloc[0] + pd.Timedelta(days=1)]
+    if base.empty:
+        return None, "sin precio de mercado"
+    return float(foto.precio.iloc[0] * hasta.iloc[-1] / base.iloc[-1]), f"estimado con {ref}"
+
+
 def pintar():
+    global pos, movs_mi
+    movs_mi = cartera.movimientos_tras_foto(pos_mi, mi, mapeo_mi, precio_en_fecha)
+    pos = cartera.completar_nombres(cartera.aplicar_movimientos(pos_base, movs_mi), instrumentos)
     intr = intradia(tuple(sorted(tickers_mercado)))
     ult = mercado.ultimos_de(intr)
     precios = mercado.precios_actuales(pos, instrumentos, hist, ult)
@@ -1131,6 +1165,17 @@ def pestaña_datos(val: pd.DataFrame):
         st.warning(f"El ticker {t} ({clave}) da un precio un {abs(ratio - 1) * 100:.0f} % distinto del de tus extractos: "
                    "probablemente sea otra clase del fondo u otra moneda. Se usa el equivalente hasta que lo corrijas "
                    "en config/instrumentos.csv.")
+    if not movs_mi.empty:
+        st.markdown("**MyInvestor: movimientos posteriores a la foto**")
+        st.caption("Las participaciones se estiman con el valor liquidativo del día. Cuando subas una foto nueva, "
+                   "estos movimientos pasan a estar incluidos en ella y la estimación se reinicia.")
+        st.dataframe(movs_mi[["fecha", "concepto", "importe", "precio", "titulos", "metodo"]], hide_index=True,
+                     width="stretch", column_config={
+                         "fecha": st.column_config.DateColumn(format="DD/MM/YYYY"),
+                         "importe": st.column_config.NumberColumn(format="%.2f €"),
+                         "precio": st.column_config.NumberColumn("precio usado", format="%.4f"),
+                         "titulos": st.column_config.NumberColumn("participaciones estimadas", format="%.4f"),
+                         "metodo": st.column_config.Column("cómo")})
     st.markdown("**Cómo se valora cada posición**")
     cat = instrumentos.set_index("clave")
     diag = val[["clave", "nombre_corto", "plataforma", "fuente", "precio"]].drop_duplicates("clave").copy()

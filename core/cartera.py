@@ -113,19 +113,16 @@ def posiciones(tr_abiertas: pd.DataFrame, pos_mi: pd.DataFrame, mi: pd.DataFrame
         p = pos_mi.rename(columns={"precio": "precio_ref", "fecha": "fecha_ref"})
         p["plataforma"] = np.where(p["cuenta"] == "pensiones", "MyInvestor (plan)", "MyInvestor")
         partes.append(p[["plataforma", "clave", "nombre", "titulos", "coste", "precio_ref", "fecha_ref"]])
-        # Compras posteriores a la foto: se valoran a coste hasta subir una foto nueva
-        fecha_foto = pos_mi["fecha"].max()
-        nuevas = mi[(mi.fecha > fecha_foto) & mi.tipo.isin(
-            ["SUSCRIPCION IIC", "COMPRA RV CONTADO", "APORTACION PLANES"])] if not mi.empty else mi
-        for r in nuevas.itertuples():
-            partes.append(pd.DataFrame([dict(plataforma="MyInvestor", clave=f"PEND_{r.concepto}",
-                                             nombre=f"{r.concepto} (pendiente de foto)", titulos=np.nan,
-                                             coste=-r.importe, precio_ref=np.nan, fecha_ref=r.fecha)]))
+        # Lo comprado o vendido después de la foto se añade luego con aplicar_movimientos()
     if not partes:
         return pd.DataFrame()
-    df = pd.concat(partes, ignore_index=True)
+    return completar_nombres(pd.concat(partes, ignore_index=True), instrumentos)
+
+
+def completar_nombres(df: pd.DataFrame, instrumentos: pd.DataFrame) -> pd.DataFrame:
     cat = instrumentos.set_index("clave")
-    df["tipo"] = df["clave"].map(cat["tipo"]).fillna(df.get("clase", pd.Series(dtype=str)).str.lower())
+    clase = df["clase"].str.lower() if "clase" in df else pd.Series(index=df.index, dtype=object)
+    df["tipo"] = df["clave"].map(cat["tipo"]).fillna(clase)
     df["nombre_corto"] = df["clave"].map(cat["nombre"]).fillna(df["nombre"])
     return df
 
@@ -446,3 +443,87 @@ def resumen_anual(mensual: pd.DataFrame, hoy: pd.Timestamp | None = None) -> pd.
                           rentabilidad_suma=r.sum(), rentabilidad_encadenada=(1 + r).prod() - 1,
                           promedio_mes=m["beneficio"].sum() / meses, valor_final=m["valor"].iloc[-1]))
     return pd.DataFrame(filas)
+
+
+# --------------------------------------------------------------------------- #
+# MyInvestor: participaciones estimadas de lo comprado o vendido después de la foto
+# --------------------------------------------------------------------------- #
+def clave_de_concepto(concepto: str, mapeo: pd.DataFrame) -> str | None:
+    texto = (concepto or "").upper()
+    for r in mapeo.itertuples():
+        if r.patron.upper() in texto:
+            return r.clave
+    return None
+
+
+def _titulos_del_concepto(concepto: str) -> float | None:
+    """En las compras de ETFs el extracto pone «NOMBRE @ N» con N títulos enteros."""
+    import re
+    m = re.search(r"@\s*(\d+)\s*$", concepto or "")
+    return float(m.group(1)) if m else None
+
+
+def movimientos_tras_foto(pos_mi: pd.DataFrame, mi: pd.DataFrame, mapeo: pd.DataFrame,
+                          precio_en_fecha) -> pd.DataFrame:
+    """Una fila por movimiento de MyInvestor posterior a la foto, con participaciones estimadas.
+
+    precio_en_fecha(clave, fecha) -> (precio, método) o (None, motivo).
+    """
+    if pos_mi.empty or mi.empty:
+        return pd.DataFrame()
+    fecha_foto = pos_mi["fecha"].max()
+    tipos = MI_COMPRAS + MI_VENTAS
+    nuevos = mi[(mi.fecha > fecha_foto) & mi.tipo.isin(tipos)]
+    filas = []
+    for r in nuevos.itertuples():
+        clave = clave_de_concepto(r.concepto, mapeo)
+        venta = r.tipo in MI_VENTAS
+        importe = abs(r.importe)
+        precio, metodo = precio_en_fecha(clave, r.fecha) if clave else (None, "fondo sin identificar")
+        titulos = None
+        if r.tipo == "COMPRA RV CONTADO":
+            titulos = _titulos_del_concepto(r.concepto)
+            if titulos:
+                metodo = "títulos del extracto"
+        if titulos is None and precio:
+            titulos = importe / precio
+        filas.append(dict(fecha=r.fecha, concepto=r.concepto, tipo=r.tipo, clave=clave, importe=importe,
+                          venta=venta, precio=precio, titulos=titulos, metodo=metodo))
+    return pd.DataFrame(filas)
+
+
+def aplicar_movimientos(pos: pd.DataFrame, movs: pd.DataFrame) -> pd.DataFrame:
+    """Suma las compras (y resta las ventas) estimadas a las posiciones. Lo que no se puede
+    estimar queda como «pendiente de foto», valorado a coste."""
+    if movs.empty:
+        return pos
+    pos = pos.copy()
+    extra = []
+    for m in movs.sort_values("fecha").itertuples():
+        es_plan = m.clave == "MI_PP_GLOBAL"
+        plataforma = "MyInvestor (plan)" if es_plan else "MyInvestor"
+        if m.titulos is None or pd.isna(m.titulos) or m.clave is None:
+            if not m.venta:
+                extra.append(dict(plataforma=plataforma, clave=f"PEND_{m.concepto}", nombre=f"{m.concepto} (pendiente de foto)",
+                                  titulos=np.nan, coste=m.importe, precio_ref=np.nan, fecha_ref=m.fecha))
+            continue
+        filas_clave = pos.index[(pos.clave == m.clave) & pos.titulos.notna()]
+        if m.venta:
+            tit_total = pos.loc[filas_clave, "titulos"].sum()
+            if tit_total <= 0:
+                continue
+            fraccion = min(1.0, m.titulos / tit_total)
+            pos.loc[filas_clave, "coste"] *= (1 - fraccion)
+            pos.loc[filas_clave, "titulos"] *= (1 - fraccion)
+        else:
+            nombre = pos.loc[filas_clave, "nombre"].iloc[0] if len(filas_clave) else m.concepto
+            extra.append(dict(plataforma=plataforma, clave=m.clave, nombre=nombre, titulos=m.titulos,
+                              coste=m.importe, precio_ref=m.precio if m.precio else m.importe / m.titulos,
+                              fecha_ref=m.fecha))
+    if extra:
+        nuevas = pd.DataFrame(extra)
+        for c in pos.columns:
+            if c not in nuevas.columns:
+                nuevas[c] = np.nan
+        pos = pd.concat([pos, nuevas[pos.columns]], ignore_index=True)
+    return pos
