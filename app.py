@@ -341,7 +341,7 @@ def pestaña_ranking(val: pd.DataFrame):
     p_sin = lambda x: f"{x * 100:.1f} %".replace(".", ",") if pd.notna(x) else "—"
     formatos = {"rentabilidad": p, "anualizada": p, "volatilidad": p_sin, "peor_caida": p,
                 "rent_riesgo": lambda x: f"{x:.2f}".replace(".", ",") if pd.notna(x) else "—"}
-    columnas = {"anualizada": st.column_config.Column("anual"), "rentabilidad": st.column_config.Column(f"total {periodo}"),
+    columnas = {"nombre": st.column_config.Column(pinned=True), "anualizada": st.column_config.Column("anual"), "rentabilidad": st.column_config.Column(f"total {periodo}"),
                 "peor_caida": st.column_config.Column("peor caída"), "rent_riesgo": st.column_config.Column(
                     "rentab./riesgo", help="Rentabilidad anual entre volatilidad: cuánto has ganado por cada unidad de sustos.")}
     orden_cols = ["nombre", "categoria", "tuyo", "anualizada", "rentabilidad", "volatilidad", "peor_caida", "rent_riesgo", "ticker"]
@@ -462,6 +462,7 @@ def pestaña_hoy(val: pd.DataFrame, intr: pd.DataFrame):
               .apply(lambda _: colores, axis=None, subset=variaciones)
               .map(color, subset=["ganancia", "ganancia_pct", "hoy_eur"]))
     st.dataframe(estilo, hide_index=True, width="stretch", height=min(40 + 35 * len(vista), 640), column_config={
+        "activo": st.column_config.Column(pinned=True),
         "var_dia": st.column_config.Column("hoy"), "var_semana": st.column_config.Column("semana"),
         "var_mes": st.column_config.Column("mes"), "var_largo": st.column_config.Column("12 meses" if doce else "año"),
         "peso": st.column_config.Column("% cartera"), "ganancia_pct": st.column_config.Column("ganancia %"),
@@ -644,6 +645,7 @@ def pestaña_mercado(val: pd.DataFrame, ult: pd.Series, intr: pd.DataFrame, efec
     formatos.update({"en_cartera": lambda x: eur(x), "RSI 14": "{:.0f}"})
     estilo = vista.style.format(formatos, na_rep="—")  # una sola llamada: una segunda borraría la primera
     st.dataframe(estilo, hide_index=True, width="stretch", column_config={
+        "activo": st.column_config.Column(pinned=True),
         "en_cartera": st.column_config.Column("en cartera"),
         "peso": st.column_config.Column("% cartera"),
         "puntos": st.column_config.ProgressColumn("puntos compra", min_value=0, max_value=9, format="%d"),
