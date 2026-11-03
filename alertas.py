@@ -40,6 +40,15 @@ def h(texto: str) -> str:
     return str(texto).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 
+PUNTOS_MAX = 9  # máximo posible de la señal de compra
+
+
+def barra(puntos: float, maximo: int = PUNTOS_MAX) -> str:
+    """Barra de nivel: ▰▰▰▰▱▱▱▱▱ 4/9"""
+    lleno = int(round(min(max(puntos, 0), maximo)))
+    return "▰" * lleno + "▱" * (maximo - lleno) + f" {lleno}/{maximo}"
+
+
 def eur(x: float) -> str:
     return f"{x:,.0f} €".replace(",", ".")
 
@@ -102,9 +111,18 @@ def main() -> None:
     val = val[val.valor > 0.5]
 
     # ------------------------------------------------------------- señales que cambian hoy
-    avisos_compra, avisos_venta = [], []
+    avisos_compra, avisos_venta, oportunidades = [], [], []
     pesos = val.groupby("clave").valor.sum()
     vistas = set()
+    # Tus posiciones (de más a menos peso) y después tus valores en seguimiento
+    seguimiento = pd.read_csv(RAIZ / "config" / "seguimiento.csv") if (RAIZ / "config" / "seguimiento.csv").exists() \
+        else pd.DataFrame(columns=["ticker", "nombre", "moneda"])
+    if not seguimiento.empty:
+        extra = sorted(set(seguimiento.ticker.dropna()) - set(hist.columns))
+        if extra:
+            h_seg = mercado.descargar_historico(extra, "5y")
+            if not h_seg.empty:
+                hist = hist.join(h_seg, how="outer")
     for clave in pesos.sort_values(ascending=False).index:
         # Monetarios y renta fija suben casi en línea recta: siempre parecerían «en máximos»
         if clave in cat.index and cat.loc[clave, "tipo"] in SIN_SEÑALES:
@@ -121,12 +139,33 @@ def main() -> None:
         if not hoy or not ayer:
             continue
         nombre = cat.loc[clave, "nombre"] if clave in cat.index else clave
-        if hoy["señal"] == "Zona de compra" and ayer["señal"] != "Zona de compra":
-            avisos_compra.append(f"• {h(nombre)}: {h(hoy['motivos'])}")
+        nueva = hoy["señal"] == "Zona de compra" and ayer["señal"] != "Zona de compra"
+        if nueva:
+            avisos_compra.append(nombre)
+        if hoy["señal"] in ("Zona de compra", "Vigilar"):
+            oportunidades.append(dict(nombre=nombre, puntos=hoy["puntos"], señal=hoy["señal"],
+                                      motivos=hoy["motivos"], nueva=nueva, tuyo=True))
         venta_hoy = mercado.señal_venta(hoy["puntos venta"])
         venta_ayer = mercado.señal_venta(ayer["puntos venta"])
         if venta_hoy == "Recoger beneficios" and venta_ayer != "Recoger beneficios":
-            avisos_venta.append(f"• {h(nombre)}: {h(', '.join(hoy['motivos venta']))}")
+            avisos_venta.append(f"• <b>{h(nombre)}</b>\n   {h(', '.join(hoy['motivos venta']))}")
+
+    for r in seguimiento.itertuples():
+        if r.ticker not in hist.columns or r.ticker in vistas:
+            continue
+        serie = hist[r.ticker].dropna()
+        if len(serie) < 60:
+            continue
+        hoy = mercado.señales(serie, float(ult[r.ticker]) if r.ticker in ult.index else None)
+        ayer = mercado.señales(serie.iloc[:-1])
+        if not hoy or not ayer:
+            continue
+        nueva = hoy["señal"] == "Zona de compra" and ayer["señal"] != "Zona de compra"
+        if nueva:
+            avisos_compra.append(f"{r.nombre} (seguimiento)")
+        if hoy["señal"] in ("Zona de compra", "Vigilar"):
+            oportunidades.append(dict(nombre=f"{r.nombre} (seguimiento)", puntos=hoy["puntos"], señal=hoy["señal"],
+                                      motivos=hoy["motivos"], nueva=nueva, tuyo=False))
 
     # ------------------------------------------------------------- evolución de la cartera
     refs = {}
@@ -149,7 +188,7 @@ def main() -> None:
     hoy_fecha = pd.Timestamp.today()
     partes = []
     if avisos_compra:
-        partes.append("🟢 <b>Entran en zona de compra</b>\n" + "\n".join(avisos_compra))
+        partes.append("🆕 <b>Entran hoy en zona de compra</b>\n" + "\n".join(f"• {h(n)}" for n in avisos_compra))
     if avisos_venta:
         partes.append("🟠 <b>Entran en zona de recoger beneficios</b>\n" + "\n".join(avisos_venta))
     if not np.isnan(semana) and semana <= -UMBRAL_CAIDA:
@@ -171,6 +210,21 @@ def main() -> None:
     if not partes:
         print("Nada que avisar hoy.")
         return
+    if oportunidades:
+        ops = sorted(oportunidades, key=lambda o: (-o["puntos"], o["nombre"]))
+        zona = [o for o in ops if o["señal"] == "Zona de compra"]
+        vigilar = [o for o in ops if o["señal"] == "Vigilar"]
+        bloque = []
+        if zona:
+            bloque.append("🟢 <b>En zona de compra</b>")
+            for o in zona:
+                bloque.append(f"{'🆕 ' if o['nueva'] else ''}<b>{h(o['nombre'])}</b>\n"
+                              f"<code>{barra(o['puntos'])}</code>\n   {h(o['motivos'])}")
+        if vigilar:
+            bloque.append("🟡 <b>Para vigilar</b>")
+            for o in vigilar:
+                bloque.append(f"{h(o['nombre'])}\n<code>{barra(o['puntos'])}</code>")
+        partes.insert(1 if avisos_compra else 0, "\n\n".join(bloque))
     mensaje = "<b>Vitillonario</b>\n\n" + "\n\n".join(partes)
     enviar(mensaje)
 
